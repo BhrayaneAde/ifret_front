@@ -48,7 +48,7 @@ class _LoginState extends State<Login> {
       body: Container(
         constraints: const BoxConstraints.expand(),
         decoration: BoxDecoration(
-          image: DecorationImage(
+          image: const DecorationImage(
             image: AssetImage('assets/images/aaaa.png'),
             fit: BoxFit.cover,
           ),
@@ -61,13 +61,13 @@ class _LoginState extends State<Login> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 18,
                   ),
                   Container(
                     width: 200,
                     height: 200,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                     ),
                     child: Transform.scale(
@@ -88,7 +88,7 @@ class _LoginState extends State<Login> {
                       color: Color(0xFFFCCE00),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 28,
                   ),
                   Container(
@@ -116,7 +116,7 @@ class _LoginState extends State<Login> {
                                         value: country,
                                         child: Text(
                                           country,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Color(0xFFFCCE00),
                                           ),
                                         ),
@@ -146,14 +146,14 @@ class _LoginState extends State<Login> {
                                         }
                                         return null;
                                       },
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         color: Colors.white,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 22,
                               ),
                               SizedBox(
@@ -188,7 +188,7 @@ class _LoginState extends State<Login> {
                                   style: ButtonStyle(
                                     backgroundColor:
                                         MaterialStateProperty.all<Color>(
-                                      Color(0xFFFCCE00),
+                                      const Color(0xFFFCCE00),
                                     ),
                                     shape: MaterialStateProperty.all<
                                         RoundedRectangleBorder>(
@@ -254,7 +254,7 @@ class _LoginState extends State<Login> {
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width,
         ),
-        color: Color(0xFF222222),
+        color: const Color(0xFF222222),
         padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
