@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "715224923360",
+    "project_id": "ifret-39a7b",
+    "storage_bucket": "ifret-39a7b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:715224923360:android:e182579772de50a3fde485",
+        "android_client_info": {
+          "package_name": "com.ilt.ifret"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRZhHCRx9y3ycHRKy3WiVpdx2by2NHovg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
