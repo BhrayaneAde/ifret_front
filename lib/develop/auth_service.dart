@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:ifret/develop/login.dart';
 import 'package:ifret/develop/register.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String verifyId = "";
 
-  // Méthode pour envoyer le code de vérification pour l'enregistrement
   Future<void> sendVerificationCodeForRegistration(
       String selectedCountry, String phoneNumber) async {
     try {
@@ -81,6 +79,7 @@ class AuthService {
     }
   }  */ /*  */
   Future<bool> signWithCode(String code) async {
+    print("l'id de vérification : $verifyId");
     bool isConnected = false;
     FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
     final cred =

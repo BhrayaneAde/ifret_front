@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     _controller = YoutubePlayerController(
       initialVideoId: 'u8H652UY-L8', // ID de la vidéo YouTube
-      flags: YoutubePlayerFlags(
+      flags: const YoutubePlayerFlags(
         mute: false,
         autoPlay: true,
         disableDragSeek: false,
@@ -138,7 +138,7 @@ class _SplashScreenState extends State<SplashScreen> {
         },
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all<Color>(
-            Color(0xFFFCCE00),
+            const Color(0xFFFCCE00),
           ),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(

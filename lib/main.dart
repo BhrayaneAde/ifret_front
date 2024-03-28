@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:ifret/composant/Transporteurs/accueilTransporteur.dart';
+import 'package:ifret/develop/auth/login_screen.dart';
 import 'package:ifret/develop/login.dart';
 import 'package:ifret/develop/phone.dart';
 
@@ -30,13 +32,14 @@ class MyApp extends StatelessWidget {
       routes: {
         '/splash': (context) => const SplashScreen(),
         '/phone': (context) => const MyPhone(),
-        '/login': (context) => Login(),
+        '/login': (context) => const LoginScreen(),
         '/transporteur': (context) => Transporteurs(
               name: '',
               profileUrl: '',
               username: '',
             ),
       },
+      builder: EasyLoading.init(),
     );
   }
 }

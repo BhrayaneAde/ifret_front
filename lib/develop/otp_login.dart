@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ifret/api/api_request.dart';
-import 'package:ifret/api/dio.dart';
 import 'package:ifret/composant/Chargeurs/accueilChargeur.dart';
 import 'package:ifret/composant/Chauffeurs/accueilChauffeur.dart';
 import 'package:ifret/composant/Transporteurs/accueilTransporteur.dart';
@@ -28,8 +27,10 @@ class Otp_login extends StatefulWidget {
 
 class _Otp_loginState extends State<Otp_login> {
   final FirebaseAuth auth = FirebaseAuth.instance;
-  late String code = "";
+
   TextEditingController countryController = TextEditingController();
+  TextEditingController _codeController = TextEditingController();
+
   var phone = "";
 
   bool isCodeValid = false;
@@ -40,6 +41,12 @@ class _Otp_loginState extends State<Otp_login> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    countryController.dispose();
+    _codeController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(
@@ -74,17 +81,17 @@ class _Otp_loginState extends State<Otp_login> {
         alignment: Alignment.center,
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 18,
                   ),
                   Container(
                     width: 200,
                     height: 200,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
@@ -92,7 +99,7 @@ class _Otp_loginState extends State<Otp_login> {
                       'assets/images/2.png',
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 24,
                   ),
                   const Text(
@@ -103,10 +110,10 @@ class _Otp_loginState extends State<Otp_login> {
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Text(
+                  const Text(
                     "Veuillez entrer le code envoyé au numéro ** ** ** ** ",
                     style: TextStyle(
                       fontSize: 12,
@@ -127,6 +134,7 @@ class _Otp_loginState extends State<Otp_login> {
                           height: 30,
                         ),
                         Pinput(
+                          controller: _codeController,
                           defaultPinTheme: defaultPinTheme,
                           focusedPinTheme: focusedPinTheme,
                           submittedPinTheme: submittedPinTheme,
@@ -134,12 +142,11 @@ class _Otp_loginState extends State<Otp_login> {
                           showCursor: true,
                           onChanged: (value) {
                             setState(() {
-                              code = value;
                               isCodeValid = value.length == 6;
                             });
                           },
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 30,
                         ),
                         SizedBox(
@@ -164,7 +171,7 @@ class _Otp_loginState extends State<Otp_login> {
                             },
                             style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all<Color>(
-                                  Color(0xFFFCCE00)),
+                                  const Color(0xFFFCCE00)),
                               shape: MaterialStateProperty.all<
                                   RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
@@ -176,8 +183,11 @@ class _Otp_loginState extends State<Otp_login> {
                               padding: EdgeInsets.all(14.0),
                               child: Text(
                                 "Verifier Numéro de Téléphone",
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 16, color: Colors.black),
+                                    fontSize: 16, color: Colors.black,
+
+                                ),
                               ),
                             ),
                           ),
@@ -218,9 +228,9 @@ class _Otp_loginState extends State<Otp_login> {
   }
 
   Future<void> submitVerificationCodeLogin() async {
+    print(_codeController.text);
     try {
-      print(code);
-      bool isConnected = await AuthService().signWithCode(code);
+      bool isConnected = await AuthService().signWithCode(_codeController.text);
       if (isConnected) {
         print("User login");
         // Redirection vers la page souhaitée après la vérification réussie du code OTP
