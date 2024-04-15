@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_echarts/flutter_echarts.dart';
+import 'package:ifret/composant/Transporteurs/profilTransporteur.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'dart:math' as math;
 
@@ -98,7 +99,7 @@ class _TransporteursState extends State<Transporteurs> {
   Widget _getBody() {
     switch (_currentIndex) {
       case 0:
-        return Home();
+        return ProfilTransporteur();
       case 1:
         return EnregistrementPage();
       case 2:

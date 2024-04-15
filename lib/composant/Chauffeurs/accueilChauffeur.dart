@@ -1,16 +1,22 @@
 import 'dart:io';
+import 'dart:math';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:ifret/api/api_request.dart';
+import 'package:ifret/composant/Chauffeurs/profilChauffeur.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'package:intl/intl.dart';
 
 class Chauffeur extends StatefulWidget {
   final String name;
-  final String profileUrl;
+  final String ParametreeUrl;
   final String username;
 
   Chauffeur({
     required this.name,
-    required this.profileUrl,
+    required this.ParametreeUrl,
     required this.username,
   });
 
@@ -38,8 +44,8 @@ class _ChauffeurState extends State<Chauffeur> {
             Colors.black, // Couleur des éléments non sélectionnés
         items: [
           _bottomNavigationBarItem(
-            icon: Icons.home_filled,
-            label: 'Home',
+            icon: Icons.person_outlined,
+            label: 'Profil',
             index: 0,
           ),
           _bottomNavigationBarItem(
@@ -48,8 +54,8 @@ class _ChauffeurState extends State<Chauffeur> {
             index: 1,
           ),
           _bottomNavigationBarItem(
-            icon: Icons.person_outlined,
-            label: 'Profil',
+            icon: Icons.settings,
+            label: 'Parametre',
             index: 2,
           ),
         ],
@@ -72,103 +78,14 @@ class _ChauffeurState extends State<Chauffeur> {
   Widget _getBody() {
     switch (_currentIndex) {
       case 0:
-        return Home();
+        return ProfilChauffeur();
       case 1:
         return Notification();
       case 2:
-        return Profil();
+        return Parametre();
       default:
-        return Container();
+        return Notification();
     }
-  }
-}
-
-class Home extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      /*  appBar: AppBar(
-        title: Text('Home'),
-      ), */
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context),
-          SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    var _currentTabIndex;
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.2,
-      child: Stack(
-        children: [
-          Image.asset(
-            'assets/images/hautTransport.jpg',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-                /*  gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withOpacity(0.7),
-                  Color.fromARGB(255, 248, 134, 3).withOpacity(0.3),
-                ],
-              ), */
-                ),
-            child:
-                SizedBox.expand(), // Pour étendre le dégradé sur toute l'image
-          ),
-          Positioned(
-            left: 16.0,
-            top: 16.0,
-            child: Image.asset(
-              'assets/images/ifret.png', // Chemin de votre image
-              width: 70, // Largeur de l'image
-              height: 70, // Hauteur de l'image
-              fit: BoxFit.cover, // Ajustement de l'image
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 27, bottom: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Bienvenue',
-                    style: TextStyle(
-                      color: Color(0xFFFCCE00),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  /* SizedBox(height: 5), */
-                  Text(
-                    'I-FRET',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -224,36 +141,36 @@ class Notification extends StatelessWidget {
             top: 16.0,
             child: Image.asset(
               'assets/images/ifret.png', // Chemin de votre image
-              width: 70, // Largeur de l'image
-              height: 70, // Hauteur de l'image
+              width: 100, // Largeur de l'image
+              height: 100, // Hauteur de l'image
               fit: BoxFit.cover, // Ajustement de l'image
             ),
           ),
           Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
-              padding: const EdgeInsets.only(left: 27, bottom: 10),
+              padding: const EdgeInsets.only(left: 27, bottom: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Alertes',
+                    'Alertes ',
                     style: TextStyle(
                       color: Color(0xFFFCCE00),
-                      fontSize: 24,
+                      fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   /* SizedBox(height: 5), */
-                  Text(
+                  /*  Text(
                     'fret',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 25,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
+                  ), */
                 ],
               ),
             ),
@@ -299,69 +216,60 @@ class Notification extends StatelessWidget {
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CircleAvatar(
-            radius: 30,
-            child: Image.asset(
-              imagePath,
-              width: 70,
-              height: 70,
-              fit: BoxFit.cover,
+      child: GestureDetector(
+        onTap: () {
+          // Action à effectuer lorsque la colonne est pressée
+          // Par exemple, vous pouvez naviguer vers la page de Parametre de l'utilisateur
+        },
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 30,
+              child: Image.asset(
+                imagePath,
+                width: 70,
+                height: 70,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            SizedBox(width: 20),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  description,
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  date,
-                  style: TextStyle(
-                      fontSize: 10, color: Color.fromARGB(255, 252, 206, 0)),
-                )
-              ],
+                  Text(
+                    description,
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    date,
+                    style: TextStyle(
+                        fontSize: 10, color: Color.fromARGB(255, 252, 206, 0)),
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(width: 20),
-          ElevatedButton(
-            onPressed: () {
-              // Action à effectuer lors du clic sur le bouton "Découvrir"
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFFCCE00),
-            ),
-            child: Text(
-              'Découvrir',
-              style: TextStyle(fontSize: 14, color: Colors.white),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-class Profil extends StatefulWidget {
+class Parametre extends StatefulWidget {
   @override
-  _ProfilState createState() => _ProfilState();
+  _ParametreState createState() => _ParametreState();
 }
 
-class _ProfilState extends State<Profil> {
+class _ParametreState extends State<Parametre> {
   final TextEditingController _numeroPermisController = TextEditingController();
   String _categorieVehicule = 'A1';
   DateTime? _dateOptention;

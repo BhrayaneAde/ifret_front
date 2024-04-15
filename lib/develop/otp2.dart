@@ -242,12 +242,12 @@ class _Otp2State extends State<Otp2> {
         );
 
         final response = await ApiRequest.register(widget.data);
-        print(response?.data.toString());
+        print(response?.toString());
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', response?.data['token']);
+        await prefs.setString('token', response?['token']);
 
-        switch (response?.data["role"]) {
+        switch (response?["role"]) {
           case "Transporteur":
             () => {
                   Navigator.pushReplacement(
@@ -283,7 +283,7 @@ class _Otp2State extends State<Otp2> {
                     MaterialPageRoute(
                       builder: (context) => Chauffeur(
                         name: '',
-                        profileUrl: '',
+                        ParametreeUrl: '',
                         username: '',
                       ),
                     ),

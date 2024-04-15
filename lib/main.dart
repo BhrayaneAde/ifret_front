@@ -1,11 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:ifret/composant/Chargeurs/accueilChargeur.dart';
+import 'package:ifret/composant/Chauffeurs/accueilChauffeur.dart';
 import 'package:ifret/composant/Transporteurs/accueilTransporteur.dart';
 import 'package:ifret/develop/auth/login_screen.dart';
-import 'package:ifret/develop/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ifret/develop/phone.dart';
-
 import 'package:ifret/develop/splash/splash_screen.dart';
 import 'package:ifret/firebase_options.dart';
 
@@ -16,11 +17,27 @@ Future<void> main() async {
   ).then((value) {
     print('initialise_Successfully');
   });
-  runApp(const MyApp());
+
+// Récupérer le jeton et le type de compte depuis les préférences partagées
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('token');
+  String? role = prefs.getString('type_compte');
+
+  print('Token: $token'); // Vérifiez si le jeton est correctement récupéré
+  print('Role: $role'); // Vérifiez si le rôle est correctement récupéré
+
+  // Déterminer la route initiale en fonction de la présence du jeton et du type de compte
+  String initialRoute = token != null && role != null ? '/home' : '/login';
+
+  runApp(MyApp(initialRoute: initialRoute, role: role));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+  final String? role;
+
+  const MyApp({required this.initialRoute, required this.role, Key? key})
+      : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -28,16 +45,38 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'I-FRET',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/splash',
+      initialRoute: initialRoute,
       routes: {
         '/splash': (context) => const SplashScreen(),
         '/phone': (context) => const MyPhone(),
         '/login': (context) => const LoginScreen(),
-        '/transporteur': (context) => Transporteurs(
-              name: '',
-              profileUrl: '',
-              username: '',
-            ),
+        '/home': (context) {
+          // Redirigez l'utilisateur vers la page appropriée en fonction de son type
+          switch (role) {
+            case "Transporteur":
+              return Transporteurs(
+                name: '',
+                profileUrl: '',
+                username: '',
+              );
+            case "Chauffeur":
+              return Chauffeur(
+                name: '',
+                ParametreeUrl: '',
+                username: '',
+              );
+            case "Chargeur":
+              return Chargeur(
+                name: '',
+                profileUrl: '',
+                username: '',
+              );
+            // Ajoutez d'autres cas pour d'autres types d'utilisateurs si nécessaire
+            default:
+              // Redirigez vers la page par défaut si le type d'utilisateur n'est pas reconnu
+              return const LoginScreen();
+          }
+        },
       },
       builder: EasyLoading.init(),
     );

@@ -1,20 +1,13 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart' as dio;
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:ifret/api/api_request.dart';
-import 'package:ifret/composant/Chargeurs/accueilChargeur.dart';
-import 'package:ifret/composant/Chauffeurs/accueilChauffeur.dart';
-import 'package:ifret/composant/Transporteurs/accueilTransporteur.dart';
 import 'package:ifret/develop/auth/register_screen.dart';
 import 'package:pinput/pinput.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../loading.dart';
 
@@ -208,10 +201,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     onPressed: () async {
                                       if (phoneFormKey.currentState!
                                           .validate()) {
-                                        await checkIfUserExistsAndLogin(
-                                            selectedCountry,
-                                            _phoneController.text,
-                                            context);
+                                        String phone =
+                                            '$selectedCountry${_phoneController.text}';
+                                        verifyPhone(phone);
                                       }
                                     },
                                     style: ButtonStyle(
@@ -456,7 +448,7 @@ class _LoginScreenState extends State<LoginScreen> {
   verifyPhone(String phone) async {
     ShowToastDialog.showLoader("Envoi en cours...");
     await FirebaseAuth.instance.verifyPhoneNumber(
-      timeout: const Duration(seconds: 30),
+      timeout: const Duration(seconds: 60),
       phoneNumber: phone,
       verificationCompleted: (PhoneAuthCredential credential) {
         print(credential);
@@ -471,66 +463,14 @@ class _LoginScreenState extends State<LoginScreen> {
               "Une erreur s'est produite lors de la vérification du numéro");
         }
       },
-      // Après avoir réussi à vérifier le numéro de téléphone
-// et avant de passer à la page suivante
       codeSent: (String verificationId, int? resendToken) async {
         ShowToastDialog.closeLoader();
         ShowToastDialog.showToast("Code de vérification envoyé avec succès ");
         setState(() {
           _verificationId = verificationId;
         });
-        // Vérifier le type de compte et le token sauvegardés
-        final SharedPreferences prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('token');
-        final role = prefs.getString('type_compte');
-        // Redirection en fonction du type de compte
-        if (role == 'Transporteur') {
-          // Redirection vers la page correspondant au type de compte 1
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Transporteurs(
-                      name: '',
-                      profileUrl: '',
-                      username: '',
-                    )),
-          );
-        } else if (role == 'Chargeur') {
-          // Redirection vers la page correspondant au type de compte 2
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Chargeur(
-                      name: '',
-                      profileUrl: '',
-                      username: '',
-                    )),
-          );
-        } else if (role == 'Chauffeur') {
-          // Redirection vers la page correspondant au type de compte 2
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Chauffeur(
-                      name: '',
-                      ParametreeUrl: '',
-                      username: '',
-                    )),
-          );
-        } else {
-          // Si le type de compte n'est pas défini ou n'est pas reconnu,
-          // vous pouvez rediriger vers une page par défaut ou gérer
-          // ce cas d'une autre manière, par exemple, afficher un message
-          // à l'utilisateur ou le rediriger vers la page d'inscription.
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => RegisterScreen()),
-          );
-        } // Passer à la page suivante du contrôleur de page _pageController
         _pageController.nextPage(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeIn,
-        );
+            duration: const Duration(milliseconds: 200), curve: Curves.easeIn);
       },
       codeAutoRetrievalTimeout: (String verificationId) {
         ShowToastDialog.showToast("Temps de vérification terminer");
@@ -587,42 +527,5 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return masque;
-  }
-
-  Future<void> checkIfUserExistsAndLogin(
-      String selectedCountry, String phoneNumber, BuildContext context) async {
-    try {
-      // Utiliser la fonction pour vérifier si le numéro existe
-      var fullPhoneNumber = '$selectedCountry$phoneNumber';
-      ShowToastDialog.showLoader(
-          "Veuillez Patienter. Verification en Cours ... ");
-      Map<String, dynamic>? numberExists =
-          await ApiRequest.checkPhoneNumberExists(
-        fullPhoneNumber,
-        timeout: const Duration(seconds: 60),
-      );
-
-      if (numberExists != null) {
-        ShowToastDialog.closeLoader();
-        // Le numéro existe dans la base de données
-        // Procéder à la vérification du téléphone
-        print("Succès ! trouvé dans la base de données: $fullPhoneNumber");
-        await verifyPhone(fullPhoneNumber);
-      } else {
-        // Le numéro n'existe pas dans la base de données
-        // Rediriger vers la page d'inscription
-        print("Numéro non trouvé dans la base de données: $fullPhoneNumber");
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RegisterScreen(),
-          ),
-        );
-      }
-    } catch (e) {
-      // Gérer les erreurs
-      print("Erreur lors de la vérification du numéro de téléphone: $e");
-      // Afficher un message d'erreur ou rediriger vers une page d'erreur
-    }
   }
 }

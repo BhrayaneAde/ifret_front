@@ -47,6 +47,7 @@ class _Otp_loginState extends State<Otp_login> {
     _codeController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(
@@ -185,8 +186,8 @@ class _Otp_loginState extends State<Otp_login> {
                                 "Verifier Numéro de Téléphone",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 16, color: Colors.black,
-
+                                  fontSize: 16,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
@@ -243,13 +244,13 @@ class _Otp_loginState extends State<Otp_login> {
           timeInSecForIosWeb: 5,
         );
 
-        final response = await ApiRequest.register(widget.data);
-        print(response?.data.toString());
+        final response = await ApiRequest.register(widget);
+        print(response?.toString());
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', response?.data['token']);
+        await prefs.setString('token', response?['token']);
 
-        switch (response?.data["role"]) {
+        switch (response?["role"]) {
           case "Transporteur":
             () => {
                   Navigator.pushReplacement(
@@ -285,7 +286,7 @@ class _Otp_loginState extends State<Otp_login> {
                     MaterialPageRoute(
                       builder: (context) => Chauffeur(
                         name: '',
-                        profileUrl: '',
+                        ParametreeUrl: '',
                         username: '',
                       ),
                     ),
@@ -338,7 +339,7 @@ class _Otp_loginState extends State<Otp_login> {
       await auth.signInWithCredential(credential);
 
       // Assurez-vous d'envoyer le numéro de téléphone correctement
-      String phoneNumber = widget.data?['numero_tel'];
+      String phoneNumber = widget?['numero_tel'];
 
       Dio.Options options =
           Dio.Options(contentType: Dio.Headers.jsonContentType);
@@ -349,24 +350,24 @@ class _Otp_loginState extends State<Otp_login> {
           options: options);
 
       print('Code de Statut de la Réponse : ${response.statusCode}');
-      print('Corps de la Réponse : ${response.data}');
+      print('Corps de la Réponse : ${response}');
 
       if (response.statusCode == 201) {
-        if (response.data != null &&
-            response.data is Map<String, dynamic> &&
-            response.data.containsKey('token') &&
-            response.data.containsKey('type_compte')) {
+        if (response != null &&
+            response is Map<String, dynamic> &&
+            response.containsKey('token') &&
+            response.containsKey('type_compte')) {
           // store token and type_compte
           final SharedPreferences prefs = await SharedPreferences.getInstance();
-          final response = await ApiRequest.login(widget.data);
-          print(response?.data.toString());
-          await prefs.setString('token', response?.data['token']);
+          final response = await ApiRequest.login(widget);
+          print(response?.toString());
+          await prefs.setString('token', response?['token']);
 
-          await prefs.setString('type_compte', response?.data['type']);
+          await prefs.setString('type_compte', response?['type']);
 
           // Redirect to the appropriate page based on type_compte
 
-          switch (response?.data["role"]) {
+          switch (response?["role"]) {
             case "Transporteur":
               () => {
                     Navigator.pushReplacement(

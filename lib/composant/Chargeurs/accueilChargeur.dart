@@ -1,14 +1,5 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MaterialApp(
-    home: Chargeur(
-      name: "John Doe",
-      profileUrl: "profile_url",
-      username: "john_doe",
-    ),
-  ));
-}
+import 'package:ifret/composant/Chargeurs/profilChargeur.dart';
 
 class Chargeur extends StatefulWidget {
   final String name;
@@ -114,7 +105,7 @@ class _ChargeurState extends State<Chargeur> {
       case 2:
         return Tracking();
       case 3:
-        return MesInformations();
+        return ProfilChargeur();
       default:
         return Container(); // Gestion d'un cas par défaut si nécessaire
     }
@@ -225,7 +216,7 @@ class Message {
 
   Message({required this.text, required this.sendByMe});
 }
-
+/* 
 class MesInformations extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -238,7 +229,7 @@ class MesInformations extends StatelessWidget {
       ),
     );
   }
-}
+} */
 
 class Paiement extends StatefulWidget {
   @override
