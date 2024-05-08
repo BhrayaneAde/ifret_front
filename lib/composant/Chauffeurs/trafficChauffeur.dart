@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:ifret/composant/Chargeurs/d%C3%A9tailsChargeur.dart';
+import 'package:ifret/composant/Chauffeurs/d%C3%A9tailsChauffeur.dart';
+import 'package:ifret/composant/Transporteurs/d%C3%A9tailsTransporteur.dart';
 
-class TrafficChargeur extends StatelessWidget {
+class TrafficChauffeur extends StatelessWidget {
   final String dateEnvoi = '2024-04-12'; // Exemple de date
-  final String fretEnvoye = '200 sacs de charbon'; // Exemple de fret envoyé
+  final String matricule = 'AX 5820'; // Exemple de fret envoyé
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class TrafficChargeur extends StatelessWidget {
                 ),
                 children: [
                   TextSpan(
-                      text: 'Trajectoire Routière',
+                      text: 'Historique Parcours',
                       style: TextStyle(color: Colors.black)),
                 ],
               ),
@@ -57,7 +59,10 @@ class TrafficChargeur extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TrafficTable(),
+                            builder: (context) => DetailChauffeur(
+                              dateEnvoi: '',
+                              matricule: '',
+                            ),
                           ),
                         );
                       },
@@ -75,7 +80,7 @@ class TrafficChargeur extends StatelessWidget {
                         ),
                       ),
                       subtitle: Text(
-                        '$fretEnvoye', // Utilisation de la variable de fret envoyé
+                        '$matricule', // Utilisation de la variable de fret envoyé
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -83,7 +88,7 @@ class TrafficChargeur extends StatelessWidget {
                         ),
                       ),
                       leading:
-                          Icon(Icons.directions_car, color: Color(0xfffcce00)),
+                          Icon(Icons.directions_car, color: Color(0xFFFCCE00)),
                       trailing: Container(
                         width: 100, // Largeur fixe du bouton
                         child: ElevatedButton(
@@ -91,13 +96,16 @@ class TrafficChargeur extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => TrafficTable(),
+                                builder: (context) => DetailTransporteur(
+                                  dateEnvoi: '',
+                                  matricule: '',
+                                ),
                               ),
                             );
                           },
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(
-                              Color(0xfffcce00),
+                              Color(0xFFFCCE00),
                             ),
                             shape: MaterialStateProperty.all<
                                 RoundedRectangleBorder>(
@@ -125,26 +133,6 @@ class TrafficChargeur extends StatelessWidget {
       ),
       backgroundColor:
           Colors.grey[400], // Set "dirty white" background for body
-    );
-  }
-
-  void _showDetailsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Détails du trafic'),
-          content: Text('Ajoutez ici les détails complets du trafic.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Fermer'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

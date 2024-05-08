@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_echarts/flutter_echarts.dart';
+import 'package:ifret/api/api_request.dart';
+import 'package:ifret/composant/Transporteurs/NotificationTransporteur.dart';
 import 'package:ifret/composant/Transporteurs/profilTransporteur.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'dart:math' as math;
@@ -40,45 +42,75 @@ class Transporteurs extends StatefulWidget {
 }
 
 class _TransporteursState extends State<Transporteurs> {
-  int _currentIndex = 0;
+  int _selectedIndex = 0;
+  int _notificationCount = 3; // Example notification count
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _getBody(),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        backgroundColor: Colors.white, // Couleur de fond blanc
-        selectedItemColor:
-            Color(0xFFFCCE00), // Couleur de l'élément sélectionné
-        unselectedItemColor:
-            Colors.black, // Couleur des éléments non sélectionnés
-        items: [
-          _bottomNavigationBarItem(
-            icon: Icons.home_filled,
-            label: 'Home',
-            index: 0,
+      bottomNavigationBar: Stack(
+        children: [
+          BottomNavigationBar(
+            items: [
+              _bottomNavigationBarItem(
+                icon: Icons.bookmark_add,
+                label: 'Enregistrement',
+                index: 0,
+              ),
+              _bottomNavigationBarItem(
+                icon: Icons.car_crash,
+                label: 'Tracking',
+                index: 1,
+              ),
+              _bottomNavigationBarItem(
+                icon: Icons.notifications_active,
+                label: 'Notifications',
+                index: 2,
+              ),
+              _bottomNavigationBarItem(
+                icon: Icons.person,
+                label: 'Profil',
+                index: 3,
+              ),
+            ],
+            selectedItemColor:
+                Color(0xFFFCCE00), // Couleur de l'élément sélectionné
+            unselectedItemColor:
+                Colors.black, // Couleur des éléments non sélectionnés
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
           ),
-          _bottomNavigationBarItem(
-            icon: Icons.bookmark_add,
-            label: 'Enregistrement',
-            index: 1,
-          ),
-          _bottomNavigationBarItem(
-            icon: Icons.car_crash,
-            label: 'Tracking',
-            index: 2,
-          ),
-          _bottomNavigationBarItem(
-            icon: Icons.notifications_active,
-            label: 'Notification',
-            index: 3,
-          ),
+          if (_notificationCount != 0)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Container(
+                padding: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                constraints: BoxConstraints(
+                  minWidth: 16,
+                  minHeight: 16,
+                ),
+                child: Text(
+                  '$_notificationCount',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -92,20 +124,20 @@ class _TransporteursState extends State<Transporteurs> {
     return BottomNavigationBarItem(
       icon: Icon(icon),
       label: label,
-      backgroundColor: Colors.white, // Fond blanc pour tous les éléments
+      backgroundColor: Colors.white,
     );
   }
 
   Widget _getBody() {
-    switch (_currentIndex) {
+    switch (_selectedIndex) {
       case 0:
-        return ProfilTransporteur();
-      case 1:
         return EnregistrementPage();
-      case 2:
+      case 1:
         return Tracking();
+      case 2:
+        return NotificationPage();
       case 3:
-        return Notification();
+        return ProfilTransporteur();
       default:
         return Container();
     }
@@ -123,18 +155,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _controller = YoutubePlayerController(
-      initialVideoId: 'u8H652UY-L8', // ID de la vidéo YouTube
-      flags: YoutubePlayerFlags(
-        mute: false,
-        autoPlay: true,
-        disableDragSeek: false,
-        loop: false,
-        isLive: false,
-        forceHD: false,
-        enableCaption: true,
-      ),
-    );
   }
 
   @override
@@ -143,24 +163,7 @@ class _HomeState extends State<Home> {
       /*   appBar: AppBar(
         title: Text('Youtube Player Flutter'),
       ), */
-      body: Column(children: [
-        _buildHeader(context),
-        SizedBox(height: 50),
-        Center(
-          child: YoutubePlayer(
-            controller: _controller,
-            showVideoProgressIndicator: true,
-            progressIndicatorColor: Colors.blueAccent,
-            onReady: () {
-              // Ajoutez ici tout code nécessaire une fois que la vidéo est prête
-              print('La vidéo est prête à être lue');
-            },
-            onEnded: (data) {
-              print('La vidéo est terminée');
-            },
-          ),
-        ),
-      ]),
+      body: Column(),
     );
   }
 
@@ -241,7 +244,8 @@ class EnregistrementPage extends StatefulWidget {
 
 class _EnregistrementPageState extends State<EnregistrementPage> {
   int _currentTabIndex = 0;
-  List<File?> _files = List.filled(4, null);
+  late List<File> _files =
+      List.filled(4, File('')); // Initialisation avec des fichiers vides
   TextEditingController _matriculeController = TextEditingController();
 
   Future<void> _pickFile(int index) async {
@@ -258,7 +262,7 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
     if (result != null) {
       final filePath = result.files.single.path!;
       setState(() {
-        _files[index] = File(filePath);
+        _files[index] = File(filePath); // Mettre à jour la liste des fichiers
       });
     }
   }
@@ -420,8 +424,10 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
   }
 }
 
+enum PhotoField { PhotoCamion, CarteGrise, VisiteTechnique, Assurance }
+
 class Enregistrements extends StatefulWidget {
-  final List<File?> files;
+  final List<File> files;
   final Function(int) pickFile;
   final TextEditingController matriculeController;
 
@@ -432,133 +438,129 @@ class Enregistrements extends StatefulWidget {
 }
 
 class _EnregistrementsState extends State<Enregistrements> {
-  bool validated = false;
-  List<String> fileLabels = [
-    "Photo du Camion",
-    "Carte Grise",
-    "Visite Technique",
-    "Assurance",
-  ];
-  List<bool> fileImported = [
-    false,
-    false,
-    false,
-    false
-  ]; // Pour suivre l'état d'importation de chaque fichier
+  String matricule = ""; // Champ pour le numéro de matricule
+  File? photoCamion;
+  File? carteGrise;
+  File? visiteTechnique;
+  File? assurance;
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(20.0),
       children: [
-        /* SizedBox(height: 10), */
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: Text(
-                'Numéro d\'immatriculation :',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(
-              width: 190,
-              height: 42,
-              child: TextField(
-                controller: widget.matriculeController,
-                decoration: InputDecoration(
-                  hintText: ' Ex: 22442890',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(45),
-                  ),
-                  filled: true, // Activer le remplissage de l'arrière-plan
-                  fillColor: Colors
-                      .grey[200], // Couleur de remplissage de l'arrière-plan
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(45),
-                    borderSide:
-                        BorderSide(color: Colors.black), // Bordure en focus
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 10.0, // Réduire la hauteur du TextField
-                    horizontal: 15.0, // Réduire la largeur du TextField
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 10),
-            for (int i = 0; i < 4; i++)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    fileLabels[i],
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => _pickAndSetFile(i), // Nouvelle méthode
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                                  (states) {
-                            if (fileImported[i]) {
-                              return Colors
-                                  .green; // Fond vert lorsque le fichier est importé
-                            } else if (states.contains(MaterialState.pressed)) {
-                              return Colors
-                                  .grey; // Fond gris lorsqu'appuyé avant l'importation
-                            } else {
-                              return Colors.white; // Fond blanc par défaut
-                            }
-                          }),
-                          foregroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                                  (states) {
-                            if (fileImported[i]) {
-                              return Colors
-                                  .white; // Texte blanc lorsque le fichier est importé
-                            } else if (states.contains(MaterialState.pressed)) {
-                              return Colors
-                                  .black; // Texte noir lorsqu'appuyé avant l'importation
-                            } else {
-                              return Colors.grey; // Texte gris par défaut
-                            }
-                          }),
-                          side: MaterialStateProperty.all<BorderSide>(
-                            BorderSide(
-                              color: Colors.black, // Bordure noire
-                            ),
-                          ),
-                        ),
-                        child: Text('Sélectionner un fichier'),
-                      ),
-                      SizedBox(width: 10),
-                      if (widget.files[i] != null)
-                        Expanded(
-                          child: Text(
-                            widget.files[i]!.path.split('/').last,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                ],
-              ),
-          ],
-        ),
-        SizedBox(height: 20),
-        SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: () {
+        // Champ pour le numéro de matricule
+        /*  buildTextField(
+          label: 'Numéro d\'immatriculation :',
+          onChanged: (value) {
             setState(() {
-              validated = true;
+              matricule = value;
             });
-            // Enregistrez les fichiers et le numéro de matricule
+          },
+        ), */
+        buildTextField(
+          label: 'Numéro d\'immatriculation :',
+          onChanged: (value) => setState(() => matricule = value),
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          textFieldWidth: 190,
+          textFieldHeight: 42,
+          hintText: 'Ex: 22442890',
+        ),
+        SizedBox(height: 10),
+        // Champ d'image pour la photo du camion
+        buildImageField(
+          label: "Photo du Camion",
+          file: photoCamion,
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          textFieldWidth: 190,
+          textFieldHeight: 42,
+          onPressed: () => _pickAndSetFile(PhotoField.PhotoCamion),
+        ),
+        SizedBox(height: 10),
+        // Champ d'image pour la carte grise
+        buildImageField(
+          label: "Carte Grise",
+          file: carteGrise,
+          onPressed: () => _pickAndSetFile(PhotoField.CarteGrise),
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          textFieldWidth: 190,
+          textFieldHeight: 42,
+        ),
+        SizedBox(height: 10),
+        // Champ d'image pour la visite technique
+        buildImageField(
+          label: "Visite Technique",
+          file: visiteTechnique,
+          onPressed: () => _pickAndSetFile(PhotoField.VisiteTechnique),
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          textFieldWidth: 190,
+          textFieldHeight: 42,
+        ),
+        SizedBox(height: 10),
+        // Champ d'image pour l'assurance
+        buildImageField(
+          label: "Assurance",
+          file: assurance,
+          onPressed: () => _pickAndSetFile(PhotoField.Assurance),
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          textFieldWidth: 190,
+          textFieldHeight: 42,
+        ),
+        SizedBox(height: 10),
+        ElevatedButton(
+          onPressed: () async {
+            if (matricule.isEmpty) {
+              // Gérer l'erreur de matricule vide
+              _showAlertDialog(context, "Erreur",
+                  "Le numéro de matricule ne peut pas être vide");
+              return;
+            }
+
+            if (photoCamion == null ||
+                carteGrise == null ||
+                visiteTechnique == null ||
+                assurance == null) {
+              // Gérer l'erreur de fichiers d'image manquants
+              _showAlertDialog(
+                  context, "Erreur", "Veuillez sélectionner toutes les images");
+              return;
+            }
+
+            List<File> files = [
+              photoCamion!,
+              carteGrise!,
+              visiteTechnique!,
+              assurance!,
+            ];
+
+            try {
+              final response = await ApiRequest.registerTruck(
+                matricule: matricule,
+                files: [
+                  photoCamion!,
+                  carteGrise!,
+                  visiteTechnique!,
+                  assurance!
+                ],
+                photoCamion: photoCamion!,
+                carteGrise: carteGrise!,
+                visiteTechnique: visiteTechnique!,
+                assurance: assurance!,
+              );
+              // Gérer la réponse réussie (par exemple, afficher un message de succès)
+              _showAlertDialog(
+                  context, "Succès", "Enregistrement effectué avec succès");
+              print('Enregistrement effectué avec succès!');
+              // Mettre à jour l'interface utilisateur ou effectuer d'autres actions
+
+              // Update UI or perform other actions
+            } on Exception catch (e) {
+              // Gérer l'erreur de la requête API (par exemple, afficher un message d'erreur)
+              _showAlertDialog(context, "Erreur",
+                  "Erreur lors de l'enregistrement: ${e.toString()}");
+              print('Erreur d\'enregistrement: ${e.toString()}');
+              // Afficher un message d'erreur à l'utilisateur
+            }
           },
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(
@@ -589,22 +591,159 @@ class _EnregistrementsState extends State<Enregistrements> {
     );
   }
 
-  Future<void> _pickAndSetFile(int index) async {
+  // Méthode pour afficher une boîte de dialogue d'alerte
+  void _showAlertDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Fonction pour créer un champ de texte
+  Widget buildTextField(
+      {required String label,
+      required ValueChanged<String> onChanged,
+      required EdgeInsets padding,
+      required int textFieldWidth,
+      required int textFieldHeight,
+      required String hintText}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Text(
+            label,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        SizedBox(
+          width: 190,
+          height: 42,
+          child: TextField(
+            onChanged: onChanged,
+            decoration: InputDecoration(
+              hintText: ' Ex: 22442890',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(45),
+              ),
+              filled: true,
+              fillColor: Colors.grey[200],
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(45),
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 10.0,
+                horizontal: 15.0,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Fonction pour créer chaque champ d'image
+  Widget buildImageField({
+    required String label,
+    required File? file,
+    required VoidCallback onPressed,
+    required EdgeInsets padding,
+    required int textFieldWidth,
+    required int textFieldHeight,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 5),
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: onPressed,
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                  Color(0xFFFCCE00), // Existing background color
+                ),
+                foregroundColor: MaterialStateProperty.resolveWith<Color>(
+                  (states) {
+                    if (states.contains(MaterialState.pressed)) {
+                      return Colors.white; // White text when pressed
+                    } else {
+                      return Colors.black; // Black text by default
+                    }
+                  },
+                ),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(45),
+                  ),
+                ),
+                minimumSize: MaterialStateProperty.all<Size>(
+                  Size(120, 48), // Minimum button size
+                ),
+              ),
+              child: Text('Sélectionner un fichier'), // Button text
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                file != null
+                    ? file.path.split('/').last
+                    : 'Aucun fichier sélectionné',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+      ],
+    );
+  }
+
+  // Fonction pour sélectionner et définir un fichier pour chaque champ d'image
+  Future<void> _pickAndSetFile(PhotoField field) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: [
-        'pdf',
-        'jpg',
-        'jpeg',
-        'png'
-      ], // Définir les extensions autorisées
+      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
     );
 
     if (result != null) {
       final filePath = result.files.single.path!;
       setState(() {
-        widget.files[index] = File(filePath);
-        fileImported[index] = true; // Mettre à jour l'état d'importation
+        switch (field) {
+          case PhotoField.PhotoCamion:
+            photoCamion = File(filePath);
+            break;
+          case PhotoField.CarteGrise:
+            carteGrise = File(filePath);
+            break;
+          case PhotoField.VisiteTechnique:
+            visiteTechnique = File(filePath);
+            break;
+          case PhotoField.Assurance:
+            assurance = File(filePath);
+            break;
+        }
       });
     }
   }
@@ -791,15 +930,179 @@ class Tracking extends StatelessWidget {
   }
 }
 
-class Notification extends StatelessWidget {
+/* class NotificationPage extends StatefulWidget {
+  @override
+  _NotificationPageState createState() => _NotificationPageState();
+}
+
+class _NotificationPageState extends State<NotificationPage> {
+  List<Map<String, dynamic>> _notifications = [];
+  int _notificationCount = 0; // Ajout du compteur de notifications
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotifications();
+  }
+
+  void _fetchNotifications() {
+    ApiRequest().fetchNotification({}).then((notification) {
+      setState(() {
+        _notifications.add(notification);
+        _notificationCount++; // Incrémentation du compteur de notifications
+      });
+    }).catchError((error) {
+      print('Error fetching notification: $error');
+    });
+  }
+
+  void _markNotificationAsRead(int index) {
+    setState(() {
+      // Marquer la notification comme lue
+      _notifications[index]['read'] = true;
+      _notificationCount--; // Décrémentation du compteur de notifications
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Tri des notifications en fonction de leur état de lecture
+    _notifications.sort((a, b) {
+      if (a['read'] == true && b['read'] == false) {
+        return 1;
+      } else if (a['read'] == false && b['read'] == true) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Notifications'),
+      ),
+      body: ListView.builder(
+        itemCount: _notifications.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(
+              _notifications[index]['message'],
+              // Utiliser le fontWeight en fonction de l'état de lecture de la notification
+              style: TextStyle(
+                fontWeight: _notifications[index]['read'] == true
+                    ? FontWeight.normal
+                    : FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(_notifications[index]['date']),
+            onTap: () {
+              // Lorsque l'utilisateur appuie sur la notification,
+              // elle est marquée comme lue et retirée de la liste
+              _markNotificationAsRead(index);
+            },
+          );
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Stack(
+              children: [
+                Icon(Icons.notifications_active),
+                if (_notificationCount !=
+                    0) // Afficher l'indice uniquement si le compteur est différent de zéro
+                  Positioned(
+                    right: 0,
+                    child: Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      constraints: BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        '$_notificationCount',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            label: 'Notifications',
+          ),
+        ],
+      ),
+    );
+  }
+}
+ */
+class NotificationPage extends StatelessWidget {
+  List<Map<String, dynamic>> _notifications = [];
+  int _notificationCount = 0; // Ajout du compteur de notifications
+
+  NotificationPage() {
+    // Simulation de l'ajout de notifications pour démonstration
+    _notifications.addAll([
+      {
+        'message': 'Nouvelle commande reçue',
+        'date': '10 avril 2024',
+        'read': false,
+      },
+      {
+        'message': 'Mise à jour de l\'application disponible',
+        'date': '8 avril 2024',
+        'read': true,
+      },
+      {
+        'message': 'Nouvelle fonctionnalité ajoutée',
+        'date': '6 avril 2024',
+        'read': false,
+      },
+    ]);
+
+    _notificationCount = _notifications.length;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Tri des notifications en fonction de leur état de lecture
+    _notifications.sort((a, b) {
+      if (a['read'] == true && b['read'] == false) {
+        return 1;
+      } else if (a['read'] == false && b['read'] == true) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Notification'),
       ),
-      body: Center(
-        child: Text('Contenu de Notification'),
+      body: ListView.builder(
+        itemCount: _notifications.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(
+              _notifications[index]['message'],
+              // Utiliser le fontWeight en fonction de l'état de lecture de la notification
+              style: TextStyle(
+                fontWeight: _notifications[index]['read'] == true
+                    ? FontWeight.normal
+                    : FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(_notifications[index]['date']),
+          );
+        },
       ),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Chargeurs/trafficChargeur.dart';
+import 'package:ifret/composant/service/clientele.dart';
 import 'dart:io';
 
 import 'package:image_picker/image_picker.dart';
@@ -169,235 +171,321 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profil'),
+        title: Row(
+          children: [
+            Spacer(), // Pousser le widget RichText vers la droite
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                children: [
+                  TextSpan(
+                      text: 'Profil', style: TextStyle(color: Colors.black)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        backgroundColor:
+            Color(0xFFFCCE00), // Définir la couleur de fond en noir
       ),
       body: Stack(
         children: [
           Column(
             children: [
               // Votre contenu actuel ici
-              Row(
-                children: [
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 70,
-                          backgroundColor: Colors.grey[200],
-                          backgroundImage: _image != null
-                              ? FileImage(_image!)
-                              : Image.asset('assets/images/2.png').image,
-                          child: _image == null
-                              ? SizedBox() // Si aucune image n'est sélectionnée, ne pas afficher de texte
-                              : null,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 20,
-                          child: GestureDetector(
-                            onTap: () {
-                              if (!_isImagePickerActive) {
-                                _getImage();
-                              } else {
-                                print('Le sélecteur d\'image est déjà actif.');
-                              }
-                            },
-                            child: CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Colors.white,
-                              child: Icon(
-                                Icons.add_photo_alternate,
-                                size: 30,
-                                color: Colors.grey[700],
+
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors
+                        .grey[200], // Set the background color to light grey
+                    borderRadius: BorderRadius.circular(
+                        10.0), // Add rounded corners (optional)
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey[300],
+                              backgroundImage: _image != null
+                                  ? FileImage(_image!)
+                                  : Image.asset('assets/images/2.png').image,
+                              child: _image == null
+                                  ? SizedBox() // Si aucune image n'est sélectionnée, ne pas afficher de texte
+                                  : null,
+                            ),
+                            Positioned(
+                              bottom: 2,
+                              right: 45,
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (!_isImagePickerActive) {
+                                    _getImage();
+                                  } else {
+                                    print(
+                                        'Le sélecteur d\'image est déjà actif.');
+                                  }
+                                },
+                                child: CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor: Colors.white,
+                                  child: Icon(
+                                    Icons.add_photo_alternate,
+                                    size: 30,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${_firstNameController.text} ${_lastNameController.text}',
-                          textAlign: TextAlign.start,
-                          textDirection: TextDirection.rtl,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            shadows: [
-                              Shadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                blurRadius: 2,
-                                offset: Offset(1, 1),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              child: Text(
+                                '${_firstNameController.text.toUpperCase()} ',
+                                /* ${_lastNameController.text} */
+                                textAlign: TextAlign.start,
+                                textDirection: TextDirection.rtl,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      blurRadius: 2,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          _accountType,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 101, 97, 72),
-                            shadows: [
-                              Shadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                blurRadius: 2,
-                                offset: Offset(1, 1),
+                            ),
+                            Container(
+                              child: Text(
+                                _accountType,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      blurRadius: 2,
+                                      offset: Offset(1, 1),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-              SizedBox(height: 70),
+              SizedBox(height: 25),
               // Deuxième ligne
-              Container(
-                width: MediaQuery.of(context).size.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: _editProfile,
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xFFFCCE00),
-                          ),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          minimumSize: MaterialStateProperty.all<Size>(
-                            Size(double.infinity,
-                                70), // Hauteur souhaitée de l'ElevatedButton
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.edit,
-                              color: Colors.black,
-                              size: 30,
-                            ), // Icône
-                            SizedBox(
-                                width:
-                                    16), // Espacement entre l'icône et le texte
-                            Text(
-                              'Modifier le profil',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ), // Texte
-                            Spacer(),
-                            IconButton(
-                              icon: Icon(Icons.arrow_forward),
-                              onPressed: _editProfile,
-                              color: Colors.black,
-                              splashRadius: 20,
-                              padding: EdgeInsets
-                                  .zero, // Supprimer le rembourrage autour de l'icône
-                              constraints:
-                                  BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
-                              alignment: Alignment
-                                  .center, // Alignement de l'icône au centre
-                              visualDensity: VisualDensity
-                                  .compact, // Densité visuelle compacte pour réduire l'espace autour de l'icône
-                            ),
-                          ],
-                        ),
-                      ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 5), // Padding horizontal de 10
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(10.0), // Forme du ListTile
+                  ),
+                  child: ListTile(
+                    onTap: _editProfile,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Forme du ListTile
                     ),
-                  ],
+                    tileColor: Color(0xfffcce00), // Couleur de fond du ListTile
+                    title: Row(
+                      children: [
+                        Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                          size: 30,
+                        ),
+                        SizedBox(
+                            width: 16), // Espacement entre l'icône et le texte
+                        Text(
+                          'Modifier le profil',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    trailing: IconButton(
+                      icon: Icon(Icons.arrow_forward),
+                      onPressed: _editProfile,
+                      color: Colors.black,
+                      splashRadius: 20,
+                      padding: EdgeInsets
+                          .zero, // Supprimer le rembourrage autour de l'icône
+                      constraints:
+                          BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
+                      alignment:
+                          Alignment.center, // Alignement de l'icône au centre
+                      visualDensity: VisualDensity
+                          .compact, // Densité visuelle compacte pour réduire l'espace autour de l'icône
+                    ),
+                  ),
                 ),
               ),
-              SizedBox(height: 40),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Action pour la liste des trafics
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TrafficChargeur(),
-                            ),
-                          );
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                            const Color(0xFFFCCE00),
-                          ),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          minimumSize: MaterialStateProperty.all<Size>(
-                            Size(double.infinity,
-                                70), // Hauteur souhaitée de l'ElevatedButton
-                          ),
+              SizedBox(height: 5), // Espacement entre les boutons
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 5), // Padding horizontal de 10
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(10.0), // Forme du ListTile
+                  ),
+                  child: ListTile(
+                    onTap: () {
+                      // Action pour la liste des trafics
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TrafficChargeur(),
                         ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.list,
-                              color: Colors.black,
-                              size: 30,
-                            ), // Icône
-                            SizedBox(
-                              width: 16,
-                            ), // Espacement entre l'icône et le texte
-                            Text(
-                              'Voir Trafic',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ), // Texte
-                            Spacer(), // Pour occuper l'espace restant
-                            IconButton(
-                              icon: Icon(Icons.arrow_forward),
-                              onPressed: () {
-                                // Action pour le bouton ">"
-                              },
-                              color: Colors.black,
-                              splashRadius: 20,
-                              padding: EdgeInsets
-                                  .zero, // Supprimer le rembourrage autour de l'icône
-                              constraints:
-                                  BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
-                              alignment: Alignment
-                                  .center, // Alignement de l'icône au centre
-                              visualDensity: VisualDensity
-                                  .compact, // Densité visuelle compacte pour réduire l'espace autour de l'icône
-                            ),
-                          ],
-                        ),
-                      ),
+                      );
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Forme du ListTile
                     ),
-                  ],
+                    tileColor: Color(0xfffcce00), // Couleur de fond du ListTile
+                    title: Row(
+                      children: [
+                        Icon(
+                          Icons.list,
+                          color: Colors.black,
+                          size: 30,
+                        ),
+                        SizedBox(
+                            width: 16), // Espacement entre l'icône et le texte
+                        Text(
+                          'Voir Trafic',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    trailing: IconButton(
+                      icon: Icon(Icons.arrow_forward),
+                      onPressed: () {
+                        // Action pour le bouton ">"
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TrafficChargeur(),
+                          ),
+                        );
+                      },
+                      color: Colors.black,
+                      splashRadius: 20,
+                      padding: EdgeInsets
+                          .zero, // Supprimer le rembourrage autour de l'icône
+                      constraints:
+                          BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
+                      alignment:
+                          Alignment.center, // Alignement de l'icône au centre
+                      visualDensity: VisualDensity
+                          .compact, // Densité visuelle compacte pour réduire l'espace autour de l'icône
+                    ),
+                  ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 5), // Espacement entre les boutons
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: 5), // Padding horizontal de 10
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(10.0), // Forme du ListTile
+                  ),
+                  child: ListTile(
+                    onTap: () {
+                      // Action pour la liste des trafics
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Clientele(),
+                        ),
+                      );
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(10.0), // Forme du ListTile
+                    ),
+                    tileColor: Color(0xfffcce00), // Couleur de fond du ListTile
+                    title: Row(
+                      children: [
+                        Icon(
+                          Icons.support_agent_rounded,
+                          color: Colors.black,
+                          size: 30,
+                        ),
+                        SizedBox(
+                            width: 16), // Espacement entre l'icône et le texte
+                        Text(
+                          'Service Clientèle',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    trailing: IconButton(
+                      icon: Icon(Icons.arrow_forward),
+                      onPressed: () {
+                        // Action pour le bouton ">"
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Clientele(),
+                          ),
+                        );
+                      },
+                      color: Colors.black,
+                      splashRadius: 20,
+                      padding: EdgeInsets
+                          .zero, // Supprimer le rembourrage autour de l'icône
+                      constraints:
+                          BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
+                      alignment:
+                          Alignment.center, // Alignement de l'icône au centre
+                      visualDensity: VisualDensity
+                          .compact, // Densité visuelle compacte pour réduire l'espace autour de l'icône
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           Positioned(
@@ -420,8 +508,8 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                             child: Text(
                               'Politique de confidentialité',
                               style: TextStyle(
-                                color: Color(0xFFFCCE00),
-                                fontSize: 11,
+                                color: Color(0xfffcce00),
+                                fontSize: 14,
                               ),
                             ),
                           ),
@@ -442,10 +530,10 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                               // Action pour les conditions générales d'utilisation
                             },
                             child: Text(
-                              'Conditions générales d\'utilisation',
+                              'Conditions générales',
                               style: TextStyle(
-                                color: Color(0xFFFCCE00),
-                                fontSize: 11,
+                                color: Color(0xfffcce00),
+                                fontSize: 14,
                               ),
                             ),
                           ),
@@ -479,6 +567,18 @@ class ModifierProfil extends StatelessWidget {
   final String accountType; // Nouveau champ pour le type de compte
   final String residence;
   final Function onUpdate;
+
+  void _showToast() {
+    Fluttertoast.showToast(
+      msg: "Profil mis à jour avec succès",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 20.0,
+    );
+  }
 
   // Définir des clés pour chaque champ
   static const String KEY_FIRST_NAME = 'prenom';
@@ -514,10 +614,36 @@ class ModifierProfil extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Modifier le profil'),
+        title: Row(
+          children: [
+            Spacer(), // Pousser le widget RichText vers la droite
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                children: [
+                  TextSpan(
+                      text: 'Information  ',
+                      style: TextStyle(color: Colors.black)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        backgroundColor:
+            Color(0xFFFCCE00), // Définir la couleur de fond en noir
+        leading: IconButton(
+          icon: Icon(Icons
+              .arrow_back), // Supposant que vous voulez un bouton de retour
+          color: Colors.black, // Définir la couleur du bouton en blanc
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.only(top: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -580,6 +706,8 @@ class ModifierProfil extends StatelessWidget {
                     accountType: _newAccountTypeController.text,
                   );
 
+                  _showToast(); // Afficher le toast après la mise à jour
+
                   Navigator.pop(context);
                 },
                 style: ButtonStyle(
@@ -587,14 +715,14 @@ class ModifierProfil extends StatelessWidget {
                       MaterialStateProperty.all<Color>(const Color(0xFFFCCE00)),
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24.0),
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
                   ),
                 ),
                 child: const Padding(
                   padding: EdgeInsets.all(14.0),
                   child: Text(
-                    'Enregistrer les modifications',
+                    'Enregistrer',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
@@ -635,76 +763,121 @@ class ModifierProfil extends StatelessWidget {
     }
   }
 
+  Future<void> _showDatePicker(
+      BuildContext context, TextEditingController controller) async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate:
+          DateTime.parse(controller.text), // Set initial date from controller
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (selectedDate != null) {
+      controller.text = selectedDate
+          .toString()
+          .split(' ')[0]; // Update controller with formatted date
+    }
+  }
+
   Widget _buildEditableInfoItem(
     String label,
     TextEditingController controller,
     IconData iconData,
     VoidCallback onPressed,
   ) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(
-            iconData,
-            size: 20,
-          ),
-          SizedBox(width: 10),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0), // Forme du Card
+      ),
+      child: ListTile(
+        onTap: onPressed,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0), // Forme du ListTile
+        ),
+        tileColor: const Color(0xfffcce00), // Couleur de fond du ListTile
+        title: Row(
+          children: [
+            Icon(
+              iconData,
+              size: 20,
+              color: Colors.black, // Couleur de l'icône
             ),
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: TextFormField(
-              controller: controller,
-              style: TextStyle(fontSize: 18),
-              enabled: false,
+            SizedBox(width: 10), // Espacement entre l'icône et le texte
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black, // Couleur du texte
+              ),
             ),
-          ),
-          IconButton(
-            icon: Icon(Icons.edit),
-            onPressed: onPressed,
-          ),
-        ],
+            SizedBox(width: 10), // Espacement avant le champ de texte
+            Expanded(
+              child: TextFormField(
+                controller: controller,
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+                enabled: false,
+              ),
+            ),
+          ],
+        ),
+        trailing: IconButton(
+          icon: Icon(Icons.edit),
+          onPressed: onPressed,
+          color: Colors.black, // Couleur de l'icône de modification
+        ),
       ),
     );
   }
 
   Widget _buildInfoContainer(
     String label,
-    String value, // Passer la valeur directe du numéro de téléphone
+    String value,
     IconData iconData,
   ) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(
-            iconData,
-            size: 20,
+      padding: EdgeInsets.symmetric(
+          vertical: 5.0, horizontal: 5), // Ajout du padding horizontal
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0), // Forme du Card
+        ),
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0), // Forme du ListTile
           ),
-          SizedBox(width: 10),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+          tileColor: const Color(0xfffcce00), // Couleur de fond du ListTile
+          title: Row(
+            children: [
+              Icon(
+                iconData,
+                size: 20,
+                color: Colors.black, // Couleur de l'icône
+              ),
+              SizedBox(width: 10), // Espacement entre l'icône et le texte
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 18,
+
+                  color: Colors.black, // Couleur du texte
+                ),
+              ),
+              SizedBox(width: 10), // Espacement avant la valeur
+              Expanded(
+                child: Text(
+                  value,
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 10),
-          // Enveloppez TextFormField avec un SizedBox et définissez une largeur explicite
-          SizedBox(
-            width: 100, // Définissez la largeur souhaitée
-          ),
-          Text(
-            value, // Utiliser la valeur directe du numéro de téléphone
-            style: TextStyle(fontSize: 18),
-          ),
-        ],
+        ),
       ),
     );
   }
