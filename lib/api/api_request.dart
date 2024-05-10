@@ -140,9 +140,13 @@ class ApiRequest {
       Dio.Options options = Dio.Options(
         contentType: Dio.Headers.jsonContentType,
         headers: {
+          "accept": "application/json", // Correction de l'en-tête accept
+          'content-type':
+              'multipart/form-data', // Correction de l'en-tête content-type
           'Authorization': 'Bearer $authToken',
         },
         validateStatus: (status) => status! < 500,
+        followRedirects: false,
       );
 
       // Convert image to FormData
@@ -190,11 +194,14 @@ class ApiRequest {
       Dio.Options options = Dio.Options(
         contentType: Dio.Headers.jsonContentType,
         headers: {
+          "accept": "application/json", // Correction de l'en-tête accept
+          'content-type':
+              'multipart/form-data', // Correction de l'en-tête content-type
           'Authorization': 'Bearer $authToken',
         },
         validateStatus: (status) => status! < 500,
+        followRedirects: false,
       );
-
       // Send a POST request with the user data to the endpoint
       Dio.Response response =
           await dio().put('/edit-profil', data: data, options: options);
@@ -284,6 +291,8 @@ class ApiRequest {
         // Affiche un message d'erreur ou redirige l'utilisateur vers l'écran de connexion
         print('L\'utilisateur n\'est pas connecté');
         return null; // Ajout d'un retour null en cas d'utilisateur non connecté
+      } else {
+        print("l\'utilisateur est connecté");
       }
       // Define request options with the authentication token
       Dio.Options options = Dio.Options(
@@ -307,22 +316,22 @@ class ApiRequest {
       }
 
       FormData formData = FormData();
+
       formData.fields.add(MapEntry('matricule', matricule));
-      MultipartFile photoCamionFile =  await MultipartFile.fromFile(photoCamion.path);
-      formData.files.add(MapEntry("photo_camion", photoCamionFile));
 
-      MultipartFile carteGriseFile = await MultipartFile.fromFile(carteGrise.path);
-      formData.files.add(MapEntry("carte_grise", carteGriseFile));
-
-      MultipartFile visiteTechniqueFile = await MultipartFile.fromFile(visiteTechnique.path);
-      formData.files.add(MapEntry("visite_technique", visiteTechniqueFile));
-
-      MultipartFile assuranceFile = await MultipartFile.fromFile(assurance.path);
-      formData.files.add(MapEntry("assurance", assuranceFile));
+      // Add image files directly using MapEntry objects
+      formData.files.add(MapEntry(
+          'photo_camion', await MultipartFile.fromFile(photoCamion.path)));
+      formData.files.add(MapEntry(
+          'carte_grise', await MultipartFile.fromFile(carteGrise.path)));
+      formData.files.add(MapEntry('visite_technique',
+          await MultipartFile.fromFile(visiteTechnique.path)));
+      formData.files.add(
+          MapEntry('assurance', await MultipartFile.fromFile(assurance.path)));
 
       print('Sending request to register truck...');
-      Dio.Response response =
-          await dio().post('/enregistrementCamion', data: formData);
+      Dio.Response response = await dio()
+          .post('/enregistrementCamion', data: formData, options: options);
 
       print('Response status code: ${response.statusCode}');
       if (response.statusCode == 201) {
