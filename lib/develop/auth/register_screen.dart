@@ -492,7 +492,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       items: _types.map((type) {
         return DropdownMenuItem(
           value: type,
-          child: Text(type),
+          child: Text(
+            type,
+            style: TextStyle(
+              color: _selectedType == type ? Colors.white : Colors.black,
+            ),
+          ),
         );
       }).toList(),
       onChanged: (value) {
