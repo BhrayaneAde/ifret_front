@@ -250,7 +250,7 @@ class _LoginState extends State<Login> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
+       bottomNavigationBar: Container(
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width,
         ),
@@ -288,6 +288,6 @@ class _LoginState extends State<Login> {
           ],
         ),
       ),
-    );
+  );
   }
 }

@@ -276,7 +276,7 @@ class Message {
 
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
-      text: json['message'],
+      text: json['text'],
       createdAt: DateTime.parse(json['created_at']),
       type: json['type'],
     );

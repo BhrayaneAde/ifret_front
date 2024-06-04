@@ -3,7 +3,21 @@ import 'dart:io';
 import 'package:dio/dio.dart' as Dio;
 import 'package:dio/dio.dart';
 import 'package:ifret/api/dio.dart';
+import 'package:ifret/composant/Chargeurs/accueilChargeur.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class MessageResponse {
+  final List<dynamic> messages;
+
+  MessageResponse({required this.messages});
+
+  factory MessageResponse.fromJson(Map<String, dynamic> json) {
+    return MessageResponse(
+      messages:
+          json['messages'] != null ? List<dynamic>.from(json['messages']) : [],
+    );
+  }
+}
 
 class ApiRequest {
   static Future<Map<String, dynamic>?> register(data) async {
@@ -86,7 +100,24 @@ class ApiRequest {
 
     // Retrieve the token from SharedPreferences under the 'token' key
     String? token = prefs.getString('token');
+    if (token != null) {
+      // If token exists, use it to fetch user details
+      Options options = Options(headers: {'Authorization': 'Bearer $token'});
+      Response response = await dio().get('/who', options: options);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Store user details in SharedPreferences
+        prefs.setString('user_numero_tel', response.data['numero_tel']);
+      }
+    }
     return token;
+  }
+
+  static Future<String?> getUserNumeroTel() async {
+    // Get the SharedPreferences instance
+    final prefs = await SharedPreferences.getInstance();
+
+    // Retrieve the user number from SharedPreferences
+    return prefs.getString('user_numero_tel');
   }
 
 // Function to fetch user data using the provided authentication token
@@ -108,7 +139,7 @@ class ApiRequest {
       print('Retrieving user data...');
       Dio.Response response = await dio().get('/who', options: options);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         print('User data retrieved successfully.');
         print(response.data);
         return response.data;
@@ -165,7 +196,7 @@ class ApiRequest {
         data: formData,
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         print('Profil mis à jour avec succès.');
         return response.data;
       } else {
@@ -206,7 +237,7 @@ class ApiRequest {
       Dio.Response response =
           await dio().put('/edit-profil', data: data, options: options);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         print('User profile updated successfully.');
         return response.data;
       } else {
@@ -217,6 +248,57 @@ class ApiRequest {
     }
 
     return null;
+  }
+
+  static Future<Map<String, dynamic>?> sendMessage(String messageText) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        return null;
+      }
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response = await dio().post(
+        '/send', // Utilisation de la route '/send' pour envoyer un message à l'administrateur
+        data: {'message': messageText},
+        options: options,
+      );
+      if (response.statusCode == 201) {
+        return response.data;
+      } else {
+        print('Error sending message to admin: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error sending message to admin: $e');
+      throw Exception('Error sending message to admin: $e');
+    }
+  }
+
+  
+  static Future<Map<String, dynamic>?> fetchMessages() async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        return null;
+      }
+      
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response = await dio().get(
+        '/receive',
+        options: options,
+      );
+      if (response.statusCode == 201) {
+        return response.data;
+      } else {
+        print('Error receiving message: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error receiving message: $e');
+      throw Exception('Error receiving message: $e');
+    }
   }
 
   static Future<List<Map<String, dynamic>>?> fetchTrafficData() async {
@@ -239,7 +321,7 @@ class ApiRequest {
       // Make the HTTP request to fetch traffic data
       Response response = await dio().get('/traffic', options: options);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         // If the request is successful, return the traffic data
         return List<Map<String, dynamic>>.from(response.data);
       } else {
@@ -260,7 +342,7 @@ class ApiRequest {
       // Faites une requête GET à votre API Laravel
       Response response = await dio().get('/notification', data: data);
       // Vérifiez si la réponse est réussie (code 200)
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         // Récupérez la notification depuis la réponse JSON
         return {
           'message': response.data['message'],
@@ -344,6 +426,98 @@ class ApiRequest {
     } catch (e) {
       print('Error during truck registration: $e');
       throw Exception("Erreur lors de l'enregistrement du camion: $e");
+    }
+  }
+
+  static Future<List<dynamic>> getUserCamions() async {
+    try {
+      // Get the authentication token from SharedPreferences
+      String? authToken = await _getAuthToken();
+
+      // If no token is available, return null
+      if (authToken == null) {}
+
+      // Define request options with the authentication token
+      Options options = Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      // Make the HTTP request to fetch traffic data
+      Response response = await dio().get('/camions', options: options);
+
+      if (response.statusCode == 201) {
+        // If the request is successful, return the traffic data
+        return response.data['data'];
+      } else {
+        // If the request fails, print the error and return null
+        print('Error fetching traffic data: ${response.statusCode}');
+        throw Exception('Erreur lors de la récupération des camions');
+      }
+    } catch (e) {
+      // If an error occurs, print the error and throw an exception
+      print('Erreur API: $e');
+      throw e;
+    }
+  }
+
+  static Future<Map<String, dynamic>> getCamionDetails(String matricule) async {
+    try {
+      String? authToken = await _getAuthToken();
+
+      if (authToken == null) {
+        throw Exception('Token d\'authentification non disponible');
+      }
+
+      Options options = Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      Response response =
+          await dio().get('/camions/$matricule', options: options);
+
+      if (response.statusCode == 201) {
+        return response.data['data'];
+      } else {
+        throw Exception('Erreur lors de la récupération des détails du camion');
+      }
+    } catch (e) {
+      print('Erreur API: $e');
+      throw e;
+    }
+  }
+
+  Future<void> updateCamion(String matricule, Map<String, dynamic> data) async {
+    try {
+      String? authToken = await _getAuthToken();
+
+      if (authToken == null) {
+        throw Exception('Token d\'authentification non disponible');
+      }
+
+      Options options = Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      FormData formData = FormData.fromMap(data);
+
+      Response response = await dio()
+          .put('/updateCamion/$matricule', data: formData, options: options);
+
+      if (response.statusCode == 201) {
+        print('Camion profile updated successfully.');
+        return response.data;
+      } else {
+        print('Error updating user profile: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erreur API: $e');
+      throw e;
     }
   }
 }

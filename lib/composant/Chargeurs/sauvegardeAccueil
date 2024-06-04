@@ -31,22 +31,17 @@ class _ChargeurState extends State<Chargeur> {
 
   Future<void> fetchMessages() async {
     try {
-      var response = await ApiRequest.fetchMessages();
-      if (response != null &&
-          response is Map<String, dynamic> &&
-          response.containsKey('messages')) {
-        List<dynamic> messagesData = response['messages'];
-        List<Message> messages = messagesData
-            .map((messageData) => Message.fromJson(messageData))
-            .toList();
+      List<Message> fetchedMessages = await ApiRequest.fetchMessages();
+      String? numeroTel = await ApiRequest.getUserNumeroTel();
+
+      if (numeroTel != null) {
         setState(() {
-          _messages = messages;
+          _currentUserNumeroTel = numeroTel;
+          _messages = fetchedMessages;
         });
-      } else {
-        print('La réponse de l\'API ne contient pas la clé "messages".');
       }
     } catch (e) {
-      print('Erreur lors de la récupération des messages : $e');
+      print('Error fetching messages: $e');
     }
   }
 
@@ -118,42 +113,16 @@ class _ChargeurState extends State<Chargeur> {
   }
 
   Widget _getMessages() {
-    return FutureBuilder<Map<String, dynamic>?>(
+    return FutureBuilder<List<Message>>(
       future: ApiRequest.fetchMessages(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          print('En attente de la récupération des messages...');
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          print(
-              'Erreur lors de la récupération des messages : ${snapshot.error}');
           return Center(child: Text('Erreur de chargement des messages'));
         } else if (snapshot.hasData) {
-          print('Messages récupérés avec succès !');
-
-          List<Message> messages = [];
-          if (snapshot.data != null && snapshot.data! is Map<String, dynamic>) {
-            print('Données des messages : ${snapshot.data!['messages']}');
-
-            if (snapshot.data!['messages'] is List) {
-              (snapshot.data!['messages'] as List<dynamic>)
-                  .forEach((messageData) {
-                Message message = Message.fromJson(messageData);
-                messages.add(message);
-              });
-            } else {
-              print('La clé "messages" ne contient pas une liste.');
-            }
-          } else {
-            print('La réponse de l\'API n\'est pas dans le format attendu.');
-          }
-
+          List<Message> messages = snapshot.data!;
           messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-
-          if (messages.isEmpty) {
-            return Center(child: Text('Aucun message disponible'));
-          }
-
           return Column(
             children: [
               Expanded(
@@ -213,25 +182,44 @@ class _ChargeurState extends State<Chargeur> {
   }
 
   Widget chatMessageTile(Message message) {
-    bool isSentByAdmin = message.type == 'admin';
-    bool isSentByUser = message.type == 'sent';
-
-    return Align(
-      alignment: isSentByAdmin ? Alignment.centerLeft : Alignment.centerRight,
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-        decoration: BoxDecoration(
-          color: isSentByAdmin ? Colors.yellow : Colors.blue,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          message.text,
-          style: TextStyle(
-            color: isSentByAdmin ? Colors.black : Colors.white,
+    return Row(
+      mainAxisAlignment: message.sendByAdmin
+          ? MainAxisAlignment.start
+          : (message.sendByMe
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.start),
+      children: [
+        Flexible(
+          child: Container(
+            padding: EdgeInsets.all(16),
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                bottomRight:
+                    message.sendByMe ? Radius.circular(0) : Radius.circular(24),
+                topRight: Radius.circular(24),
+                bottomLeft: message.sendByAdmin
+                    ? Radius.circular(0)
+                    : Radius.circular(24),
+              ),
+              color: message.sendByAdmin
+                  ? Colors.blue
+                  : (message.sendByMe
+                      ? Color.fromARGB(255, 234, 236, 240)
+                      : Color.fromARGB(255, 211, 228, 243)),
+            ),
+            child: Text(
+              message.message,
+              style: TextStyle(
+                color: message.sendByAdmin ? Colors.white : Colors.black,
+                fontSize: 15.0,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -240,10 +228,11 @@ class _ChargeurState extends State<Chargeur> {
       if (response != null) {
         setState(() {
           Message message = Message(
-            text: messageText,
-            type: 'sent', // Le type de message envoyé par l'utilisateur
-
+            message: messageText,
+            statut: null,
+            numeroTel: _currentUserNumeroTel!,
             createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
           );
           _messages.insert(0, message);
           _messageController.clear();
@@ -268,17 +257,36 @@ class _ChargeurState extends State<Chargeur> {
 }
 
 class Message {
-  final String text;
-  final String type;
+  final int? id; // Rendre l'identifiant facultatif
+  final String message;
+  final String? statut;
+  final String numeroTel;
   final DateTime createdAt;
+  final DateTime updatedAt;
+  bool sendByMe;
+  bool sendByAdmin;
 
-  Message({required this.text, required this.createdAt, required this.type});
+  Message({
+    this.id, // Rendre l'identifiant facultatif
+    required this.message,
+    this.statut,
+    required this.numeroTel,
+    required this.createdAt,
+    required this.updatedAt,
+    this.sendByMe = false,
+    this.sendByAdmin = false,
+  });
 
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
-      text: json['message'],
+      id: json['id'], // Récupérer l'identifiant depuis le JSON si disponible
+      message: json['message'],
+      statut: json['statut'],
+      numeroTel: json['numero_tel'],
       createdAt: DateTime.parse(json['created_at']),
-      type: json['type'],
+      updatedAt: DateTime.parse(json['updated_at']),
+      sendByMe: false,
+      sendByAdmin: false,
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_echarts/flutter_echarts.dart';
 import 'package:ifret/api/api_request.dart';
+import 'package:ifret/composant/Transporteurs/EnregistrerCamionModif.dart';
 import 'package:ifret/composant/Transporteurs/NotificationTransporteur.dart';
 import 'package:ifret/composant/Transporteurs/profilTransporteur.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -749,170 +750,158 @@ class _EnregistrementsState extends State<Enregistrements> {
   }
 }
 
-class Catalogue extends StatelessWidget {
-  // Définir des valeurs par défaut pour les camions
-  int camionsEnregistres = 100;
-  int camionsValides = 50;
-  int camionsEnAttente = 30;
-  int camionsRejetes = 20;
+class Catalogue extends StatefulWidget {
+  @override
+  _CatalogueState createState() => _CatalogueState();
+}
+
+class _CatalogueState extends State<Catalogue> {
+  List<dynamic> _camionsEnAttente = [];
+  List<dynamic> _camionsValides = [];
+  List<dynamic> _camionsRejetes = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCamions();
+  }
+
+  Future<void> _fetchCamions() async {
+    try {
+      List<dynamic> camions = await ApiRequest.getUserCamions();
+      setState(() {
+        _camionsEnAttente =
+            camions.where((camion) => camion['statut'] == 'En attent').toList();
+        _camionsValides =
+            camions.where((camion) => camion['statut'] == 'Validé').toList();
+        _camionsRejetes =
+            camions.where((camion) => camion['statut'] == 'Rejeté').toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print('Erreur: $e');
+    }
+  }
+
+  void _navigateToCorrectionPage(String matricule) async {
+    try {
+      Map<String, dynamic> camionDetails =
+          await ApiRequest.getCamionDetails(matricule);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EnregistrerCamionModifPage(
+              matricule: matricule, details: camionDetails),
+        ),
+      );
+    } catch (e) {
+      print('Erreur lors de la récupération des détails du camion: $e');
+      // Gérez les erreurs ici, par exemple, en affichant un message d'erreur à l'utilisateur
+    }
+  }
+
+  Widget _buildCamionTable(List<dynamic> camions, bool showActions) {
+    Color getStatutColor(String statut) {
+      switch (statut) {
+        case 'En attent':
+          return Color(0xFFFCCE00);
+        case 'Validé':
+          return Colors.green;
+        case 'Rejeté':
+          return Colors.red;
+        default:
+          return Colors.black;
+      }
+    }
+
+    return DataTable(
+      columns: [
+        DataColumn(label: Text('Matricule')),
+        DataColumn(label: Text('Statut')),
+        DataColumn(label: Text(showActions ? 'Actions' : 'Date de création')),
+      ],
+      rows: camions.map((camion) {
+        return DataRow(cells: [
+          DataCell(Text(camion['matricule'])),
+          DataCell(Text(
+            camion['statut'],
+            style: TextStyle(
+              color: getStatutColor(camion['statut']),
+              fontWeight: FontWeight.bold,
+            ),
+          )),
+          DataCell(
+            showActions
+                ? ElevatedButton(
+                    onPressed: () {
+                      _navigateToCorrectionPage(camion['matricule']);
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        Color(0xFFFCCE00),
+                      ),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24.0),
+                        ),
+                      ),
+                      minimumSize: MaterialStateProperty.all<Size>(
+                        Size(120, 48),
+                      ),
+                    ),
+                    child: Text(
+                      'Corriger',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  )
+                : Text(camion['created_at']),
+          ),
+        ]);
+      }).toList(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Afficher le nombre total de camions enregistrés
-              Text(
-                'Nombre de camions enregistrés : $camionsEnregistres',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20), // Espacement
-              // Utilisation de CustomPaint pour dessiner le diagramme circulaire
-              Container(
-                width: 200,
-                height: 200,
-                child: CustomPaint(
-                  painter: PieChartPainter(
-                    camionsValides: camionsValides,
-                    camionsRejetes: camionsRejetes,
-                    camionsEnAttente: camionsEnAttente,
-                  ),
+      appBar: AppBar(
+        title: Text('Mes Camions'),
+      ),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('En attente de validation',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    _buildCamionTable(_camionsEnAttente, false),
+                    SizedBox(height: 20),
+                    Text('Camions Validés',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    _buildCamionTable(_camionsValides, false),
+                    SizedBox(height: 20),
+                    Text('Camions Rejetés',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    _buildCamionTable(_camionsRejetes, true),
+                  ],
                 ),
               ),
-              SizedBox(height: 20), // Espacement
-              // Légende du diagramme
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildLegendItem(Color(0xff316eb5), 'Camions validés'),
-                  _buildLegendItem(Color(0xffe7324c), 'Camions rejetés'),
-                  _buildLegendItem(Color(0xfff5af19), 'Camions en attente'),
-                  SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Action à effectuer lors du clic sur le bouton "Voir raison de rejet"
-                        // Par exemple, afficher une boîte de dialogue avec la raison du rejet
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor:
-                            Color(0xFFFCCE00), // foreground/text color
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Text('Voir raison de rejet'),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
-  }
-
-  // Méthode utilitaire pour construire un élément de légende
-  Widget _buildLegendItem(Color color, String label) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(width: 20, height: 20, color: color),
-        SizedBox(width: 5),
-        Text(label),
-        SizedBox(width: 10),
-      ],
-    );
-  }
-}
-
-// Classe pour dessiner le diagramme circulaire
-class PieChartPainter extends CustomPainter {
-  final int camionsValides;
-  final int camionsRejetes;
-  final int camionsEnAttente;
-
-  PieChartPainter({
-    required this.camionsValides,
-    required this.camionsRejetes,
-    required this.camionsEnAttente,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double centerX = size.width / 2;
-    final double centerY = size.height / 2;
-    final double radius = math.min(centerX, centerY);
-    final Paint paint = Paint()..style = PaintingStyle.fill;
-
-    // Dessiner la section des camions validés
-    paint.color = Color(0xff316eb5);
-    _drawSection(canvas, centerX, centerY, radius, 0, camionsValides, paint);
-
-    // Dessiner la section des camions rejetés
-    paint.color = Color(0xffe7324c);
-    _drawSection(canvas, centerX, centerY, radius,
-        _calculateAngle(camionsValides), camionsRejetes, paint);
-
-    // Dessiner la section des camions en attente
-    paint.color = Color(0xFFFCCE00);
-    _drawSection(
-        canvas,
-        centerX,
-        centerY,
-        radius,
-        _calculateAngle(camionsValides) + _calculateAngle(camionsRejetes),
-        camionsEnAttente,
-        paint);
-  }
-
-  void _drawSection(Canvas canvas, double centerX, double centerY,
-      double radius, double startAngle, int camions, Paint paint) {
-    final double sweepAngle = _calculateAngle(camions);
-    canvas.drawArc(
-      Rect.fromCircle(center: Offset(centerX, centerY), radius: radius),
-      startAngle,
-      sweepAngle,
-      true,
-      paint,
-    );
-
-    // Afficher le nombre de camions à côté de chaque section
-    final double sectionCenterAngle = startAngle + sweepAngle / 2;
-    final double sectionCenterX =
-        centerX + (radius * 0.8) * math.cos(sectionCenterAngle);
-    final double sectionCenterY =
-        centerY + (radius * 0.8) * math.sin(sectionCenterAngle);
-
-    final TextSpan span = TextSpan(
-      style: TextStyle(
-          color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-      text: camions.toString(),
-    );
-    final TextPainter tp = TextPainter(
-      text: span,
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
-    );
-    tp.layout();
-    tp.paint(canvas,
-        Offset(sectionCenterX - tp.width / 2, sectionCenterY - tp.height / 2));
-  }
-
-  double _calculateAngle(int camions) {
-    final int totalCamions = camionsValides + camionsRejetes + camionsEnAttente;
-    return (camions / totalCamions) * 2 * math.pi;
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }
 
