@@ -6,9 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_echarts/flutter_echarts.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Transporteurs/EnregistrerCamionModif.dart';
+import 'package:ifret/composant/Transporteurs/FretDetailsPage.dart';
 import 'package:ifret/composant/Transporteurs/NotificationTransporteur.dart';
 import 'package:ifret/composant/Transporteurs/profilTransporteur.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:intl/intl.dart';
+
 import 'dart:math' as math;
 
 void main() {
@@ -1032,67 +1035,181 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 }
  */
-class NotificationPage extends StatelessWidget {
+class NotificationPage extends StatefulWidget {
+  @override
+  _NotificationPageState createState() => _NotificationPageState();
+}
+
+class _NotificationPageState extends State<NotificationPage> {
   List<Map<String, dynamic>> _notifications = [];
-  int _notificationCount = 0; // Ajout du compteur de notifications
+  int _notificationCount = 0;
+  bool _isLoading = true;
 
-  NotificationPage() {
-    // Simulation de l'ajout de notifications pour démonstration
-    _notifications.addAll([
-      {
-        'message': 'Nouvelle commande reçue',
-        'date': '10 avril 2024',
-        'read': false,
-      },
-      {
-        'message': 'Mise à jour de l\'application disponible',
-        'date': '8 avril 2024',
-        'read': true,
-      },
-      {
-        'message': 'Nouvelle fonctionnalité ajoutée',
-        'date': '6 avril 2024',
-        'read': false,
-      },
-    ]);
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotifications();
+  }
 
-    _notificationCount = _notifications.length;
+  Future<void> _fetchNotifications() async {
+    try {
+      List<Map<String, dynamic>>? notifications =
+          await ApiRequest.fetchNotifications();
+      if (notifications != null) {
+        setState(() {
+          _notifications = notifications.map((notification) {
+            // Formater la date ici
+            String formattedDate = _formatDate(notification['created_at']);
+
+            return {
+              'id': notification['id'],
+              'message': 'Fret Disponible', // Message fixe
+              'date': formattedDate, // Date formatée
+              'read': false, // par défaut non lu
+            };
+          }).toList();
+          _notificationCount = _notifications.length;
+          _isLoading = false; // Arrêter l'indicateur de chargement
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching notifications: $e');
+      setState(() {
+        _isLoading =
+            false; // Arrêter l'indicateur de chargement même en cas d'erreur
+      });
+    }
+  }
+
+  // Nouvelle fonction pour formater la date
+  String _formatDate(String dateString) {
+    DateTime dateTime = DateTime.parse(dateString);
+    String formattedDate = DateFormat('dd/MM/yyyy - HH:mm').format(dateTime);
+    return formattedDate;
   }
 
   @override
   Widget build(BuildContext context) {
-    // Tri des notifications en fonction de leur état de lecture
-    _notifications.sort((a, b) {
-      if (a['read'] == true && b['read'] == false) {
-        return 1;
-      } else if (a['read'] == false && b['read'] == true) {
-        return -1;
-      } else {
-        return 0;
-      }
-    });
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notification'),
+        title: Text('Notifications'),
+        backgroundColor: Colors.grey[400],
       ),
-      body: ListView.builder(
-        itemCount: _notifications.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(
-              _notifications[index]['message'],
-              // Utiliser le fontWeight en fonction de l'état de lecture de la notification
-              style: TextStyle(
-                fontWeight: _notifications[index]['read'] == true
-                    ? FontWeight.normal
-                    : FontWeight.bold,
+      body: _isLoading
+          ? Center(
+              child:
+                  CircularProgressIndicator()) // Afficher l'indicateur de chargement pendant le fetch
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 15), // Espace entre chaque notification
+                  ..._notifications.map((notification) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5.0, horizontal: 8.0),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: ListTile(
+                          onTap: () {
+                            // Marquer la notification comme lue
+                            setState(() {
+                              notification['read'] = true;
+                            });
+                          },
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          tileColor: Colors.white,
+                          leading: Icon(Icons.notifications,
+                              color: Color(0xFFFCCE00)),
+                          title: Text(
+                            notification['message'],
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: notification['read']
+                                  ? FontWeight.normal
+                                  : FontWeight.bold,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          subtitle: Text(
+                            notification['date'],
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+                          trailing: ElevatedButton(
+                            onPressed: () {
+                              print(
+                                  'ID de la notification sélectionnée : ${notification['id']}'); // Print pour vérifier l'ID
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      FutureBuilder<Map<String, dynamic>>(
+                                    future: ApiRequest.fetchFretDetails(
+                                        notification['id']),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Center(
+                                            child: CircularProgressIndicator());
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                            child: Text(
+                                                'Erreur : ${snapshot.error}'));
+                                      } else if (!snapshot.hasData ||
+                                          snapshot.data == null) {
+                                        return Center(
+                                            child: Text(
+                                                'Aucun détail disponible pour ce fret'));
+                                      } else {
+                                        final fret = snapshot.data!;
+                                        return FretDetailsPage(
+                                            fretDetails: fret);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Color(0xFFFCCE00)),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24.0),
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Détails',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ],
               ),
             ),
-            subtitle: Text(_notifications[index]['date']),
-          );
-        },
-      ),
+      backgroundColor: Colors.grey[400], // Couleur de fond du Scaffold
     );
   }
 }

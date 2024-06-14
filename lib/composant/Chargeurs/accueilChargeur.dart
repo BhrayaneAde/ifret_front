@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Chargeurs/profilChargeur.dart';
+import 'package:ifret/main.dart';
 
 class Chargeur extends StatefulWidget {
   final String name;
@@ -42,12 +44,45 @@ class _ChargeurState extends State<Chargeur> {
         setState(() {
           _messages = messages;
         });
+        // Afficher une notification si un message de type "admin" est reçu
+        _showAdminMessagesNotification(messages);
       } else {
         print('La réponse de l\'API ne contient pas la clé "messages".');
       }
     } catch (e) {
       print('Erreur lors de la récupération des messages : $e');
     }
+  }
+
+  void _showAdminMessagesNotification(List<Message> messages) {
+    for (var message in messages) {
+      if (message.type == 'admin') {
+        _showNotification(message.text);
+      }
+    }
+  }
+
+  Future<void> _showNotification(String messageText) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'your_channel_id',
+      'your_channel_name',
+      channelDescription: 'your_channel_description',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Nouveau message de l\'administrateur',
+      messageText,
+      platformChannelSpecifics,
+      payload: 'item x',
+    );
   }
 
   @override

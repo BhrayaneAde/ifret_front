@@ -275,14 +275,13 @@ class ApiRequest {
     }
   }
 
-  
   static Future<Map<String, dynamic>?> fetchMessages() async {
     try {
       String? authToken = await _getAuthToken();
       if (authToken == null) {
         return null;
       }
-      
+
       Options options =
           Options(headers: {'Authorization': 'Bearer $authToken'});
       Response response = await dio().get(
@@ -298,6 +297,61 @@ class ApiRequest {
     } catch (e) {
       print('Error receiving message: $e');
       throw Exception('Error receiving message: $e');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>?> fetchNotifications() async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response = await dio().get('/frets', options: options);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Convertir les données reçues en une liste de maps
+        List<dynamic> data = response.data['data'];
+        List<Map<String, dynamic>> notifications = data.map((item) {
+          return item as Map<String, dynamic>;
+        }).toList();
+        return notifications;
+      } else {
+        print('Error fetching notifications: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching notifications: $e');
+      throw Exception('Error fetching notifications: $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchFretDetails(int id) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response = await dio().get('/frets/$id', options: options);
+
+      if (response.statusCode == 201) {
+        // Succès : Convertir les données en Map<String, dynamic>
+        return response.data['data'] as Map<String, dynamic>;
+      } else if (response.statusCode == 404) {
+        // Fret non trouvé : Gérer l'erreur avec une exception ou une réponse vide
+        throw Exception('Fret non trouvé');
+      } else {
+        // Autres erreurs : Gérer selon le code d'erreur
+        throw Exception('Error fetching fret details: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching fret details: $e');
+      throw Exception('Error fetching fret details: $e');
     }
   }
 
@@ -341,7 +395,7 @@ class ApiRequest {
     try {
       // Faites une requête GET à votre API Laravel
       Response response = await dio().get('/notification', data: data);
-      // Vérifiez si la réponse est réussie (code 200)
+      // Vérifiez si la réponse est réussie (code 201)
       if (response.statusCode == 201) {
         // Récupérez la notification depuis la réponse JSON
         return {
