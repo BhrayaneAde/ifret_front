@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart' as Dio;
@@ -154,6 +155,161 @@ class ApiRequest {
     return null;
   }
 
+  static Future<Dio.Response?> soumissionner(Map<String, dynamic> data) async {
+    try {
+      // Récupérer le token d'authentification
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('Token d\'authentification non disponible');
+      }
+
+      // Définir les options de la requête avec le token d'authentification
+      var options = Dio.Options(
+        contentType: Dio.Headers.jsonContentType,
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+        validateStatus: (status) => status! < 500,
+      );
+
+      // Faire la requête POST pour soumissionner
+      Dio.Response response =
+          await dio().post('/soumissionnaires', data: data, options: options);
+
+      // Retourner la réponse pour un traitement ultérieur
+      return response;
+    } catch (e) {
+      // Gérer l'exception
+      print('Erreur lors de la soumission : $e');
+      return null; // Retourner null en cas d'erreur
+    }
+  }
+
+  // Fonction pour récupérer les voyages
+  static Future<List<Map<String, dynamic>>> fetchVoyages() async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('Token d\'authentification non disponible');
+      }
+
+      var options = Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      Response response = await dio().get(
+        '/voyages',
+        options: options,
+      );
+
+      if (response.statusCode == 200) {
+        return List<Map<String, dynamic>>.from(response.data);
+      } else {
+        print(
+            'Erreur lors de la récupération des données : ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Erreur lors de la récupération des voyages : $e');
+      return [];
+    }
+  }
+
+  // Fonction pour récupérer les détails d'un voyage par demandeId
+  static Future<Map<String, dynamic>> fetchVoyageDetails(int demandeId) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response =
+          await dio().get('/voyages/$demandeId', options: options);
+
+      if (response.statusCode == 200) {
+        // Convertir les données en Map<String, dynamic>
+        Map<String, dynamic> voyageDetails =
+            Map<String, dynamic>.from(response.data);
+
+        // Ajouter des détails supplémentaires si nécessaire
+        if (voyageDetails.containsKey('demande_details')) {
+          voyageDetails['fret_details'] = {
+            'type_vehicule': voyageDetails['demande_details']
+                    ['type_vehicule'] ??
+                'Non spécifié',
+            'date_depart': voyageDetails['demande_details']['date_depart'] ??
+                'Non spécifié', // Ajout de la date de départ
+            'date_arrive': voyageDetails['demande_details']['date_arrive'] ??
+                'Non spécifié', // Ajout de la date d'arrivée
+            'montant':
+                voyageDetails['demande_details']['montant'] ?? 'Non spécifié',
+            'lieu_depart': voyageDetails['demande_details']['lieu_depart'] ??
+                'Non spécifié',
+            'lieu_arrive': voyageDetails['demande_details']['lieu_arrive'] ??
+                'Non spécifié',
+          };
+        } else {
+          voyageDetails['fret_details'] = {
+            'type_vehicule': 'Non spécifié',
+            'montant': 'Non spécifié',
+            'date_depart': 'Non spécifié', // Par défaut si non spécifié
+            'date_arrive': 'Non spécifié', // Par défaut si non spécifié
+            'lieu_depart': 'Non spécifié',
+            'lieu_arrive': 'Non spécifié',
+          };
+        }
+
+        return voyageDetails;
+      } else if (response.statusCode == 404) {
+        throw Exception('Voyage not found');
+      } else {
+        throw Exception(
+            'Error fetching voyage details: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching voyage details: $e');
+      throw Exception('Error fetching voyage details: $e');
+    }
+  }
+
+  /*  static Future<Map<String, dynamic>> fetchFretDetailsA(int fretId) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response = await dio().get('/fretsA/$fretId', options: options);
+
+      if (response.statusCode == 200) {
+        // Succès : La réponse est déjà sous forme de Map<String, dynamic>
+        Map<String, dynamic> fretDetails = response.data;
+
+        // Ajouter des détails supplémentaires si nécessaire
+        /* fretDetails['additional_info'] = 'Some extra details'; */
+
+        print(fretDetails); // Pour déboguer et voir les données reçues
+
+        return fretDetails;
+      } else if (response.statusCode == 404) {
+        // Fret non trouvé : Gérer l'erreur avec une exception ou une réponse vide
+        throw Exception('Fret not found');
+      } else {
+        // Autres erreurs : Gérer selon le code d'erreur
+        throw Exception('Error fetching fret details: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching fret details: $e');
+      throw Exception('Error fetching fret details: $e');
+    }
+  } */
+
   static Future<Map<String, dynamic>?> updateUserProfileWithImage({
     required Map<String, dynamic> userData,
     required File image,
@@ -237,7 +393,7 @@ class ApiRequest {
       Dio.Response response =
           await dio().put('/edit-profil', data: data, options: options);
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         print('User profile updated successfully.');
         return response.data;
       } else {
@@ -480,6 +636,43 @@ class ApiRequest {
     } catch (e) {
       print('Error during truck registration: $e');
       throw Exception("Erreur lors de l'enregistrement du camion: $e");
+    }
+  }
+
+  static Future<List<dynamic>?> getChauffeurs() async {
+    try {
+      // Récupérer le jeton d'authentification depuis SharedPreferences
+      String? authToken = await _getAuthToken();
+
+      // Vérifier si le jeton d'authentification est disponible
+      if (authToken == null) {
+        throw Exception('Auth token not available');
+      }
+
+      // Définir les options de la requête avec le jeton d'authentification
+      Options options = Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+
+      // Faire la requête GET à l'API pour récupérer les chauffeurs
+      Response response = await dio().get(
+        '/chauffeurs', // Remplacez par votre URL d'API Laravel
+        options: options,
+      );
+
+      // Vérifier le code de statut de la réponse
+      if (response.statusCode == 201) {
+        // Convertir les données JSON en une liste dynamique
+        List<dynamic> chauffeurs = response.data['chauffeurs'];
+        return chauffeurs;
+      } else {
+        throw Exception('Failed to fetch chauffeurs: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching chauffeurs: $e');
+      throw Exception('Error fetching chauffeurs: $e');
     }
   }
 

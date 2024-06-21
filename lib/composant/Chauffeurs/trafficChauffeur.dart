@@ -1,77 +1,133 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:ifret/composant/Chargeurs/d%C3%A9tailsChargeur.dart';
-import 'package:ifret/composant/Chauffeurs/d%C3%A9tailsChauffeur.dart';
-import 'package:ifret/composant/Transporteurs/d%C3%A9tailsTransporteur.dart';
+import 'package:ifret/api/api_request.dart';
 
-class TrafficChauffeur extends StatelessWidget {
-  final String dateEnvoi = '2024-04-12'; // Exemple de date
-  final String matricule = 'AX 5820'; // Exemple de fret envoyé
+import 'package:intl/intl.dart';
+
+import 'détailsChauffeur.dart';
+
+class TrafficChauffeur extends StatefulWidget {
+  @override
+  _TrafficChauffeurState createState() => _TrafficChauffeurState();
+}
+
+class _TrafficChauffeurState extends State<TrafficChauffeur> {
+  Map<String, dynamic> voyage = {};
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadVoyageDetails(); // Charger les détails du premier voyage par défaut
+  }
+
+  // Fonction pour charger les détails du voyage et du chauffeur associé
+  Future<void> loadVoyageDetails() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Supposons que vous récupérez l'ID du voyage d'une source dynamique
+      int voyageId =
+          await _getVoyageId(); // Appel à une fonction pour récupérer l'ID du voyage
+
+      Map<String, dynamic> fetchedVoyage =
+          await ApiRequest.fetchVoyageDetails(voyageId);
+
+      setState(() {
+        voyage = fetchedVoyage;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading voyage details: $e');
+      setState(() {
+        isLoading = false;
+      });
+      // Gérer l'erreur, par exemple afficher un message à l'utilisateur
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Erreur'),
+          content: Text('Erreur lors du chargement des détails du voyage.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  // Fonction fictive pour récupérer l'ID du voyage (à adapter selon votre logique)
+  Future<int> _getVoyageId() async {
+    // Ici, vous pouvez implémenter la logique pour récupérer l'ID du voyage
+    // Par exemple, à partir d'une liste de voyages, d'une sélection utilisateur, etc.
+    return 1; // Retourne un ID fictif pour cet exemple, à remplacer par votre propre logique
+  }
+
+  // Fonction pour formater la date et l'heure
+  String formatDateTime(String dateTimeStr) {
+    DateTime dateTime = DateTime.parse(dateTimeStr);
+    return DateFormat('dd/MM/yyyy HH:mm').format(dateTime);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Spacer(), // Pousser le widget RichText vers la droite
-            RichText(
-              text: TextSpan(
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                children: [
-                  TextSpan(
-                      text: 'Historique Parcours',
-                      style: TextStyle(color: Colors.black)),
-                ],
-              ),
-            ),
-          ],
+        title: Text(
+          'Historique Parcours Chauffeurs',
+          style: TextStyle(color: Colors.black),
         ),
-        backgroundColor:
-            Color(0xFFFCCE00), // Définir la couleur de fond en noir
+        backgroundColor: Color(0xFFFCCE00),
         leading: IconButton(
-          icon: Icon(Icons
-              .arrow_back), // Supposant que vous voulez un bouton de retour
-          color: Colors.white, // Définir la couleur du bouton en blanc
+          icon: Icon(Icons.arrow_back),
+          color: Colors.white,
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 15), // Espace entre chaque Container
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : voyage.isEmpty
+              ? Center(
+                  child: Text('Aucun voyage disponible'),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
                   child: Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: ListTile(
-                      onTap: () {
-                        // Action à effectuer lorsque l'utilisateur appuie sur le ListTile
-                        Navigator.push(
+                      onTap: () async {
+                        int chauffeurId = voyage['chauffeur']
+                            ['id']; // Récupérer l'ID du chauffeur
+                        int voyageId = voyage['id']; // Récupérer l'ID du voyage
+
+                        // Utiliser Navigator pour aller à DetailChauffeur avec l'ID
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => DetailChauffeur(
-                              dateEnvoi: '',
-                              matricule: '',
+                              chauffeurId: chauffeurId,
+                              voyageId:
+                                  voyageId, // Passer voyageId à DetailChauffeur
                             ),
                           ),
                         );
+                        // Après retour de DetailChauffeur, rafraîchir les détails du voyage si nécessaire
+                        loadVoyageDetails();
                       },
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       tileColor: Colors.white,
                       title: Text(
-                        '$dateEnvoi', // Utilisation de la variable de date
+                        formatDateTime(voyage['date_creation']),
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -80,7 +136,7 @@ class TrafficChauffeur extends StatelessWidget {
                         ),
                       ),
                       subtitle: Text(
-                        '$matricule', // Utilisation de la variable de fret envoyé
+                        voyage['vehicule_matricule'] ?? 'N/A',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -90,23 +146,31 @@ class TrafficChauffeur extends StatelessWidget {
                       leading:
                           Icon(Icons.directions_car, color: Color(0xFFFCCE00)),
                       trailing: Container(
-                        width: 100, // Largeur fixe du bouton
+                        width: 100,
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            int chauffeurId = voyage['chauffeur']
+                                ['id']; // Récupérer l'ID du chauffeur
+                            int voyageId =
+                                voyage['id']; // Récupérer l'ID du voyage
+
+                            // Utiliser Navigator pour aller à DetailChauffeur avec l'ID
+                            await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DetailTransporteur(
-                                  dateEnvoi: '',
-                                  matricule: '',
+                                builder: (context) => DetailChauffeur(
+                                  chauffeurId: chauffeurId,
+                                  voyageId:
+                                      voyageId, // Passer voyageId à DetailChauffeur
                                 ),
                               ),
                             );
+                            // Après retour de DetailChauffeur, rafraîchir les détails du voyage si nécessaire
+                            loadVoyageDetails();
                           },
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(
-                              Color(0xFFFCCE00),
-                            ),
+                                Color(0xFFFCCE00)),
                             shape: MaterialStateProperty.all<
                                 RoundedRectangleBorder>(
                               RoundedRectangleBorder(
@@ -126,13 +190,7 @@ class TrafficChauffeur extends StatelessWidget {
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      backgroundColor:
-          Colors.grey[400], // Set "dirty white" background for body
+      backgroundColor: Colors.grey[400],
     );
   }
 }

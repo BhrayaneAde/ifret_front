@@ -736,6 +736,7 @@ class ModifierProfil extends StatelessWidget {
           ],
         ),
       ),
+      backgroundColor: Colors.grey[400],
     );
   }
 
@@ -795,13 +796,13 @@ class ModifierProfil extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0), // Forme du ListTile
         ),
-        tileColor: const Color(0xfffcce00), // Couleur de fond du ListTile
+        tileColor: Colors.white, // Couleur de fond du ListTile
         title: Row(
           children: [
             Icon(
               iconData,
               size: 20,
-              color: Colors.black, // Couleur de l'icône
+              color: Color(0xfffcce00), // Couleur de l'icône
             ),
             SizedBox(width: 10), // Espacement entre l'icône et le texte
             Text(
@@ -849,13 +850,13 @@ class ModifierProfil extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0), // Forme du ListTile
           ),
-          tileColor: const Color(0xfffcce00), // Couleur de fond du ListTile
+          tileColor: Colors.white, // Couleur de fond du ListTile
           title: Row(
             children: [
               Icon(
                 iconData,
                 size: 20,
-                color: Colors.black, // Couleur de l'icône
+                color: Color(0xfffcce00), // Couleur de l'icône
               ),
               SizedBox(width: 10), // Espacement entre l'icône et le texte
               Text(

@@ -91,30 +91,6 @@ class _TransporteursState extends State<Transporteurs> {
             currentIndex: _selectedIndex,
             onTap: _onItemTapped,
           ),
-          if (_notificationCount != 0)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                constraints: BoxConstraints(
-                  minWidth: 16,
-                  minHeight: 16,
-                ),
-                child: Text(
-                  '$_notificationCount',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -454,14 +430,7 @@ class _EnregistrementsState extends State<Enregistrements> {
       padding: const EdgeInsets.all(20.0),
       children: [
         // Champ pour le numéro de matricule
-        /*  buildTextField(
-          label: 'Numéro d\'immatriculation :',
-          onChanged: (value) {
-            setState(() {
-              matricule = value;
-            });
-          },
-        ), */
+
         buildTextField(
           label: 'Numéro d\'immatriculation :',
           onChanged: (value) => setState(() => matricule = value),
@@ -1068,7 +1037,7 @@ class _NotificationPageState extends State<NotificationPage> {
               'read': false, // par défaut non lu
             };
           }).toList();
-          _notificationCount = _notifications.length;
+          _updateNotificationCount(); // Mettre à jour le compteur initial
           _isLoading = false; // Arrêter l'indicateur de chargement
         });
       } else {
@@ -1092,11 +1061,29 @@ class _NotificationPageState extends State<NotificationPage> {
     return formattedDate;
   }
 
+  // Fonction pour mettre à jour le compteur de notifications non lues
+  void _updateNotificationCount() {
+    setState(() {
+      _notificationCount =
+          _notifications.where((notification) => !notification['read']).length;
+    });
+  }
+
+  // Fonction pour marquer une notification comme lue
+  void _markAsRead(Map<String, dynamic> notification) {
+    if (!notification['read']) {
+      setState(() {
+        notification['read'] = true;
+        _updateNotificationCount(); // Mettre à jour le compteur après avoir marqué comme lu
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: Text('Notifications ($_notificationCount)'),
         backgroundColor: Colors.grey[400],
       ),
       body: _isLoading
@@ -1118,10 +1105,8 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                         child: ListTile(
                           onTap: () {
-                            // Marquer la notification comme lue
-                            setState(() {
-                              notification['read'] = true;
-                            });
+                            _markAsRead(
+                                notification); // Marquer la notification comme lue
                           },
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),

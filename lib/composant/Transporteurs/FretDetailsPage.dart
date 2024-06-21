@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ifret/api/api_request.dart';
+import 'package:ifret/composant/Transporteurs/ValidatedCamionsPage.dart';
 
 class FretDetailsPage extends StatefulWidget {
   final Map<String, dynamic> fretDetails;
@@ -10,7 +12,37 @@ class FretDetailsPage extends StatefulWidget {
 }
 
 class _FretDetailsPageState extends State<FretDetailsPage> {
+  List<dynamic> _camionsValides = []; // Déclaration de _camionsValides
+  bool _isLoading = true;
+
   @override
+  void initState() {
+    super.initState();
+    _fetchCamionsValides();
+  }
+
+  Future<void> _fetchCamionsValides() async {
+    try {
+      // Appel à la méthode statique pour récupérer les camions depuis ApiRequest
+      List<dynamic> camions = await ApiRequest.getUserCamions();
+
+      // Filtrer les camions validés
+      List<dynamic> camionsValides =
+          camions.where((camion) => camion['statut'] == 'Validé').toList();
+
+      setState(() {
+        _camionsValides = camionsValides;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Erreur lors de la récupération des camions validés: $e');
+      setState(() {
+        _isLoading = false;
+      });
+      // Gérez l'erreur ici, par exemple, affichez un message à l'utilisateur
+    }
+  }
+
   Widget build(BuildContext context) {
     // Print pour afficher les détails complets du fret
     print('Détails complets du fret : ${widget.fretDetails}');
@@ -104,7 +136,15 @@ class _FretDetailsPageState extends State<FretDetailsPage> {
               SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context); // Retourner à la page précédente
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ValidatedCamionsPage(
+                        validatedCamions: _camionsValides,
+                        fretId: widget.fretDetails['id'], // Passer l'ID du fret
+                      ),
+                    ),
+                  );
                 },
                 style: ButtonStyle(
                   backgroundColor:
