@@ -185,7 +185,7 @@ class ApiRequest {
     }
   }
 
-  // Fonction pour récupérer les voyages
+// Fonction pour récupérer les voyages
   static Future<List<Map<String, dynamic>>> fetchVoyages() async {
     try {
       String? authToken = await _getAuthToken();
@@ -199,10 +199,7 @@ class ApiRequest {
         },
       );
 
-      Response response = await dio().get(
-        '/voyages',
-        options: options,
-      );
+      Response response = await dio().get('/voyages', options: options);
 
       if (response.statusCode == 200) {
         return List<Map<String, dynamic>>.from(response.data);
@@ -211,7 +208,13 @@ class ApiRequest {
             'Erreur lors de la récupération des données : ${response.statusCode}');
         return [];
       }
+    } on DioException catch (e) {
+      // Gérer les exceptions spécifiques à Dio
+      print(
+          'Erreur lors de la récupération des voyages (DioException) : ${e.response?.statusCode} - ${e.response?.data}');
+      return [];
     } catch (e) {
+      // Gérer les exceptions génériques
       print('Erreur lors de la récupération des voyages : $e');
       return [];
     }
@@ -231,35 +234,37 @@ class ApiRequest {
           await dio().get('/voyages/$demandeId', options: options);
 
       if (response.statusCode == 200) {
-        // Convertir les données en Map<String, dynamic>
         Map<String, dynamic> voyageDetails =
             Map<String, dynamic>.from(response.data);
 
-        // Ajouter des détails supplémentaires si nécessaire
         if (voyageDetails.containsKey('demande_details')) {
           voyageDetails['fret_details'] = {
             'type_vehicule': voyageDetails['demande_details']
                     ['type_vehicule'] ??
                 'Non spécifié',
             'date_depart': voyageDetails['demande_details']['date_depart'] ??
-                'Non spécifié', // Ajout de la date de départ
+                'Non spécifié',
             'date_arrive': voyageDetails['demande_details']['date_arrive'] ??
-                'Non spécifié', // Ajout de la date d'arrivée
+                'Non spécifié',
             'montant':
                 voyageDetails['demande_details']['montant'] ?? 'Non spécifié',
             'lieu_depart': voyageDetails['demande_details']['lieu_depart'] ??
                 'Non spécifié',
             'lieu_arrive': voyageDetails['demande_details']['lieu_arrive'] ??
                 'Non spécifié',
+            'description_fret': voyageDetails['demande_details']
+                    ['description_fret'] ??
+                'Aucune description disponible',
           };
         } else {
           voyageDetails['fret_details'] = {
             'type_vehicule': 'Non spécifié',
+            'date_depart': 'Non spécifié',
+            'date_arrive': 'Non spécifié',
             'montant': 'Non spécifié',
-            'date_depart': 'Non spécifié', // Par défaut si non spécifié
-            'date_arrive': 'Non spécifié', // Par défaut si non spécifié
             'lieu_depart': 'Non spécifié',
             'lieu_arrive': 'Non spécifié',
+            'description_fret': 'Aucune description disponible',
           };
         }
 
@@ -270,9 +275,17 @@ class ApiRequest {
         throw Exception(
             'Error fetching voyage details: ${response.statusCode}');
       }
+    } on DioException catch (e) {
+      // Gérer les exceptions spécifiques à Dio
+      print(
+          'Erreur lors de la récupération des détails du voyage (DioException) : ${e.response?.statusCode} - ${e.response?.data}');
+      throw Exception(
+          'Erreur lors de la récupération des détails du voyage : ${e.response?.statusCode} - ${e.response?.data}');
     } catch (e) {
-      print('Error fetching voyage details: $e');
-      throw Exception('Error fetching voyage details: $e');
+      // Gérer les exceptions génériques
+      print('Erreur lors de la récupération des détails du voyage : $e');
+      throw Exception(
+          'Erreur lors de la récupération des détails du voyage : $e');
     }
   }
 

@@ -11,9 +11,10 @@ class DetailTransporteur extends StatefulWidget {
 }
 
 class _DetailTransporteurState extends State<DetailTransporteur> {
-  late Map<String, dynamic> _voyageDetails;
+  late Map<String, dynamic> _voyageDetails = {}; // Initialize with empty map
   bool _isLoading = true;
   bool _hasError = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -23,16 +24,28 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
 
   Future<void> _fetchVoyageDetails() async {
     try {
+      // Récupérer les détails du voyage
       Map<String, dynamic> details =
           await ApiRequest.fetchVoyageDetails(widget.demandeId);
+
+      // Extraire les détails du fret si disponibles
+      if (details.containsKey('fret_details')) {
+        // Assurer que la clé 'description_fret' est correctement extraite
+        details['fret_details']['description'] = details['fret_details']
+                ['description_fret'] ??
+            'Aucune description disponible';
+      }
+
       setState(() {
         _voyageDetails = details;
         _isLoading = false;
       });
     } catch (error) {
+      print('Erreur lors de la récupération des détails du voyage : $error');
       setState(() {
         _isLoading = false;
         _hasError = true;
+        _errorMessage = error.toString();
       });
     }
   }
@@ -72,8 +85,15 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
           ? Center(child: CircularProgressIndicator())
           : _hasError
               ? Center(
-                  child:
-                      Text('Erreur lors du chargement des détails du voyage'))
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Erreur lors du chargement des détails du voyage'),
+                      SizedBox(height: 10),
+                      Text('Détails de l\'erreur: $_errorMessage'),
+                    ],
+                  ),
+                )
               : SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.all(10.0),
@@ -83,37 +103,45 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
                         _buildSectionTitle('Détails du Fret'),
                         _buildDetailsCard(
                           'Type de Véhicule:',
-                          _voyageDetails['fret_details']['type_vehicule'] ??
+                          _voyageDetails['fret_details']?['type_vehicule'] ??
                               'Non spécifié',
                         ),
                         SizedBox(height: 5),
                         _buildDetailsCard(
                           'Montant:',
-                          _voyageDetails['fret_details']['montant'].toString(),
+                          _voyageDetails['fret_details']?['montant']
+                                  ?.toString() ??
+                              'Non spécifié',
                         ),
                         SizedBox(height: 5),
                         _buildDetailsCard(
                           'Lieu de Départ:',
-                          _voyageDetails['fret_details']['lieu_depart'] ??
+                          _voyageDetails['fret_details']?['lieu_depart'] ??
                               'Non spécifié',
                         ),
                         SizedBox(height: 5),
                         _buildDetailsCard(
                           'Lieu d\'Arrivée:',
-                          _voyageDetails['fret_details']['lieu_arrive'] ??
+                          _voyageDetails['fret_details']?['lieu_arrive'] ??
                               'Non spécifié',
                         ),
                         SizedBox(height: 5),
                         _buildDetailsCard(
                           'Date de Départ:',
-                          _voyageDetails['fret_details']['date_depart'] ??
+                          _voyageDetails['fret_details']?['date_depart'] ??
                               'Non spécifié',
                         ),
                         SizedBox(height: 5),
                         _buildDetailsCard(
                           'Date d\'Arrivée:',
-                          _voyageDetails['fret_details']['date_arrive'] ??
+                          _voyageDetails['fret_details']?['date_arrive'] ??
                               'Non spécifié',
+                        ),
+                        SizedBox(height: 5),
+                        _buildDetailsCard(
+                          'Description du Fret:',
+                          _voyageDetails['fret_details']?['description'] ??
+                              'Aucune description disponible',
                         ),
                         SizedBox(height: 15),
                         _buildSectionTitle('Détails du Voyage'),
