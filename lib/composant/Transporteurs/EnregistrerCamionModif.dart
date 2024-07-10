@@ -23,6 +23,10 @@ class _EnregistrerCamionModifPageState
   File? _carteGrise;
   File? _visiteTechnique;
   File? _assurance;
+  String? _photoCamionCommentaire;
+  String? _carteGriseCommentaire;
+  String? _visiteTechniqueCommentaire;
+  String? _assuranceCommentaire;
   bool _isLoading = true;
 
   @override
@@ -40,8 +44,13 @@ class _EnregistrerCamionModifPageState
   Future<void> _fetchCamionDetails(String matricule) async {
     try {
       var camion = await ApiRequest.getCamionDetails(matricule);
+
+      // Print the entire response to debug
+      print('API Response: $camion');
+
       setState(() {
         _matriculeController.text = camion['matricule'] ?? '';
+
         // Set other fields based on the API response
         _photoCamion = camion['photo_camion'] != null
             ? File(camion['photo_camion'])
@@ -53,6 +62,23 @@ class _EnregistrerCamionModifPageState
             : null;
         _assurance =
             camion['assurance'] != null ? File(camion['assurance']) : null;
+
+        // Assign comments regardless of status
+        _photoCamionCommentaire =
+            camion['photo_camion_commentaire'] ?? _photoCamionCommentaire;
+        _carteGriseCommentaire =
+            camion['carte_grise_commentaire'] ?? _carteGriseCommentaire;
+        _visiteTechniqueCommentaire = camion['visite_technique_commentaire'] ??
+            _visiteTechniqueCommentaire;
+        _assuranceCommentaire =
+            camion['assurance_commentaire'] ?? _assuranceCommentaire;
+
+        // Print comments to check if they are retrieved correctly
+        print('Photo Camion Commentaire: $_photoCamionCommentaire');
+        print('Carte Grise Commentaire: $_carteGriseCommentaire');
+        print('Visite Technique Commentaire: $_visiteTechniqueCommentaire');
+        print('Assurance Commentaire: $_assuranceCommentaire');
+
         _isLoading = false;
       });
     } catch (e) {
@@ -160,26 +186,30 @@ class _EnregistrerCamionModifPageState
                         label: "Photo du Camion",
                         file: _photoCamion,
                         onPressed: () => _pickFile(0),
+                        commentaire: _photoCamionCommentaire,
                       ),
                       SizedBox(height: 10),
                       buildImageField(
                         label: "Carte Grise",
                         file: _carteGrise,
                         onPressed: () => _pickFile(1),
+                        commentaire: _carteGriseCommentaire,
                       ),
                       SizedBox(height: 10),
                       buildImageField(
                         label: "Visite Technique",
                         file: _visiteTechnique,
                         onPressed: () => _pickFile(2),
+                        commentaire: _visiteTechniqueCommentaire,
                       ),
                       SizedBox(height: 10),
                       buildImageField(
                         label: "Assurance",
                         file: _assurance,
                         onPressed: () => _pickFile(3),
+                        commentaire: _assuranceCommentaire,
                       ),
-                      SizedBox(height: 10),
+                      SizedBox(height: 50),
                       ElevatedButton(
                         onPressed: _submitForm,
                         style: ButtonStyle(
@@ -193,18 +223,14 @@ class _EnregistrerCamionModifPageState
                             ),
                           ),
                           minimumSize: MaterialStateProperty.all<Size>(
-                            Size(120, 48),
+                            Size(double.infinity, 50),
                           ),
                         ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Text(
-                            'Valider',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                        child: Text(
+                          'Mettre à jour',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -213,13 +239,14 @@ class _EnregistrerCamionModifPageState
                 ),
               ],
             ),
+      backgroundColor: Colors.grey[200],
     );
   }
 
   Widget buildTextField({
     required String label,
     required TextEditingController controller,
-    required String hintText,
+    String? hintText,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,29 +255,20 @@ class _EnregistrerCamionModifPageState
           padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
             label,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
-        SizedBox(
-          width: 190,
-          height: 42,
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+            color: Colors.white,
+          ),
           child: TextField(
             controller: controller,
             decoration: InputDecoration(
               hintText: hintText,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(45),
-              ),
-              filled: true,
-              fillColor: Colors.grey[200],
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(45),
-                borderSide: BorderSide(color: Colors.black),
-              ),
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 10.0,
-                horizontal: 15.0,
-              ),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 10),
             ),
           ),
         ),
@@ -262,107 +280,108 @@ class _EnregistrerCamionModifPageState
     required String label,
     required File? file,
     required VoidCallback onPressed,
+    String? commentaire,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Text(
+            label,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
-        SizedBox(height: 5),
-        Row(
-          children: [
-            ElevatedButton(
-              onPressed: onPressed,
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  Color(0xFFFCCE00),
-                ),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(45),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10.0),
+            color: Colors.white,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: file != null
+                    ? ListTile(
+                        title: Text(file.path.split('/').last),
+                        trailing: IconButton(
+                          icon: Icon(Icons.clear),
+                          onPressed: () {
+                            setState(() {
+                              switch (label) {
+                                case "Photo du Camion":
+                                  _photoCamion = null;
+                                  break;
+                                case "Carte Grise":
+                                  _carteGrise = null;
+                                  break;
+                                case "Visite Technique":
+                                  _visiteTechnique = null;
+                                  break;
+                                case "Assurance":
+                                  _assurance = null;
+                                  break;
+                              }
+                            });
+                          },
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Text('Aucun fichier sélectionné'),
+                      ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: onPressed,
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Color(0xFFFCCE00)),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    'Importer',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                minimumSize: MaterialStateProperty.all<Size>(
-                  Size(120, 48),
-                ),
               ),
-              child: Text('Sélectionner un fichier'),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                file != null
-                    ? file.path.split('/').last
-                    : 'Aucun fichier sélectionné',
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-        SizedBox(height: 10),
+        if (commentaire != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              '$commentaire',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ),
       ],
     );
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.2,
-      child: Stack(
+    return Padding(
+      padding: const EdgeInsets.only(top: 40.0, left: 16.0, right: 16.0),
+      child: Row(
         children: [
-          Image.asset(
-            'assets/images/hautTransport.jpg',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
+          IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          DecoratedBox(
-            decoration: BoxDecoration(),
-            child: SizedBox.expand(),
-          ),
-          Positioned(
-            left: 16.0,
-            top: 16.0,
-            child: Image.asset(
-              'assets/images/ifret.png',
-              width: 70,
-              height: 70,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 27, bottom: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.matricule != null
-                        ? 'Mise à jour'
-                        : 'Enregistrer Camion',
-                    style: TextStyle(
-                      color: Color(0xFFFCCE00),
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    'Camion',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          SizedBox(width: 16.0),
+          Text(
+            "Enregistrer un Camion",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ],
       ),

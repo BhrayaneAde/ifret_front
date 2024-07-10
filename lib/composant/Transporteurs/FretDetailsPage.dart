@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Transporteurs/ValidatedCamionsPage.dart';
 
@@ -96,6 +97,33 @@ class _FretDetailsPageState extends State<FretDetailsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        SizedBox(height: 10),
+                        ListTile(
+                          leading:
+                              Icon(Icons.directions_car, color: Colors.black),
+                          title: Text('Type de véhicule'),
+                          subtitle: Text(
+                              '${widget.fretDetails['type_vehicule'] ?? 'Non disponible'}'),
+                        ),
+                        SizedBox(height: 10),
+                        ListTile(
+                          leading: Icon(Icons.description, color: Colors.black),
+                          title: Text('Description',
+                              style: TextStyle(color: Colors.black)),
+                          subtitle: Text(
+                              '${widget.fretDetails['description'] ?? 'Aucune description disponible'}',
+                              style: TextStyle(color: Colors.black)),
+                        ),
+                        SizedBox(height: 10),
+                        ListTile(
+                          leading:
+                              Icon(Icons.attach_money, color: Colors.black),
+                          title: Text('Montant',
+                              style: TextStyle(color: Colors.black)),
+                          subtitle: Text(_montant,
+                              style: TextStyle(color: Colors.black)),
+                        ),
+                        SizedBox(height: 10),
                         ListTile(
                           leading: Icon(Icons.location_on, color: Colors.black),
                           title: Text('Lieu de départ',
@@ -113,25 +141,6 @@ class _FretDetailsPageState extends State<FretDetailsPage> {
                               '${widget.fretDetails['lieu_arrive'] ?? 'Non disponible'}',
                               style: TextStyle(color: Colors.black)),
                         ),
-                        SizedBox(height: 10),
-                        ListTile(
-                          leading:
-                              Icon(Icons.attach_money, color: Colors.black),
-                          title: Text('Montant',
-                              style: TextStyle(color: Colors.black)),
-                          subtitle: Text(_montant,
-                              style: TextStyle(color: Colors.black)),
-                        ),
-                        SizedBox(height: 10),
-                        ListTile(
-                          leading: Icon(Icons.description, color: Colors.black),
-                          title: Text('Description',
-                              style: TextStyle(color: Colors.black)),
-                          subtitle: Text(
-                              '${widget.fretDetails['description'] ?? 'Aucune description disponible'}',
-                              style: TextStyle(color: Colors.black)),
-                        ),
-                        SizedBox(height: 10),
                         ListTile(
                           leading: Icon(Icons.info, color: Colors.black),
                           title: Text('Statut',
@@ -140,43 +149,40 @@ class _FretDetailsPageState extends State<FretDetailsPage> {
                               '${widget.fretDetails['statut'] ?? 'Non disponible'}',
                               style: TextStyle(color: Colors.black)),
                         ),
-                        SizedBox(height: 10),
-                        ListTile(
-                          leading:
-                              Icon(Icons.directions_car, color: Colors.black),
-                          title: Text('Type de véhicule'),
-                          subtitle: Text(
-                              '${widget.fretDetails['type_vehicule'] ?? 'Non disponible'}'),
-                        ),
                         SizedBox(height: 30),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ValidatedCamionsPage(
-                                  validatedCamions: _camionsValides,
-                                  fretId: widget.fretDetails['id'],
+                        Align(
+                          alignment: Alignment.center,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ValidatedCamionsPage(
+                                    validatedCamions: _camionsValides,
+                                    fretId: widget.fretDetails['id'],
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Color(0xFFFCCE00)),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24.0),
                                 ),
                               ),
-                            );
-                          },
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                Color(0xFFFCCE00)),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24.0),
-                              ),
                             ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Soumissionner',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                            child: const Padding(
+                              padding: EdgeInsets.all(14.0),
+                              child: Text(
+                                'Soumissionner',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ),

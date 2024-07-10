@@ -496,51 +496,62 @@ class _ProfilTransporteurState extends State<ProfilTransporteur> {
             child: Column(
               children: [
                 BottomAppBar(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              // Action pour la politique de confidentialité
-                            },
-                            child: Text(
-                              'Politique de confidentialité',
-                              style: TextStyle(
-                                color: Color(0xfffcce00),
-                                fontSize: 14,
+                  child: Container(
+                    height: 500,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor:
+                                    Colors.transparent, // Fond transparent
+                              ),
+                              onPressed: () {
+                                // Action pour la politique de confidentialité
+                              },
+                              child: Text(
+                                'Politique de confidentialité',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        '|',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
+                          ],
                         ),
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              // Action pour les conditions générales d'utilisation
-                            },
-                            child: Text(
-                              'Conditions générales',
-                              style: TextStyle(
-                                color: Color(0xfffcce00),
-                                fontSize: 14,
+                        Text(
+                          '|',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor:
+                                    Colors.transparent, // Fond transparent
+                              ),
+                              onPressed: () {
+                                // Action pour les conditions générales d'utilisation
+                              },
+                              child: Text(
+                                'Conditions générales',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -548,7 +559,7 @@ class _ProfilTransporteurState extends State<ProfilTransporteur> {
                 Text(
                   'Version 1.0', // Texte de la version de l'application
                   style: TextStyle(
-                    color: Colors.grey, // Couleur du texte
+                    color: Colors.grey[700], // Couleur du texte
                   ),
                 ),
               ],
@@ -644,7 +655,7 @@ class ModifierProfil extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.only(top: 20),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -665,7 +676,7 @@ class ModifierProfil extends StatelessWidget {
             ),
             SizedBox(height: 20),
             _buildEditableInfoItem(
-              'Date de naissance:',
+              'Date Naissance:',
               _newDateOfBirthController,
               Icons.calendar_today,
               () => _showEditDialog(context, 'Date de naissance',
@@ -736,7 +747,7 @@ class ModifierProfil extends StatelessWidget {
           ],
         ),
       ),
-      backgroundColor: Colors.grey[400],
+      backgroundColor: Colors.grey[200],
     );
   }
 
@@ -817,7 +828,7 @@ class ModifierProfil extends StatelessWidget {
               child: TextFormField(
                 controller: controller,
                 style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.black),
                 enabled: false,
@@ -862,7 +873,7 @@ class ModifierProfil extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16,
 
                   color: Colors.black, // Couleur du texte
                 ),
@@ -872,7 +883,7 @@ class ModifierProfil extends StatelessWidget {
                 child: Text(
                   value,
                   style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       color: Colors.black,
                       fontWeight: FontWeight.bold),
                 ),
@@ -895,29 +906,69 @@ class ModifierProfil extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Modifier $fieldName'),
+          title: Text(
+            'Modifier $fieldName',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              fontSize: 20,
+            ),
+          ),
           content: TextFormField(
             onChanged: (value) {
               newValue = value;
             },
             controller: controller,
-            decoration: InputDecoration(hintText: 'Nouvelle valeur'),
+            decoration: InputDecoration(
+              hintText: 'Nouvelle valeur',
+              hintStyle: TextStyle(
+                color: Colors.grey,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.blue,
+                ),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Annuler'),
+              child: Text(
+                'Annuler',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 controller.text = newValue;
                 Navigator.pop(context);
               },
-              child: Text('OK'),
+              child: Text(
+                'OK',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          backgroundColor: Colors.white,
         );
       },
     );

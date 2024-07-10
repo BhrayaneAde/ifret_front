@@ -170,16 +170,34 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
                               decoration: TextDecoration.none,
                             ),
                           ),
-                          subtitle: Text(
-                            voyage['vehicule_matricule'] ?? 'N/A',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              decoration: TextDecoration.none,
-                            ),
+                          subtitle: Row(
+                            children: [
+                              Text(
+                                voyage['vehicule_matricule'] ?? 'N/A',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                              SizedBox(
+                                  width:
+                                      10), // Add some space between the texts
+                              Text(
+                                voyage['statut_soumission'] ?? 'N/A',
+                                style: TextStyle(
+                                  color: _getStatutColor(
+                                      voyage['statut_soumission']),
+                                  fontSize: 16,
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                            ],
                           ),
-                          leading: Icon(Icons.directions_car,
-                              color: Color(0xFFFCCE00)),
+                          leading: Icon(
+                            Icons.directions_car,
+                            color: Color(0xFFFCCE00),
+                          ),
                           trailing: Container(
                             width: 100,
                             child: ElevatedButton(
@@ -209,7 +227,21 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
                     );
                   },
                 ),
-      backgroundColor: Colors.grey[400],
+      backgroundColor: Colors.grey[200],
     );
+  }
+
+  // Function to get the color based on the status
+  Color _getStatutColor(String? statut) {
+    switch (statut) {
+      case 'En attente':
+        return Color(0xFFFCCE00);
+      case 'Retenue':
+        return Colors.green;
+      case 'Rejetée':
+        return Colors.red;
+      default:
+        return Colors.black;
+    }
   }
 }

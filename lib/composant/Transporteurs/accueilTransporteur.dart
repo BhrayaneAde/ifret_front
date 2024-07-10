@@ -479,7 +479,7 @@ class _EnregistrementsState extends State<Enregistrements> {
           textFieldWidth: 190,
           textFieldHeight: 42,
         ),
-        SizedBox(height: 10),
+        SizedBox(height: 30),
         ElevatedButton(
           onPressed: () async {
             if (matricule.isEmpty) {
@@ -553,7 +553,7 @@ class _EnregistrementsState extends State<Enregistrements> {
             child: Text(
               'Valider',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -742,20 +742,27 @@ class _CatalogueState extends State<Catalogue> {
   Future<void> _fetchCamions() async {
     try {
       List<dynamic> camions = await ApiRequest.getUserCamions();
-      setState(() {
-        _camionsEnAttente =
-            camions.where((camion) => camion['statut'] == 'En attent').toList();
-        _camionsValides =
-            camions.where((camion) => camion['statut'] == 'Validé').toList();
-        _camionsRejetes =
-            camions.where((camion) => camion['statut'] == 'Rejeté').toList();
-        _isLoading = false;
-      });
+      if (camions != null) {
+        setState(() {
+          _camionsEnAttente = camions
+              .where((camion) => camion['statut'] == 'En attent')
+              .toList();
+          _camionsValides =
+              camions.where((camion) => camion['statut'] == 'Validé').toList();
+          _camionsRejetes =
+              camions.where((camion) => camion['statut'] == 'Rejeté').toList();
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } catch (e) {
+      print('Erreur: $e');
       setState(() {
         _isLoading = false;
       });
-      print('Erreur: $e');
     }
   }
 
@@ -777,99 +784,120 @@ class _CatalogueState extends State<Catalogue> {
   }
 
   Widget _buildCamionTable(List<dynamic> camions, bool showActions) {
-    Color getStatutColor(String statut) {
-      switch (statut) {
-        case 'En attent':
-          return Color(0xFFFCCE00);
-        case 'Validé':
-          return Colors.green;
-        case 'Rejeté':
-          return Colors.red;
-        default:
-          return Colors.black;
-      }
-    }
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 15), // Espace entre chaque camion
+          ...camions.map((camion) {
+            bool isModifiable =
+                camion['statut'] != 'Validé' && camion['statut'] != 'En attent';
 
-    return DataTable(
-      columns: [
-        DataColumn(label: Text('Matricule')),
-        DataColumn(label: Text('Statut')),
-        DataColumn(label: Text(showActions ? 'Actions' : 'Date de création')),
-      ],
-      rows: camions.map((camion) {
-        return DataRow(cells: [
-          DataCell(Text(camion['matricule'])),
-          DataCell(Text(
-            camion['statut'],
-            style: TextStyle(
-              color: getStatutColor(camion['statut']),
-              fontWeight: FontWeight.bold,
-            ),
-          )),
-          DataCell(
-            showActions
-                ? ElevatedButton(
-                    onPressed: () {
+            return Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: ListTile(
+                  onTap: () {
+                    if (isModifiable) {
                       _navigateToCorrectionPage(camion['matricule']);
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        Color(0xFFFCCE00),
-                      ),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24.0),
+                    }
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  tileColor: Colors.white,
+                  leading: Icon(Icons.directions_car, color: Color(0xFFFCCE00)),
+                  title: Text(
+                    camion['matricule'],
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _formatDate(camion['created_at']),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
                         ),
                       ),
-                      minimumSize: MaterialStateProperty.all<Size>(
-                        Size(120, 48),
+                      SizedBox(height: 5),
+                      Text(
+                        camion['statut'],
+                        style: TextStyle(
+                          color: _getStatutColor(camion['statut']),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Corriger',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  )
-                : Text(camion['created_at']),
-          ),
-        ]);
-      }).toList(),
+                    ],
+                  ),
+                  trailing: isModifiable ? Icon(Icons.arrow_forward_ios) : null,
+                ),
+              ),
+            );
+          }).toList(),
+        ],
+      ),
     );
+  }
+
+  String _formatDate(String dateString) {
+    DateTime dateTime = DateTime.parse(dateString);
+    String formattedDate = DateFormat('dd MMM yyyy - kk:mm').format(dateTime);
+    return formattedDate;
+  }
+
+  Color _getStatutColor(String statut) {
+    switch (statut) {
+      case 'En attent':
+        return Color(0xFFFCCE00);
+      case 'Validé':
+        return Colors.green;
+      case 'Rejeté':
+        return Colors.red;
+      default:
+        return Colors.black;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Mes Camions'),
-      ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('En attente de validation',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    _buildCamionTable(_camionsEnAttente, false),
-                    SizedBox(height: 20),
-                    Text('Camions Validés',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    _buildCamionTable(_camionsValides, false),
-                    SizedBox(height: 20),
-                    Text('Camions Rejetés',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    _buildCamionTable(_camionsRejetes, true),
-                  ],
+                child: Container(
+                  color: Colors.grey[200],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('En attente',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      _buildCamionTable(_camionsEnAttente, false),
+                      SizedBox(height: 20),
+                      Text('Validé(s)',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      _buildCamionTable(_camionsValides, false),
+                      SizedBox(height: 20),
+                      Text('Rejeté(s)',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      _buildCamionTable(_camionsRejetes, true),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -1084,7 +1112,7 @@ class _NotificationPageState extends State<NotificationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Notifications ($_notificationCount)'),
-        backgroundColor: Colors.grey[400],
+        backgroundColor: Colors.grey[200],
       ),
       body: _isLoading
           ? Center(
@@ -1194,7 +1222,7 @@ class _NotificationPageState extends State<NotificationPage> {
                 ],
               ),
             ),
-      backgroundColor: Colors.grey[400], // Couleur de fond du Scaffold
+      backgroundColor: Colors.grey[200], // Couleur de fond du Scaffold
     );
   }
 }

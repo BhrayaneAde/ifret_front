@@ -33,7 +33,7 @@ class Clientele extends StatelessWidget {
         backgroundColor: Color(0xFFFCCE00),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          color: Colors.white,
+          color: Colors.black,
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -66,12 +66,12 @@ class Clientele extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  tileColor: Color(0xFF14337C),
+                  tileColor: Color(0xFFFCCE00),
                   title: Row(
                     children: [
                       Icon(
                         Icons.support_agent_rounded,
-                        color: Colors.white,
+                        color: Colors.black,
                         size: 30,
                       ),
                       SizedBox(width: 16),
@@ -79,7 +79,7 @@ class Clientele extends StatelessWidget {
                         'Service Clientèle',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white,
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -88,7 +88,7 @@ class Clientele extends StatelessWidget {
                   trailing: IconButton(
                     icon: Icon(Icons.phone),
                     onPressed: () => _makeCall(context, customerServiceNumber),
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
               ),

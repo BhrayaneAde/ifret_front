@@ -100,11 +100,18 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSectionTitle('Détails du Fret'),
+                        _buildSectionTitle('Statut'),
+                        SizedBox(height: 5),
                         _buildDetailsCard(
-                          'Type de Véhicule:',
-                          _voyageDetails['fret_details']?['type_vehicule'] ??
-                              'Non spécifié',
+                          'Statut:',
+                          _voyageDetails['statut_demande'] ?? 'Non spécifié',
+                        ),
+                        _buildSectionTitle('Fret'),
+                        SizedBox(height: 5),
+                        _buildDetailsCard(
+                          'Description :',
+                          _voyageDetails['fret_details']?['description'] ??
+                              'Aucune description disponible',
                         ),
                         SizedBox(height: 5),
                         _buildDetailsCard(
@@ -125,6 +132,18 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
                           _voyageDetails['fret_details']?['lieu_arrive'] ??
                               'Non spécifié',
                         ),
+                        _buildSectionTitle('Véhicule'),
+                        _buildDetailsCard(
+                          'Type :',
+                          _voyageDetails['fret_details']?['type_vehicule'] ??
+                              'Non spécifié',
+                        ),
+                        SizedBox(height: 5),
+                        _buildDetailsCard(
+                          'Matricule :',
+                          _voyageDetails['vehicule_matricule'] ??
+                              'Non spécifié',
+                        ),
                         SizedBox(height: 5),
                         _buildDetailsCard(
                           'Date de Départ:',
@@ -137,62 +156,48 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
                           _voyageDetails['fret_details']?['date_arrive'] ??
                               'Non spécifié',
                         ),
-                        SizedBox(height: 5),
-                        _buildDetailsCard(
-                          'Description du Fret:',
-                          _voyageDetails['fret_details']?['description'] ??
-                              'Aucune description disponible',
-                        ),
-                        SizedBox(height: 15),
-                        _buildSectionTitle('Détails du Voyage'),
-                        _buildDetailsCard(
-                          'Numéro de Téléphone du Transporteur:',
-                          _voyageDetails['numero_tel_transport'] ??
-                              'Non spécifié',
-                        ),
-                        SizedBox(height: 5),
-                        _buildDetailsCard(
-                          'Matricule du Véhicule:',
-                          _voyageDetails['vehicule_matricule'] ??
-                              'Non spécifié',
-                        ),
-                        SizedBox(height: 5),
-                        _buildDetailsCard(
-                          'Numéro de Téléphone du Chauffeur:',
-                          _voyageDetails['numero_tel_chauffeur'] ??
-                              'Non spécifié',
-                        ),
-                        SizedBox(height: 5),
-                        _buildDetailsCard(
-                          'Nom du Chauffeur:',
-                          _voyageDetails['chauffeur_nom'] ?? 'Non spécifié',
-                        ),
-                        SizedBox(height: 5),
-                        _buildDetailsCard(
-                          'Prénom du Chauffeur:',
-                          _voyageDetails['chauffeur_prenom'] ?? 'Non spécifié',
-                        ),
-                        SizedBox(height: 5),
-                        _buildDetailsCard(
-                          'ID de la Demande:',
-                          _voyageDetails['demande_id'].toString(),
-                        ),
-                        SizedBox(height: 5),
+                        /*  SizedBox(height: 5),
                         _buildDetailsCard(
                           'Statut de la Soumission:',
                           _voyageDetails['statut_soumission'] ?? 'Non spécifié',
+                        ), */
+
+                        SizedBox(height: 15),
+                        _buildSectionTitle('Chauffeur'),
+                        SizedBox(height: 5),
+                        _buildDetailsCard(
+                          'Nom et Prénom :',
+                          '${_voyageDetails['chauffeur_nom'] ?? 'Non spécifié'} ${_voyageDetails['chauffeur_prenom'] ?? 'Non spécifié'}',
                         ),
                         SizedBox(height: 5),
                         _buildDetailsCard(
-                          'Statut de la Demande:',
-                          _voyageDetails['statut_demande'] ?? 'Non spécifié',
+                          'Téléphone :',
+                          _voyageDetails['numero_tel_chauffeur'] ??
+                              'Non spécifié',
                         ),
+
+                        /*  SizedBox(height: 5),
+                        _buildDetailsCard(
+                          'ID de la Demande:',
+                          _voyageDetails['demande_id'].toString(),
+                        ), */
+
+                        SizedBox(height: 5),
+                        /*  _buildSectionTitle('Transporteur'),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        _buildDetailsCard(
+                          'Numéro de Téléphone:',
+                          _voyageDetails['numero_tel_transport'] ??
+                              'Non spécifié',
+                        ), */
                         SizedBox(height: 15),
                       ],
                     ),
                   ),
                 ),
-      backgroundColor: Colors.grey[400],
+      backgroundColor: Colors.grey[200],
     );
   }
 

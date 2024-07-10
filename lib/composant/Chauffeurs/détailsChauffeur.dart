@@ -79,7 +79,7 @@ class _DetailChauffeurState extends State<DetailChauffeur> {
                     ),
                   ),
                 ),
-      backgroundColor: Colors.grey[400],
+      backgroundColor: Colors.grey[200],
     );
   }
 

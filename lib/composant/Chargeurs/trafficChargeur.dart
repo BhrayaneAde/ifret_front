@@ -124,7 +124,7 @@ class TrafficChargeur extends StatelessWidget {
         ),
       ),
       backgroundColor:
-          Colors.grey[400], // Set "dirty white" background for body
+          Colors.grey[200], // Set "dirty white" background for body
     );
   }
 
