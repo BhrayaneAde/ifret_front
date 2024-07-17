@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Intégrer Feda Checkout à mon site</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
+  <style>
+      body {
+          background-color: #f8f9fa; /* Couleur de fond */
+      }
+      .btn-custom {
+          background-color: #FCCE00; /* Couleur mère pour le bouton */
+          border: none;
+          color: white;
+          font-size: 1.25rem; /* Augmenter la taille du texte */
+      }
+      .btn-custom:hover {
+          background-color: #e6b800; /* Couleur légèrement plus sombre au survol */
+      }
+      .card {
+          border-radius: 15px; /* Coins arrondis */
+      }
+      h3 {
+          color: #FCCE00; /* Couleur mère pour le texte */
+      }
+      p {
+          font-size: 1.2rem; /* Agrandir le texte de la description */
+      }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-12"> <!-- Agrandir la colonne -->
+        <div class="card mb-10 shadow-lg"> <!-- Ajouter une ombre à la carte -->
+          <div class="card-header text-center">
+            <h3>Paiement via FedaPay</h3>
+          </div>
+          <div class="card-body text-center">
+            <p>Pour procéder au paiement de votre Fret ici, cliquez sur le bouton ci-dessous.</p>
+            <button id="pay-btn" class="btn btn-custom btn-lg btn-block">Effectuez le Paiement</button> <!-- Bouton en pleine largeur -->
+          </div>
+          <div class="card-footer text-center">
+            <small>Merci de faire confiance à notre service. Votre satisfaction est notre priorité !</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+      FedaPay.init('#pay-btn', { public_key: 'VOTRE_CLE_API_PUBLIQUE' });
+  </script>
+</body>
+</html>

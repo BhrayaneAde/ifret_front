@@ -444,6 +444,36 @@ class ApiRequest {
     }
   }
 
+  static Future<Map<String, dynamic>?> createTransaction(
+      Map<String, dynamic> transaction) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        return null;
+      }
+
+      Options options = Options(
+        headers: {'Authorization': 'Bearer $authToken'},
+      );
+
+      Dio.Response response = await dio().post(
+        '/transactions',
+        data: transaction,
+        options: options,
+      );
+
+      if (response.statusCode == 201) {
+        return response.data;
+      } else {
+        print('Error creating transaction: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error creating transaction: $e');
+      throw Exception('Error creating transaction: $e');
+    }
+  }
+
   static Future<Map<String, dynamic>?> fetchMessages() async {
     try {
       String? authToken = await _getAuthToken();
@@ -521,6 +551,31 @@ class ApiRequest {
     } catch (e) {
       print('Error fetching fret details: $e');
       throw Exception('Error fetching fret details: $e');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>?> fetchTransactions() async {
+    try {
+      // Remplacez par votre méthode pour obtenir le token d'authentification
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response = await dio().get('/frets', options: options);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        List<dynamic> data = response.data;
+        return data.map((item) => item as Map<String, dynamic>).toList();
+      } else {
+        print('Error fetching transactions: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching transactions: $e');
+      throw Exception('Error fetching transactions: $e');
     }
   }
 

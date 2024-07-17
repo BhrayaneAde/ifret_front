@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Chargeurs/d%C3%A9tailsChargeur.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-class TrafficChargeur extends StatelessWidget {
-  final String dateEnvoi = '2024-04-12'; // Exemple de date
-  final String fretEnvoye = '200 sacs de charbon'; // Exemple de fret envoyé
+class TrafficChargeur extends StatefulWidget {
+  @override
+  _TrafficChargeurState createState() => _TrafficChargeurState();
+}
+
+class _TrafficChargeurState extends State<TrafficChargeur> {
+  late Future<List<Map<String, dynamic>>?> _futureTransactions;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureTransactions = ApiRequest.fetchNotifications();
+  }
+
+  String formatDate(String dateStr) {
+    final DateTime dateTime = DateTime.parse(dateStr);
+    final DateFormat formatter = DateFormat('dd MM yyyy HH:mm');
+    return formatter.format(dateTime);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,52 +30,71 @@ class TrafficChargeur extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           children: [
-            Spacer(), // Pousser le widget RichText vers la droite
+            Spacer(),
             RichText(
               text: TextSpan(
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
                 children: [
                   TextSpan(
-                      text: 'Trajectoire Routière',
-                      style: TextStyle(color: Colors.black)),
+                    text: 'Trajectoire Routière',
+                    style: TextStyle(color: Colors.black),
+                  ),
                 ],
               ),
             ),
           ],
         ),
-        backgroundColor:
-            Color(0xFFFCCE00), // Définir la couleur de fond en noir
+        backgroundColor: Color(0xFFFCCE00),
         leading: IconButton(
-          icon: Icon(Icons
-              .arrow_back), // Supposant que vous voulez un bouton de retour
-          color: Colors.white, // Définir la couleur du bouton en blanc
+          icon: Icon(Icons.arrow_back),
+          color: Colors.white,
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 15), // Espace entre chaque Container
-            Row(
+      body: FutureBuilder<List<Map<String, dynamic>>?>(
+        future: _futureTransactions,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: SpinKitFadingCircle(
+                color: Color(0xFFFCCE00),
+                size: 50.0,
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Erreur: ${snapshot.error}'),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Text('Aucune transaction trouvée'),
+            );
+          }
+
+          List<Map<String, dynamic>> transactions = snapshot.data!;
+
+          return SingleChildScrollView(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
+              children: transactions.map((transaction) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
                   child: Card(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: ListTile(
                       onTap: () {
-                        // Action à effectuer lorsque l'utilisateur appuie sur le ListTile
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TrafficTable(),
+                            builder: (context) => DetailsChargeur(
+                                transactionId: transaction['id']),
                           ),
                         );
                       },
@@ -66,7 +103,7 @@ class TrafficChargeur extends StatelessWidget {
                       ),
                       tileColor: Colors.white,
                       title: Text(
-                        '$dateEnvoi', // Utilisation de la variable de date
+                        formatDate(transaction['created_at']),
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -75,7 +112,7 @@ class TrafficChargeur extends StatelessWidget {
                         ),
                       ),
                       subtitle: Text(
-                        '$fretEnvoye', // Utilisation de la variable de fret envoyé
+                        transaction['description'],
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -85,13 +122,14 @@ class TrafficChargeur extends StatelessWidget {
                       leading:
                           Icon(Icons.directions_car, color: Color(0xfffcce00)),
                       trailing: Container(
-                        width: 100, // Largeur fixe du bouton
+                        width: 100,
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => TrafficTable(),
+                                builder: (context) => DetailsChargeur(
+                                    transactionId: transaction['id']),
                               ),
                             );
                           },
@@ -117,34 +155,19 @@ class TrafficChargeur extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
-              ],
+                );
+              }).toList(),
             ),
-          ],
-        ),
+          );
+        },
       ),
-      backgroundColor:
-          Colors.grey[200], // Set "dirty white" background for body
+      backgroundColor: Colors.grey[200],
     );
   }
+}
 
-  void _showDetailsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Détails du trafic'),
-          content: Text('Ajoutez ici les détails complets du trafic.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Fermer'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+void main() {
+  runApp(MaterialApp(
+    home: TrafficChargeur(),
+  ));
 }

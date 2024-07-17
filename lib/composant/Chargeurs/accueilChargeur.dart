@@ -3,6 +3,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Chargeurs/profilChargeur.dart';
 import 'package:ifret/main.dart';
+import 'dart:convert';
+
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class Chargeur extends StatefulWidget {
   final String name;
@@ -339,7 +343,7 @@ class Paiement extends StatefulWidget {
 }
 
 class _PaiementState extends State<Paiement> {
-  int _currentTabIndex = 0;
+  late InAppWebViewController _controller;
 
   @override
   Widget build(BuildContext context) {
@@ -351,82 +355,8 @@ class _PaiementState extends State<Paiement> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(context),
-          SizedBox(height: 20),
-          Expanded(
-            child: _currentTabIndex == 0
-                ? PaiementLocal()
-                : PaiementInternational(),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color.fromARGB(255, 245, 234, 234),
-        currentIndex: _currentTabIndex,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.black,
-        onTap: (index) {
-          setState(() {
-            _currentTabIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                border:
-                    Border.all(color: const Color.fromARGB(255, 252, 250, 250)),
-                color: _currentTabIndex == 0 ? Color(0xFFFCCE00) : null,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.save_sharp,
-                      color:
-                          _currentTabIndex == 0 ? Colors.white : Colors.black),
-                  SizedBox(width: 8.0),
-                  Text(
-                    'Paiement Local',
-                    style: TextStyle(
-                        color: _currentTabIndex == 0
-                            ? Colors.white
-                            : Colors.black),
-                  ),
-                ],
-              ),
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(color: Color.fromARGB(255, 247, 245, 245)),
-                color: _currentTabIndex == 1 ? Color(0xFFFCCE00) : null,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.bookmark_sharp,
-                      color:
-                          _currentTabIndex == 1 ? Colors.white : Colors.black),
-                  SizedBox(width: 8.0),
-                  Expanded(
-                    child: Text(
-                      'Paiement International',
-                      style: TextStyle(
-                          color: _currentTabIndex == 1
-                              ? Colors.white
-                              : Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            label: '',
-          ),
+          SizedBox(height: 100),
+          Expanded(child: _buildWebView()), // Afficher le WebView
         ],
       ),
     );
@@ -439,33 +369,23 @@ class _PaiementState extends State<Paiement> {
       child: Stack(
         children: [
           Image.asset(
-            'assets/images/hautPaiement1.jpg', // Chemin de votre image
+            'assets/images/hautPaiement1.jpg',
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
           ),
           DecoratedBox(
-            decoration: BoxDecoration(
-                /*  gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withOpacity(0.7),
-                  Color.fromARGB(255, 248, 134, 3).withOpacity(0.3)
-                ],
-              ), */
-                ),
-            child:
-                SizedBox.expand(), // Pour étendre le dégradé sur toute l'image
+            decoration: BoxDecoration(),
+            child: SizedBox.expand(),
           ),
           Positioned(
             left: 16.0,
             top: 16.0,
             child: Image.asset(
-              'assets/images/ifret.png', // Chemin de votre image
-              width: 70, // Largeur de l'image
-              height: 70, // Hauteur de l'image
-              fit: BoxFit.cover, // Ajustement de l'image
+              'assets/images/ifret.png',
+              width: 70,
+              height: 70,
+              fit: BoxFit.cover,
             ),
           ),
           Align(
@@ -477,9 +397,7 @@ class _PaiementState extends State<Paiement> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _currentTabIndex == 0
-                        ? 'Paiement Local'
-                        : 'Paiement International',
+                    'Paiement Fret',
                     style: TextStyle(
                       color: Color(0xFFFCCE00),
                       fontSize: 28,
@@ -502,138 +420,26 @@ class _PaiementState extends State<Paiement> {
       ),
     );
   }
-}
 
-class PaiementLocal extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 16.0),
-          Center(
-            child: Text(
-              'Choisissez un moyen de paiement local:',
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 70.0),
-              ElevatedButton(
-                onPressed: () {
-                  // Gérer le paiement local (Fedapay MTN)
-                  // Ajoutez le code de traitement pour le paiement local ici
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/images/mtn.png', height: 30.0),
-                    SizedBox(width: 8.0),
-                  ],
-                ),
-              ),
-              /* SizedBox(height: 16.0), */
-              SizedBox(width: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  // Gérer le paiement local (Fedapay Moov)
-                  // Ajoutez le code de traitement pour le paiement local ici
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/images/moov.png', height: 30.0),
-                    SizedBox(width: 8.0),
-                    /* Text('Moov'), */
-                  ],
-                ),
-              ),
-            ],
-          )
-        ],
+  Widget _buildWebView() {
+    return InAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri("about:blank")),
+      onWebViewCreated: (InAppWebViewController controller) {
+        _controller = controller;
+        _loadHtmlFromAssets();
+      },
+      initialOptions: InAppWebViewGroupOptions(
+        crossPlatform: InAppWebViewOptions(
+          javaScriptEnabled: true,
+        ),
       ),
     );
   }
-}
 
-class PaiementInternational extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 16.0),
-          Center(
-            child: Text(
-              'Choisissez un moyen de paiement international:',
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(height: 16.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // Gérer le paiement international (Visa)
-                  // Ajoutez le code de traitement pour le paiement international ici
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/images/visa.png', height: 20.0),
-                    SizedBox(width: 8.0),
-                    /* Text('Visa'), */
-                  ],
-                ),
-              ),
-              SizedBox(width: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  // Gérer le paiement international (PayPal)
-                  // Ajoutez le code de traitement pour le paiement international ici
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/images/paypal.png', height: 20.0),
-                    SizedBox(width: 8.0),
-                    /* Text('PayPal'), */
-                  ],
-                ),
-              ),
-              SizedBox(width: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  // Gérer le paiement international (MasterCard)
-                  // Ajoutez le code de traitement pour le paiement international ici
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/images/mastercard-2.png', height: 20.0),
-                    SizedBox(width: 8.0),
-                    /*  Text('MasterCard'), */
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+  void _loadHtmlFromAssets() async {
+    String fileText = await rootBundle.loadString('assets/fedapay.html');
+    _controller.loadData(
+        data: fileText, mimeType: "text/html", encoding: "utf-8");
   }
 }
 

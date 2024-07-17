@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:ifret/api/api_request.dart';
 
-class TrafficTable extends StatelessWidget {
-  static final List<Map<String, dynamic>> _trafficData = [
-    {
-      'vehicle': 'Camion 20 - 30 Tonnes',
-      'freight': '200 sacs de charbon',
-      'departure': 'Djougou',
-      'destination': 'Cotonou',
-      'status': 'Finalisé',
-    },
-  ];
+class DetailsChargeur extends StatelessWidget {
+  final int transactionId;
+
+  DetailsChargeur({required this.transactionId});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +13,7 @@ class TrafficTable extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           children: [
-            Spacer(), // Pousser le widget RichText vers la droite
+            Spacer(),
             RichText(
               text: TextSpan(
                 style: TextStyle(
@@ -27,131 +23,98 @@ class TrafficTable extends StatelessWidget {
                 ),
                 children: [
                   TextSpan(
-                    text: 'Information du Traffic',
+                    text: 'Détails du Fret',
                   ),
                 ],
               ),
             ),
           ],
         ),
-        backgroundColor:
-            Color(0xFFFCCE00), // Définir la couleur de fond en noir
+        backgroundColor: Color(0xFFFCCE00),
         leading: IconButton(
-          icon: Icon(Icons
-              .arrow_back), // Supposant que vous voulez un bouton de retour
-          color: Colors.black, // Définir la couleur du bouton en blanc
+          icon: Icon(Icons.arrow_back),
+          color: Colors.white,
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                'Détails du Traffic',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: ApiRequest.fetchFretDetails(transactionId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFFCCE00),
               ),
-            ),
-            SizedBox(height: 5), // Espace entre chaque Container
-            Column(
-              children: _trafficData.map<Widget>((traffic) {
-                return Column(
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Erreur: ${snapshot.error}'),
+            );
+          } else if (!snapshot.hasData) {
+            return Center(
+              child: Text('Aucune donnée trouvée'),
+            );
+          }
+
+          var transaction = snapshot.data!;
+          return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(
+                    'Détails du Chargeur',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 5),
+                Column(
                   children: [
                     Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Forme du ListTile
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: ListTile(
-                        onTap: () {
-                          // Action à effectuer lorsque l'utilisateur appuie sur le ListTile
-                        },
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(10.0), // Forme du ListTile
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        tileColor:
-                            Color(0xfffcce00), // Couleur de fond du ListTile
+                        tileColor: Colors.white,
                         title: Text(
-                          'Véhicule:',
+                          'Description:',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.none,
-                          ), // Couleur du texte
+                          ),
                         ),
                         subtitle: Text(
-                          traffic['vehicle'],
+                          transaction['description'] ?? 'N/A',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
                             decoration: TextDecoration.none,
-                          ), // Couleur du texte
+                          ),
                         ),
-                        leading: Icon(Icons.local_shipping,
-                            color: Colors.white), // Icône devant le champ
+                        leading:
+                            Icon(Icons.description, color: Color(0xfffcce00)),
                       ),
                     ),
-                    SizedBox(height: 15), // Espace entre chaque Container
+                    SizedBox(height: 15),
                     Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Forme du ListTile
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: ListTile(
-                        onTap: () {
-                          // Action à effectuer lorsque l'utilisateur appuie sur le ListTile
-                        },
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(10.0), // Forme du ListTile
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        tileColor:
-                            Color(0xfffcce00), // Couleur de fond du ListTile
-                        title: Text(
-                          'Fret:',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.none,
-                          ), // Couleur du texte
-                        ),
-                        subtitle: Text(
-                          traffic['freight'],
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            decoration: TextDecoration.none,
-                          ), // Couleur du texte
-                        ),
-                        leading: Icon(Icons.grain,
-                            color: Colors.white), // Icône devant le champ
-                      ),
-                    ),
-                    SizedBox(height: 15), // Espace entre chaque Container
-                    Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Forme du ListTile
-                      ),
-                      child: ListTile(
-                        onTap: () {
-                          // Action à effectuer lorsque l'utilisateur appuie sur le ListTile
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(10.0), // Forme du ListTile
-                        ),
-                        tileColor:
-                            Color(0xfffcce00), // Couleur de fond du ListTile
+                        tileColor: Colors.white,
                         title: Text(
                           'Lieu de départ:',
                           style: TextStyle(
@@ -159,36 +122,30 @@ class TrafficTable extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.none,
-                          ), // Couleur du texte
+                          ),
                         ),
                         subtitle: Text(
-                          traffic['departure'],
+                          transaction['lieu_depart'] ?? 'N/A',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
                             decoration: TextDecoration.none,
-                          ), // Couleur du texte
+                          ),
                         ),
-                        leading: Icon(Icons.location_on,
-                            color: Colors.white), // Icône devant le champ
+                        leading:
+                            Icon(Icons.location_on, color: Color(0xfffcce00)),
                       ),
                     ),
-                    SizedBox(height: 15), // Espace entre chaque Container
+                    SizedBox(height: 15),
                     Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Forme du ListTile
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: ListTile(
-                        onTap: () {
-                          // Action à effectuer lorsque l'utilisateur appuie sur le ListTile
-                        },
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(10.0), // Forme du ListTile
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        tileColor:
-                            Color(0xfffcce00), // Couleur de fond du ListTile
+                        tileColor: Colors.white,
                         title: Text(
                           'Lieu d\'arrivée:',
                           style: TextStyle(
@@ -196,36 +153,61 @@ class TrafficTable extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.none,
-                          ), // Couleur du texte
+                          ),
                         ),
                         subtitle: Text(
-                          traffic['destination'],
+                          transaction['lieu_arrive'] ?? 'N/A',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
                             decoration: TextDecoration.none,
-                          ), // Couleur du texte
+                          ),
                         ),
-                        leading: Icon(Icons.location_on,
-                            color: Colors.white), // Icône devant le champ
+                        leading:
+                            Icon(Icons.location_on, color: Color(0xfffcce00)),
                       ),
                     ),
-                    SizedBox(height: 15), // Espace entre chaque Container
+                    SizedBox(height: 15),
                     Card(
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(10.0), // Forme du ListTile
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: ListTile(
-                        onTap: () {
-                          // Action à effectuer lorsque l'utilisateur appuie sur le ListTile
-                        },
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(10.0), // Forme du ListTile
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        tileColor:
-                            Color(0xfffcce00), // Couleur de fond du ListTile
+                        tileColor: Colors.white,
+                        title: Text(
+                          'Montant:',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                        subtitle: Text(
+                          transaction['montant'] ?? 'N/A',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                        leading:
+                            Icon(Icons.attach_money, color: Color(0xfffcce00)),
+                      ),
+                    ),
+                    SizedBox(height: 15),
+                    Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: ListTile(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        tileColor: Colors.white,
                         title: Text(
                           'Statut:',
                           style: TextStyle(
@@ -233,38 +215,102 @@ class TrafficTable extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             decoration: TextDecoration.none,
-                          ), // Couleur du texte
+                          ),
                         ),
                         subtitle: Text(
-                          traffic['status'],
+                          transaction['statut'] ?? 'N/A',
                           style: TextStyle(
-                            color: traffic['status'] == 'En cours'
+                            color: transaction['statut'] == 'En cours'
                                 ? Colors.orange
                                 : Colors.green,
                             fontSize: 16,
                             decoration: TextDecoration.none,
-                          ), // Couleur du texte
+                          ),
                         ),
-                        leading: Icon(Icons.info_outline,
-                            color: Colors.white), // Icône devant le champ
+                        leading:
+                            Icon(Icons.info_outline, color: Color(0xfffcce00)),
                       ),
                     ),
-                    SizedBox(height: 15), // Espace entre chaque Container
+                    SizedBox(height: 15),
                   ],
-                );
-              }).toList(),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
-      backgroundColor:
-          Colors.grey[300], // Set "dirty white" background for body
+      backgroundColor: Colors.grey[200],
     );
   }
 }
 
-void main() {
-  runApp(MaterialApp(
-    home: TrafficTable(),
-  ));
+ 
+/* 
+import 'package:flutter/material.dart';
+import 'package:ifret/api/api_request.dart';
+
+class DetailsChargeur extends StatelessWidget {
+  final int transactionId;
+
+  DetailsChargeur({required this.transactionId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Détails du Chargeur'),
+        backgroundColor: Color(0xFFFCCE00),
+      ),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: ApiRequest.fetchFretDetails(transactionId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFFCCE00),
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Erreur: ${snapshot.error}'),
+            );
+          } else if (!snapshot.hasData) {
+            return Center(
+              child: Text('Aucune donnée trouvée'),
+            );
+          }
+
+          var transaction = snapshot.data!;
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(
+              children: [
+                ListTile(
+                  title: Text('Description'),
+                  subtitle: Text(transaction['description'] ?? 'N/A'),
+                ),
+                ListTile(
+                  title: Text('Lieu de départ'),
+                  subtitle: Text(transaction['lieu_depart'] ?? 'N/A'),
+                ),
+                ListTile(
+                  title: Text('Lieu d\'arrivée'),
+                  subtitle: Text(transaction['lieu_arrive'] ?? 'N/A'),
+                ),
+                ListTile(
+                  title: Text('Montant'),
+                  subtitle: Text(transaction['montant'] ?? 'N/A'),
+                ),
+                ListTile(
+                  title: Text('Statut'),
+                  subtitle: Text(transaction['statut'] ?? 'N/A'),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
+ */

@@ -508,7 +508,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                             child: Text(
                               'Politique de confidentialité',
                               style: TextStyle(
-                                color: Color(0xfffcce00),
+                                color: Colors.black,
                                 fontSize: 14,
                               ),
                             ),
@@ -532,7 +532,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                             child: Text(
                               'Conditions générales',
                               style: TextStyle(
-                                color: Color(0xfffcce00),
+                                color: Colors.black,
                                 fontSize: 14,
                               ),
                             ),
@@ -547,7 +547,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                 Text(
                   'Version 1.0', // Texte de la version de l'application
                   style: TextStyle(
-                    color: Colors.grey, // Couleur du texte
+                    color: Colors.grey[700], // Couleur du texte
                   ),
                 ),
               ],
@@ -555,6 +555,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
           ),
         ],
       ),
+      backgroundColor: Colors.grey[200],
     );
   }
 }
@@ -735,6 +736,7 @@ class ModifierProfil extends StatelessWidget {
           ],
         ),
       ),
+      backgroundColor: Colors.grey[200],
     );
   }
 
@@ -794,21 +796,21 @@ class ModifierProfil extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0), // Forme du ListTile
         ),
-        tileColor: const Color(0xfffcce00), // Couleur de fond du ListTile
+        tileColor: Colors.white, // Couleur de fond du ListTile
         title: Row(
           children: [
             Icon(
               iconData,
               size: 20,
-              color: Colors.black, // Couleur de l'icône
+              color: Color(0xfffcce00), // Couleur de l'icône
             ),
             SizedBox(width: 10), // Espacement entre l'icône et le texte
             Text(
               label,
               style: TextStyle(
-                fontSize: 16,
-                color: Colors.black, // Couleur du texte
-              ),
+                  fontSize: 16,
+                  color: Colors.black, // Couleur du texte
+                  fontWeight: FontWeight.bold),
             ),
             SizedBox(width: 10), // Espacement avant le champ de texte
             Expanded(
@@ -817,7 +819,7 @@ class ModifierProfil extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                    color: Colors.black),
                 enabled: false,
               ),
             ),
@@ -826,7 +828,7 @@ class ModifierProfil extends StatelessWidget {
         trailing: IconButton(
           icon: Icon(Icons.edit),
           onPressed: onPressed,
-          color: Colors.black, // Couleur de l'icône de modification
+          color: Color(0xfffcce00), // Couleur de l'icône de modification
         ),
       ),
     );
@@ -848,20 +850,20 @@ class ModifierProfil extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0), // Forme du ListTile
           ),
-          tileColor: const Color(0xfffcce00), // Couleur de fond du ListTile
+          tileColor: Colors.white, // Couleur de fond du ListTile
           title: Row(
             children: [
               Icon(
                 iconData,
                 size: 20,
-                color: Colors.black, // Couleur de l'icône
+                color: Color(0xfffcce00), // Couleur de l'icône
               ),
               SizedBox(width: 10), // Espacement entre l'icône et le texte
               Text(
                 label,
                 style: TextStyle(
                   fontSize: 18,
-
+                  fontWeight: FontWeight.bold,
                   color: Colors.black, // Couleur du texte
                 ),
               ),
@@ -893,29 +895,69 @@ class ModifierProfil extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Modifier $fieldName'),
+          title: Text(
+            'Modifier $fieldName',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              fontSize: 20,
+            ),
+          ),
           content: TextFormField(
             onChanged: (value) {
               newValue = value;
             },
             controller: controller,
-            decoration: InputDecoration(hintText: 'Nouvelle valeur'),
+            decoration: InputDecoration(
+              hintText: 'Nouvelle valeur',
+              hintStyle: TextStyle(
+                color: Colors.grey,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.blue,
+                ),
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Annuler'),
+              child: Text(
+                'Annuler',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 controller.text = newValue;
                 Navigator.pop(context);
               },
-              child: Text('OK'),
+              child: Text(
+                'OK',
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          backgroundColor: Colors.white,
         );
       },
     );
