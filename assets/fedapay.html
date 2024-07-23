@@ -51,7 +51,13 @@
   </div>
 
   <script type="text/javascript">
-      FedaPay.init('#pay-btn', { public_key: 'VOTRE_CLE_API_PUBLIQUE' });
+    // Initialisation de FedaPay
+    function initFedaPay(publicKey, callbackUrl) {
+      FedaPay.init('#pay-btn', { 
+        public_key: publicKey, 
+        callback_url: callbackUrl 
+      });
+    }
   </script>
 </body>
 </html>

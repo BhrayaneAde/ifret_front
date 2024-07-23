@@ -7,6 +7,94 @@ import 'package:ifret/api/dio.dart';
 import 'package:ifret/composant/Chargeurs/accueilChargeur.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/* 
+class KkiapayApi {
+  static const String baseUrl = 'https://api.kkiapay.com';
+  static const String kkiapaySecretKey = '2b8e553045da11efba1789f22fb73fae';
+
+  static Future<Map<String, dynamic>?> createPayment({
+    required double amount,
+  }) async {
+    try {
+      // Récupérer le token d'authentification
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('Token d\'authentification non disponible');
+      }
+
+      final response = await dio().post(
+        '/payment/init',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $kkiapaySecretKey',
+            'Content-Type': 'application/json',
+          },
+        ),
+        data: jsonEncode({
+          'amount': amount,
+
+          // Ajoute d'autres paramètres nécessaires ici
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data;
+      } else {
+        print('Erreur lors de la création du paiement: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Erreur lors de la création du paiement: $e');
+      return null;
+    }
+  }
+
+// Helper function to retrieve the authentication token from SharedPreferences
+  static Future<String?> _getAuthToken() async {
+    // Get the SharedPreferences instance
+    final prefs = await SharedPreferences.getInstance();
+
+    // Retrieve the token from SharedPreferences under the 'token' key
+    String? token = prefs.getString('token');
+    if (token != null) {
+      // If token exists, use it to fetch user details
+      Options options = Options(headers: {'Authorization': 'Bearer $token'});
+      Response response = await dio().get('/who', options: options);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Store user details in SharedPreferences
+        prefs.setString('user_numero_tel', response.data['numero_tel']);
+      }
+    }
+    return token;
+  }
+
+  /*  static Future<Map<String, dynamic>?> verifyPayment(
+      String transactionId) async {
+    try {
+      final response = await dio().get(
+        '$baseUrl/v1/transactions/$transactionId',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $kkiapaySecretKey',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        print(
+            'Erreur lors de la vérification du paiement: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Erreur lors de la vérification du paiement: $e');
+      return null;
+    }
+  }
+ */
+}
+ */
 class MessageResponse {
   final List<dynamic> messages;
 
@@ -37,6 +125,74 @@ class ApiRequest {
       }
     } catch (e) {
       throw Exception(" $e Erreur lors de l'inscription");
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> initializePayment(double amount) async {
+    try {
+      String? numeroTel = await getUserNumeroTel();
+      if (numeroTel == null) throw Exception("Numéro de téléphone non trouvé");
+
+      Options options = Options(
+        contentType: Headers.jsonContentType,
+        validateStatus: (status) => status! < 500,
+      );
+
+      Response response = await dio().post('/initialize-payment',
+          data: {'amount': amount, 'numero_tel': numeroTel}, options: options);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data;
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de l'initialisation du paiement : $e");
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> getPaymentStatus() async {
+    try {
+      String? numeroTel = await getUserNumeroTel();
+      if (numeroTel == null) throw Exception("Numéro de téléphone non trouvé");
+
+      Options options = Options(
+        contentType: Headers.jsonContentType,
+        validateStatus: (status) => status! < 500,
+      );
+
+      Response response =
+          await dio().get('/payment-status/$numeroTel', options: options);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data;
+      }
+    } catch (e) {
+      throw Exception(
+          "Erreur lors de la récupération du statut du paiement : $e");
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> updatePaymentStatus(double paidAmount) async {
+    try {
+      String? numeroTel = await getUserNumeroTel();
+      if (numeroTel == null) throw Exception("Numéro de téléphone non trouvé");
+
+      Options options = Options(
+        contentType: Headers.jsonContentType,
+        validateStatus: (status) => status! < 500,
+      );
+
+      Response response = await dio().put('/update-payment-status',
+          data: {'paid_amount': paidAmount, 'numero_tel': numeroTel},
+          options: options);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data;
+      }
+    } catch (e) {
+      throw Exception("Erreur lors de la mise à jour du paiement : $e");
     }
     return null;
   }
@@ -208,10 +364,10 @@ class ApiRequest {
             'Erreur lors de la récupération des données : ${response.statusCode}');
         return [];
       }
-    } on DioException catch (e) {
+    } on DioError catch (e) {
       // Gérer les exceptions spécifiques à Dio
       print(
-          'Erreur lors de la récupération des voyages (DioException) : ${e.response?.statusCode} - ${e.response?.data}');
+          'Erreur lors de la récupération des voyages (DioError) : ${e.response?.statusCode} - ${e.response?.data}');
       return [];
     } catch (e) {
       // Gérer les exceptions génériques
@@ -275,7 +431,7 @@ class ApiRequest {
         throw Exception(
             'Error fetching voyage details: ${response.statusCode}');
       }
-    } on DioException catch (e) {
+    } on DioError catch (e) {
       // Gérer les exceptions spécifiques à Dio
       print(
           'Erreur lors de la récupération des détails du voyage (DioException) : ${e.response?.statusCode} - ${e.response?.data}');
@@ -618,7 +774,8 @@ class ApiRequest {
       Map<String, dynamic> data) async {
     try {
       // Faites une requête GET à votre API Laravel
-      Response response = await dio().get('/notification', data: data);
+      Response response =
+          await dio().get('/notification', queryParameters: data);
       // Vérifiez si la réponse est réussie (code 201)
       if (response.statusCode == 201) {
         // Récupérez la notification depuis la réponse JSON

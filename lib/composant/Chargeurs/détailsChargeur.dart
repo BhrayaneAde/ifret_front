@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
 import 'package:ifret/api/api_request.dart';
+import 'package:ifret/composant/Chargeurs/paiement.dart';
 
 class DetailsChargeur extends StatelessWidget {
   final int transactionId;
@@ -57,6 +57,18 @@ class DetailsChargeur extends StatelessWidget {
           }
 
           var transaction = snapshot.data!;
+          var montant = transaction['montant'];
+
+          // Convertir montant en entier si nécessaire
+          int montantInt;
+          try {
+            montantInt = int.parse(montant);
+          } catch (e) {
+            return Center(
+              child: Text('Erreur: montant invalide'),
+            );
+          }
+
           return SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
@@ -232,6 +244,30 @@ class DetailsChargeur extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 15),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PaiementPage(
+                                transactionId: transactionId,
+                                montant: montantInt,
+                              ),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xff222F5A),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 15),
+                        ),
+                        child: Text(
+                          'Effectuer un paiement',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -243,74 +279,3 @@ class DetailsChargeur extends StatelessWidget {
     );
   }
 }
-
- 
-/* 
-import 'package:flutter/material.dart';
-import 'package:ifret/api/api_request.dart';
-
-class DetailsChargeur extends StatelessWidget {
-  final int transactionId;
-
-  DetailsChargeur({required this.transactionId});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Détails du Chargeur'),
-        backgroundColor: Color(0xFFFCCE00),
-      ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: ApiRequest.fetchFretDetails(transactionId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFFFCCE00),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Erreur: ${snapshot.error}'),
-            );
-          } else if (!snapshot.hasData) {
-            return Center(
-              child: Text('Aucune donnée trouvée'),
-            );
-          }
-
-          var transaction = snapshot.data!;
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView(
-              children: [
-                ListTile(
-                  title: Text('Description'),
-                  subtitle: Text(transaction['description'] ?? 'N/A'),
-                ),
-                ListTile(
-                  title: Text('Lieu de départ'),
-                  subtitle: Text(transaction['lieu_depart'] ?? 'N/A'),
-                ),
-                ListTile(
-                  title: Text('Lieu d\'arrivée'),
-                  subtitle: Text(transaction['lieu_arrive'] ?? 'N/A'),
-                ),
-                ListTile(
-                  title: Text('Montant'),
-                  subtitle: Text(transaction['montant'] ?? 'N/A'),
-                ),
-                ListTile(
-                  title: Text('Statut'),
-                  subtitle: Text(transaction['statut'] ?? 'N/A'),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
- */

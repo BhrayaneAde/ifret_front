@@ -3,10 +3,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Chargeurs/profilChargeur.dart';
 import 'package:ifret/main.dart';
-import 'dart:convert';
+import 'package:kkiapay_flutter_sdk/kkiapay_flutter_sdk.dart';
+import 'package:kkiapay_flutter_sdk/kkiapay_flutter_sdk_platform_interface.dart';
 
-import 'package:flutter/services.dart' show rootBundle;
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'success_screen.dart';
 
 class Chargeur extends StatefulWidget {
   final String name;
@@ -146,7 +146,7 @@ class _ChargeurState extends State<Chargeur> {
       case 0:
         return _getMessages();
       case 1:
-        return Paiement();
+        return KkiapaySample();
       case 2:
         return Tracking();
       case 3:
@@ -337,109 +337,179 @@ class MesInformations extends StatelessWidget {
   }
 } */
 
-class Paiement extends StatefulWidget {
-  @override
-  _PaiementState createState() => _PaiementState();
+// Votre clé API publique ici
+const String publicApiKey = "2b8e553045da11efba1789f22fb73fae";
+
+void callback(response, context) {
+  switch (response['status']) {
+    case PAYMENT_CANCELLED:
+      debugPrint(PAYMENT_CANCELLED);
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(PAYMENT_CANCELLED),
+      ));
+      break;
+
+    case PENDING_PAYMENT:
+      debugPrint(PENDING_PAYMENT);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(PENDING_PAYMENT),
+      ));
+      break;
+
+    case PAYMENT_INIT:
+      debugPrint(PAYMENT_INIT);
+      //ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      //content: Text(PAYMENT_INIT),
+      //));
+      break;
+
+    case PAYMENT_SUCCESS:
+      debugPrint(PAYMENT_SUCCESS);
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(PAYMENT_SUCCESS),
+      ));
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SuccessScreen(
+            amount: response['requestData']['amount'],
+            transactionId: response['transactionId'],
+          ),
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(PAYMENT_SUCCESS),
+      ));
+      break;
+    case PAYMENT_FAILED:
+      debugPrint(PAYMENT_FAILED);
+      break;
+
+    default:
+      debugPrint(UNKNOWN_EVENT);
+      break;
+  }
 }
 
-class _PaiementState extends State<Paiement> {
-  late InAppWebViewController _controller;
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      /*  appBar: AppBar(
-        title: Text('Paiement'),
-      ), */
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context),
-          SizedBox(height: 100),
-          Expanded(child: _buildWebView()), // Afficher le WebView
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.2,
-      child: Stack(
-        children: [
-          Image.asset(
-            'assets/images/hautPaiement1.jpg',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-          DecoratedBox(
-            decoration: BoxDecoration(),
-            child: SizedBox.expand(),
-          ),
-          Positioned(
-            left: 16.0,
-            top: 16.0,
-            child: Image.asset(
-              'assets/images/ifret.png',
-              width: 70,
-              height: 70,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 27, bottom: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Paiement Fret',
-                    style: TextStyle(
-                      color: Color(0xFFFCCE00),
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  Text(
-                    'En Ligne',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWebView() {
-    return InAppWebView(
-      initialUrlRequest: URLRequest(url: WebUri("about:blank")),
-      onWebViewCreated: (InAppWebViewController controller) {
-        _controller = controller;
-        _loadHtmlFromAssets();
-      },
-      initialOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(
-          javaScriptEnabled: true,
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor:
+              Colors.blue, // Utilisez la couleur primaire souhaitée
+          title: const Text('Kkiapay Sample'),
+          centerTitle: true,
         ),
+        body: const KkiapaySample(),
       ),
     );
   }
+}
 
-  void _loadHtmlFromAssets() async {
-    String fileText = await rootBundle.loadString('assets/fedapay.html');
-    _controller.loadData(
-        data: fileText, mimeType: "text/html", encoding: "utf-8");
+class KkiapaySample extends StatelessWidget {
+  void _callback(Map<String, dynamic> response, BuildContext context) {
+    switch (response['status']) {
+      case PAYMENT_CANCELLED:
+        debugPrint(PAYMENT_CANCELLED);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(PAYMENT_CANCELLED),
+        ));
+        break;
+
+      case PENDING_PAYMENT:
+        debugPrint(PENDING_PAYMENT);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(PENDING_PAYMENT),
+        ));
+        break;
+
+      case PAYMENT_INIT:
+        debugPrint(PAYMENT_INIT);
+        break;
+
+      case PAYMENT_SUCCESS:
+        debugPrint(PAYMENT_SUCCESS);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(PAYMENT_SUCCESS),
+        ));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SuccessScreen(
+              amount: response['requestData']['amount'],
+              transactionId: response['transactionId'],
+            ),
+          ),
+        );
+        break;
+
+      default:
+        debugPrint(UNKNOWN_EVENT);
+        break;
+    }
+  }
+
+  const KkiapaySample({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Création de l'objet KKiaPay
+    final kkiapay = const KKiaPay(
+      amount: 1000,
+      countries: ["BJ", "CI", "SN", "TG"],
+      phone: "22961000000",
+      name: "John Doe",
+      email: "email@mail.com",
+      reason: 'transaction reason',
+      data: 'Fake data',
+      sandbox: true,
+      apikey: publicApiKey,
+      callback:
+          callback, // Assurez-vous que la signature du callback est correcte
+      theme: defaultTheme,
+      partnerId: 'AxXxXXxId',
+      paymentMethods: ["momo", "card"],
+    );
+
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ButtonTheme(
+            minWidth: 500.0,
+            height: 100.0,
+            child: TextButton(
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(const Color(0xff222F5A)),
+                foregroundColor: MaterialStateProperty.all(Colors.white),
+              ),
+              child: const Text(
+                'Pay Now ( on Mobile )',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => kkiapay),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 50),
+        ],
+      ),
+    );
   }
 }
 
