@@ -735,6 +735,81 @@ class ApiRequest {
     }
   }
 
+  static Future<void> storeTransaction(
+      String fretId, String kkiapayTransactionId, int montantPaye) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      print('Auth Token: $authToken');
+      print('Transaction ID: $kkiapayTransactionId');
+      print('Montant Payé: $montantPaye');
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response = await dio().post(
+        '/store-transaction',
+        options: options,
+        data: {
+          'fretId': fretId,
+          'transactionId': kkiapayTransactionId,
+          'montant_paye': montantPaye,
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Data: ${response.data}');
+
+      if (response.statusCode != 201 && response.statusCode != 200) {
+        throw Exception('Erreur lors de l\'enregistrement de la transaction.');
+      }
+    } catch (e) {
+      print('Error storing transaction: $e');
+      throw Exception('Error storing transaction: $e');
+    }
+  }
+
+  static Future<int> fetchTotalPaidAmount(String fretId) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response =
+          await dio().get('/frets/$fretId/paid-amount', options: options);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data['total_paid'];
+      } else {
+        print('Error fetching total paid amount: ${response.statusCode}');
+        return 0;
+      }
+    } catch (e) {
+      print('Error fetching total paid amount: $e');
+      throw Exception('Error fetching total paid amount: $e');
+    }
+  }
+
+  // Récupérer les transactions d'un fret spécifique
+  Future<List<dynamic>> getTransactionsForFret(int fretId) async {
+    try {
+      final response = await dio().get('/recupere-transac/$fretId');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data;
+      } else {
+        throw Exception('Erreur lors de la récupération des transactions.');
+      }
+    } catch (e) {
+      print('Erreur lors de la récupération des transactions: $e');
+      throw Exception('Erreur lors de la récupération des transactions: $e');
+    }
+  }
+
   static Future<List<Map<String, dynamic>>?> fetchTrafficData() async {
     try {
       // Get the authentication token from SharedPreferences
@@ -755,7 +830,7 @@ class ApiRequest {
       // Make the HTTP request to fetch traffic data
       Response response = await dio().get('/traffic', options: options);
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         // If the request is successful, return the traffic data
         return List<Map<String, dynamic>>.from(response.data);
       } else {
@@ -777,7 +852,7 @@ class ApiRequest {
       Response response =
           await dio().get('/notification', queryParameters: data);
       // Vérifiez si la réponse est réussie (code 201)
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         // Récupérez la notification depuis la réponse JSON
         return {
           'message': response.data['message'],
@@ -851,7 +926,8 @@ class ApiRequest {
           .post('/enregistrementCamion', data: formData, options: options);
 
       print('Response status code: ${response.statusCode}');
-      if (response.statusCode == 201) {
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
         print('Truck registration successful');
         return response.data;
       } else {
@@ -919,7 +995,7 @@ class ApiRequest {
       // Make the HTTP request to fetch traffic data
       Response response = await dio().get('/camions', options: options);
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         // If the request is successful, return the traffic data
         return response.data['data'];
       } else {

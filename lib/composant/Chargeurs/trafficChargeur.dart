@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Chargeurs/d%C3%A9tailsChargeur.dart';
+
 import 'package:intl/intl.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -81,6 +82,11 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: transactions.map((transaction) {
+                int transactionId = transaction['id'] ??
+                    0; // Assurez-vous que transactionId est un entier
+                int fretId = transaction['fret_id'] ??
+                    0; // Assurez-vous que fretId est un entier
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(
                       vertical: 8.0, horizontal: 16.0),
@@ -94,7 +100,9 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => DetailsChargeur(
-                                transactionId: transaction['id']),
+                              transactionId: transactionId,
+                              fretId: fretId,
+                            ),
                           ),
                         );
                       },
@@ -103,7 +111,7 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
                       ),
                       tileColor: Colors.white,
                       title: Text(
-                        formatDate(transaction['created_at']),
+                        formatDate(transaction['created_at'] ?? ''),
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -112,7 +120,7 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
                         ),
                       ),
                       subtitle: Text(
-                        transaction['description'],
+                        transaction['description'] ?? 'N/A',
                         style: TextStyle(
                           color: Colors.black,
                           fontSize: 16,
@@ -129,7 +137,9 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DetailsChargeur(
-                                    transactionId: transaction['id']),
+                                  transactionId: transactionId,
+                                  fretId: fretId,
+                                ),
                               ),
                             );
                           },

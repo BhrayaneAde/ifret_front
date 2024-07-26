@@ -1,63 +1,91 @@
 import 'package:flutter/material.dart';
+import 'package:ifret/api/api_request.dart';
+
 import 'package:kkiapay_flutter_sdk/kkiapay_flutter_sdk.dart';
 import 'success_screen.dart';
 
-// Votre clé API publique ici
 const String publicApiKey = "2b8e553045da11efba1789f22fb73fae";
 
-void callback(response, context) {
-  switch (response['status']) {
-    case PAYMENT_CANCELLED:
-      debugPrint(PAYMENT_CANCELLED);
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text(PAYMENT_CANCELLED),
-      ));
-      break;
-
-    case PENDING_PAYMENT:
-      debugPrint(PENDING_PAYMENT);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text(PENDING_PAYMENT),
-      ));
-      break;
-
-    case PAYMENT_INIT:
-      debugPrint(PAYMENT_INIT);
-      break;
-
-    case PAYMENT_SUCCESS:
-      debugPrint(PAYMENT_SUCCESS);
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text(PAYMENT_SUCCESS),
-      ));
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SuccessScreen(
-            amount: response['requestData']['amount'],
-            transactionId: response['transactionId'],
-          ),
-        ),
-      );
-      break;
-
-    case PAYMENT_FAILED:
-      debugPrint(PAYMENT_FAILED);
-      break;
-
-    default:
-      debugPrint(UNKNOWN_EVENT);
-      break;
-  }
-}
-
 class PaiementPage extends StatelessWidget {
-  final int transactionId;
+  final String transactionId;
   final int montant;
 
-  PaiementPage({required this.transactionId, required this.montant});
+  PaiementPage({
+    required this.transactionId,
+    required this.montant,
+  });
+
+  void callback(Map<String, dynamic> response, BuildContext context) async {
+    print('Callback triggered');
+    print('Response: ${response.toString()}'); // Imprime la réponse complète
+
+    switch (response['status']) {
+      case PAYMENT_CANCELLED:
+        debugPrint(PAYMENT_CANCELLED);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(PAYMENT_CANCELLED),
+        ));
+        break;
+
+      case PENDING_PAYMENT:
+        debugPrint(PENDING_PAYMENT);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(PENDING_PAYMENT),
+        ));
+        break;
+
+      case PAYMENT_INIT:
+        debugPrint(PAYMENT_INIT);
+        break;
+
+      case PAYMENT_SUCCESS:
+        print(response['status']);
+        debugPrint(PAYMENT_SUCCESS);
+        print('Transaction ID: ${response['transactionId']}');
+        print('Montant Payé: ${response['requestData']['amount']}');
+
+        String kkiapayTransactionId =
+            response['transactionId']?.toString() ?? '';
+        int montantPaye =
+            int.tryParse(response['requestData']['amount']?.toString() ?? '') ??
+                0;
+
+        try {
+          // Appeler la méthode avec les valeurs converties
+          await ApiRequest.storeTransaction(
+              transactionId, kkiapayTransactionId, montantPaye);
+        } catch (e) {
+          print('Erreur lors du stockage de la transaction: $e');
+        }
+
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(PAYMENT_SUCCESS),
+        ));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SuccessScreen(
+              montantPaye: montantPaye,
+              transactionId: transactionId,
+            ),
+          ),
+        );
+        break;
+
+      case PAYMENT_FAILED:
+        debugPrint(PAYMENT_FAILED);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(PAYMENT_FAILED),
+        ));
+        break;
+
+      default:
+        debugPrint(UNKNOWN_EVENT);
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,11 +95,11 @@ class PaiementPage extends StatelessWidget {
       phone: "22961000000",
       name: "John Doe",
       email: "email@mail.com",
-      reason: 'Paiement pour transaction $transactionId',
-      data: 'Data for transaction $transactionId',
+      reason: 'Paiement',
+      data: 'Donnée de transaction',
       sandbox: true,
       apikey: publicApiKey,
-      callback: callback,
+      callback: callback, // Utiliser le callback correct
       theme: defaultTheme,
       partnerId: 'AxXxXXxId',
       paymentMethods: ["momo", "card"],

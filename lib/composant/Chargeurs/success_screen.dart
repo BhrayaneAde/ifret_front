@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:ifret/composant/Chargeurs/d%C3%A9tailsChargeur.dart';
 
 class SuccessScreen extends StatelessWidget {
-  final int amount;
+  final int montantPaye;
   final String transactionId;
 
-  const SuccessScreen({
-    Key? key,
-    required this.amount,
+  SuccessScreen({
+    required this.montantPaye,
     required this.transactionId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +39,7 @@ class SuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Montant de la Transaction: FCFA ${amount / 100}',
+                'Montant de la Transaction: FCFA $montantPaye',
                 style: const TextStyle(
                   fontSize: 18,
                 ),
@@ -57,6 +57,7 @@ class SuccessScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
+                  DetailsChargeur;
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFCCE00),

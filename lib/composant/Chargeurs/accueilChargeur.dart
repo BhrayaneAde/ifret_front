@@ -337,10 +337,13 @@ class MesInformations extends StatelessWidget {
   }
 } */
 
-// Votre clé API publique ici
+/// Votre clé API publique ici/*
 const String publicApiKey = "2b8e553045da11efba1789f22fb73fae";
 
-void callback(response, context) {
+Future<void> callback(response, context) async {
+  print('Callback triggered');
+  print('Response: ${response.toString()}'); // Imprime la réponse complète
+
   switch (response['status']) {
     case PAYMENT_CANCELLED:
       debugPrint(PAYMENT_CANCELLED);
@@ -359,30 +362,43 @@ void callback(response, context) {
 
     case PAYMENT_INIT:
       debugPrint(PAYMENT_INIT);
-      //ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      //content: Text(PAYMENT_INIT),
-      //));
       break;
 
     case PAYMENT_SUCCESS:
       debugPrint(PAYMENT_SUCCESS);
+      print('Transaction ID: ${response['transactionId']}');
+      print('Montant Payé: ${response['requestData']['amount']}');
+      print('Fret ID: ${response['fretId']}');
+
+      String kkiapayTransactionId = response['transactionId']?.toString() ?? '';
+      int montantPaye =
+          int.tryParse(response['requestData']['amount']?.toString() ?? '') ??
+              0;
+
+      try {
+        // Appeler la méthode avec les valeurs converties
+        /*  await ApiRequest.storeTransaction(
+              transactionId, kkiapayTransactionId, montantPaye); */
+      } catch (e) {
+        print('Erreur lors du stockage de la transaction: $e');
+      }
+
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text(PAYMENT_SUCCESS),
       ));
-      Navigator.push(
+      /*   Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => SuccessScreen(
-            amount: response['requestData']['amount'],
-            transactionId: response['transactionId'],
+            montantPaye: montantPaye,
+            transactionId: transactionId,
+            
           ),
         ),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text(PAYMENT_SUCCESS),
-      ));
+      ); */
       break;
+
     case PAYMENT_FAILED:
       debugPrint(PAYMENT_FAILED);
       break;
@@ -414,56 +430,12 @@ class App extends StatelessWidget {
 }
 
 class KkiapaySample extends StatelessWidget {
-  void _callback(Map<String, dynamic> response, BuildContext context) {
-    switch (response['status']) {
-      case PAYMENT_CANCELLED:
-        debugPrint(PAYMENT_CANCELLED);
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(PAYMENT_CANCELLED),
-        ));
-        break;
-
-      case PENDING_PAYMENT:
-        debugPrint(PENDING_PAYMENT);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(PENDING_PAYMENT),
-        ));
-        break;
-
-      case PAYMENT_INIT:
-        debugPrint(PAYMENT_INIT);
-        break;
-
-      case PAYMENT_SUCCESS:
-        debugPrint(PAYMENT_SUCCESS);
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text(PAYMENT_SUCCESS),
-        ));
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SuccessScreen(
-              amount: response['requestData']['amount'],
-              transactionId: response['transactionId'],
-            ),
-          ),
-        );
-        break;
-
-      default:
-        debugPrint(UNKNOWN_EVENT);
-        break;
-    }
-  }
-
   const KkiapaySample({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // Création de l'objet KKiaPay
-    final kkiapay = const KKiaPay(
+    final kkiapay = KKiaPay(
       amount: 1000,
       countries: ["BJ", "CI", "SN", "TG"],
       phone: "22961000000",
