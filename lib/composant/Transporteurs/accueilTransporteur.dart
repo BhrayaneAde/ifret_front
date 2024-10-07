@@ -3,16 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_echarts/flutter_echarts.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Transporteurs/EnregistrerCamionModif.dart';
 import 'package:ifret/composant/Transporteurs/FretDetailsPage.dart';
-import 'package:ifret/composant/Transporteurs/NotificationTransporteur.dart';
 import 'package:ifret/composant/Transporteurs/profilTransporteur.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:intl/intl.dart';
-
-import 'dart:math' as math;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +17,7 @@ void main() {
       statusBarColor: Colors.blueAccent,
     ),
   );
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: Transporteurs(
       name: "John Doe Transporteur",
       profileUrl: "profile_url",
@@ -35,7 +31,8 @@ class Transporteurs extends StatefulWidget {
   final String profileUrl;
   final String username;
 
-  Transporteurs({
+  const Transporteurs({
+    super.key,
     required this.name,
     required this.profileUrl,
     required this.username,
@@ -47,7 +44,7 @@ class Transporteurs extends StatefulWidget {
 
 class _TransporteursState extends State<Transporteurs> {
   int _selectedIndex = 0;
-  int _notificationCount = 3; // Example notification count
+  final int _notificationCount = 3; // Example notification count
 
   void _onItemTapped(int index) {
     setState(() {
@@ -85,7 +82,7 @@ class _TransporteursState extends State<Transporteurs> {
               ),
             ],
             selectedItemColor:
-                Color(0xFFFCCE00), // Couleur de l'élément sélectionné
+                const Color(0xFFFCCE00), // Couleur de l'élément sélectionné
             unselectedItemColor:
                 Colors.black, // Couleur des éléments non sélectionnés
             currentIndex: _selectedIndex,
@@ -111,13 +108,13 @@ class _TransporteursState extends State<Transporteurs> {
   Widget _getBody() {
     switch (_selectedIndex) {
       case 0:
-        return EnregistrementPage();
+        return const EnregistrementPage();
       case 1:
-        return Tracking();
+        return const Tracking();
       case 2:
-        return NotificationPage();
+        return const NotificationPage();
       case 3:
-        return ProfilTransporteur();
+        return const ProfilTransporteur();
       default:
         return Container();
     }
@@ -125,6 +122,8 @@ class _TransporteursState extends State<Transporteurs> {
 }
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
   _HomeState createState() => _HomeState();
 }
@@ -139,7 +138,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       /*   appBar: AppBar(
         title: Text('Youtube Player Flutter'),
       ), */
@@ -148,7 +147,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.2,
       child: Stack(
@@ -159,7 +158,7 @@ class _HomeState extends State<Home> {
             width: double.infinity,
             height: double.infinity,
           ),
-          DecoratedBox(
+          const DecoratedBox(
             decoration: BoxDecoration(),
             child:
                 SizedBox.expand(), // Pour étendre le dégradé sur toute l'image
@@ -174,10 +173,10 @@ class _HomeState extends State<Home> {
               fit: BoxFit.cover, // Ajustement de l'image
             ),
           ),
-          Align(
+          const Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
-              padding: const EdgeInsets.only(left: 27, bottom: 10),
+              padding: EdgeInsets.only(left: 27, bottom: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -216,7 +215,7 @@ class _HomeState extends State<Home> {
 }
 
 class EnregistrementPage extends StatefulWidget {
-  const EnregistrementPage({Key? key}) : super(key: key);
+  const EnregistrementPage({super.key});
 
   @override
   _EnregistrementPageState createState() => _EnregistrementPageState();
@@ -224,9 +223,9 @@ class EnregistrementPage extends StatefulWidget {
 
 class _EnregistrementPageState extends State<EnregistrementPage> {
   int _currentTabIndex = 0;
-  late List<File> _files =
+  late final List<File> _files =
       List.filled(4, File('')); // Initialisation avec des fichiers vides
-  TextEditingController _matriculeController = TextEditingController();
+  final TextEditingController _matriculeController = TextEditingController();
 
   Future<void> _pickFile(int index) async {
     final result = await FilePicker.platform.pickFiles(
@@ -254,11 +253,11 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(context),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Expanded(
             child: _currentTabIndex == 0
                 ? Enregistrements(_files, _pickFile, _matriculeController)
-                : Catalogue(),
+                : const Catalogue(),
           ),
         ],
       ),
@@ -275,12 +274,12 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
         items: [
           BottomNavigationBarItem(
             icon: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 border:
                     Border.all(color: const Color.fromARGB(255, 252, 250, 250)),
-                color: _currentTabIndex == 0 ? Color(0xFFFCCE00) : null,
+                color: _currentTabIndex == 0 ? const Color(0xFFFCCE00) : null,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -288,7 +287,7 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
                   Icon(Icons.save_sharp,
                       color:
                           _currentTabIndex == 0 ? Colors.white : Colors.black),
-                  SizedBox(width: 8.0),
+                  const SizedBox(width: 8.0),
                   Text(
                     'Enregistrements',
                     style: TextStyle(
@@ -303,11 +302,12 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
           ),
           BottomNavigationBarItem(
             icon: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(color: Color.fromARGB(255, 247, 245, 245)),
-                color: _currentTabIndex == 1 ? Color(0xFFFCCE00) : null,
+                border:
+                    Border.all(color: const Color.fromARGB(255, 247, 245, 245)),
+                color: _currentTabIndex == 1 ? const Color(0xFFFCCE00) : null,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -315,7 +315,7 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
                   Icon(Icons.bookmark_sharp,
                       color:
                           _currentTabIndex == 1 ? Colors.white : Colors.black),
-                  SizedBox(width: 8.0),
+                  const SizedBox(width: 8.0),
                   Text(
                     'Catalogue',
                     style: TextStyle(
@@ -334,7 +334,7 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.2,
       child: Stack(
@@ -345,7 +345,7 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
             width: double.infinity,
             height: double.infinity,
           ),
-          DecoratedBox(
+          const DecoratedBox(
             decoration: BoxDecoration(
                 /*  gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -379,14 +379,14 @@ class _EnregistrementPageState extends State<EnregistrementPage> {
                 children: [
                   Text(
                     _currentTabIndex == 0 ? 'Enregistrement' : 'Catalogue',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xFFFCCE00),
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   /* SizedBox(height: 5), */
-                  Text(
+                  const Text(
                     'Camion',
                     style: TextStyle(
                       color: Colors.white,
@@ -411,7 +411,8 @@ class Enregistrements extends StatefulWidget {
   final Function(int) pickFile;
   final TextEditingController matriculeController;
 
-  Enregistrements(this.files, this.pickFile, this.matriculeController);
+  const Enregistrements(this.files, this.pickFile, this.matriculeController,
+      {super.key});
 
   @override
   _EnregistrementsState createState() => _EnregistrementsState();
@@ -423,6 +424,8 @@ class _EnregistrementsState extends State<Enregistrements> {
   File? carteGrise;
   File? visiteTechnique;
   File? assurance;
+  String?
+      selectedTypeVehicule; // Variable pour stocker la sélection du type de véhicule
 
   @override
   Widget build(BuildContext context) {
@@ -430,7 +433,6 @@ class _EnregistrementsState extends State<Enregistrements> {
       padding: const EdgeInsets.all(20.0),
       children: [
         // Champ pour le numéro de matricule
-
         buildTextField(
           label: 'Numéro d\'immatriculation :',
           onChanged: (value) => setState(() => matricule = value),
@@ -439,7 +441,44 @@ class _EnregistrementsState extends State<Enregistrements> {
           textFieldHeight: 42,
           hintText: 'Ex: 22442890',
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
+
+        // Ajout du champ de sélection pour le type de véhicule
+        DropdownButtonFormField<String>(
+          decoration: const InputDecoration(labelText: 'Type de véhicule'),
+          value: selectedTypeVehicule,
+          onChanged: (String? newValue) {
+            setState(() {
+              selectedTypeVehicule = newValue;
+            });
+          },
+          items: <String>[
+            'Ampliroll',
+            'Benne',
+            'Benne grue',
+            'Bétaillère',
+            'Chariot élévateur',
+            'Citerne',
+            'Dépanneuse',
+            'Fourgon',
+            'Fourgon frigorifique',
+            'Pickup',
+            'Plateau 20',
+            'Plateau 40',
+            'Plateau double 20\'\'',
+            'Plateau Grue',
+            'Porte-Char',
+            'Utilitaire',
+            'Autre'
+          ].map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ),
+        const SizedBox(height: 10),
+
         // Champ d'image pour la photo du camion
         buildImageField(
           label: "Photo du Camion",
@@ -449,7 +488,8 @@ class _EnregistrementsState extends State<Enregistrements> {
           textFieldHeight: 42,
           onPressed: () => _pickAndSetFile(PhotoField.PhotoCamion),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
+
         // Champ d'image pour la carte grise
         buildImageField(
           label: "Carte Grise",
@@ -459,7 +499,8 @@ class _EnregistrementsState extends State<Enregistrements> {
           textFieldWidth: 190,
           textFieldHeight: 42,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
+
         // Champ d'image pour la visite technique
         buildImageField(
           label: "Visite Technique",
@@ -469,7 +510,8 @@ class _EnregistrementsState extends State<Enregistrements> {
           textFieldWidth: 190,
           textFieldHeight: 42,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
+
         // Champ d'image pour l'assurance
         buildImageField(
           label: "Assurance",
@@ -479,13 +521,14 @@ class _EnregistrementsState extends State<Enregistrements> {
           textFieldWidth: 190,
           textFieldHeight: 42,
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
+
         ElevatedButton(
           onPressed: () async {
-            if (matricule.isEmpty) {
-              // Gérer l'erreur de matricule vide
+            if (matricule.isEmpty || selectedTypeVehicule == null) {
+              // Vérifier que tous les champs obligatoires sont remplis
               _showAlertDialog(context, "Erreur",
-                  "Le numéro de matricule ne peut pas être vide");
+                  "Veuillez remplir tous les champs obligatoires");
               return;
             }
 
@@ -509,43 +552,32 @@ class _EnregistrementsState extends State<Enregistrements> {
             try {
               final response = await ApiRequest.registerTruck(
                 matricule: matricule,
-                files: [
-                  photoCamion!,
-                  carteGrise!,
-                  visiteTechnique!,
-                  assurance!
-                ],
+                files: files,
                 photoCamion: photoCamion!,
                 carteGrise: carteGrise!,
                 visiteTechnique: visiteTechnique!,
                 assurance: assurance!,
+                typeVehicule: selectedTypeVehicule!, // Ajoutez ce champ ici
               );
-              // Gérer la réponse réussie (par exemple, afficher un message de succès)
+
               _showAlertDialog(
                   context, "Succès", "Enregistrement effectué avec succès");
-              print('Enregistrement effectué avec succès!');
-              // Mettre à jour l'interface utilisateur ou effectuer d'autres actions
-
-              // Update UI or perform other actions
             } on Exception catch (e) {
-              // Gérer l'erreur de la requête API (par exemple, afficher un message d'erreur)
               _showAlertDialog(context, "Erreur",
                   "Erreur lors de l'enregistrement: ${e.toString()}");
-              print('Erreur d\'enregistrement: ${e.toString()}');
-              // Afficher un message d'erreur à l'utilisateur
             }
           },
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(
-              Color(0xFFFCCE00),
+            backgroundColor: WidgetStateProperty.all<Color>(
+              const Color(0xFFFCCE00),
             ),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(24.0),
               ),
             ),
-            minimumSize: MaterialStateProperty.all<Size>(
-              Size(120, 48), // Définir la largeur minimale du bouton
+            minimumSize: WidgetStateProperty.all<Size>(
+              const Size(120, 48), // Définir la largeur minimale du bouton
             ),
           ),
           child: const Padding(
@@ -574,7 +606,7 @@ class _EnregistrementsState extends State<Enregistrements> {
           content: Text(message),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -600,7 +632,7 @@ class _EnregistrementsState extends State<Enregistrements> {
           padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
             label,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         SizedBox(
@@ -617,9 +649,9 @@ class _EnregistrementsState extends State<Enregistrements> {
               fillColor: Colors.grey[200],
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(45),
-                borderSide: BorderSide(color: Colors.black),
+                borderSide: const BorderSide(color: Colors.black),
               ),
-              contentPadding: EdgeInsets.symmetric(
+              contentPadding: const EdgeInsets.symmetric(
                 vertical: 10.0,
                 horizontal: 15.0,
               ),
@@ -644,40 +676,40 @@ class _EnregistrementsState extends State<Enregistrements> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Row(
           children: [
             ElevatedButton(
               onPressed: onPressed,
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  Color(0xFFFCCE00), // Existing background color
+                backgroundColor: WidgetStateProperty.all<Color>(
+                  const Color(0xFFFCCE00), // Existing background color
                 ),
-                foregroundColor: MaterialStateProperty.resolveWith<Color>(
+                foregroundColor: WidgetStateProperty.resolveWith<Color>(
                   (states) {
-                    if (states.contains(MaterialState.pressed)) {
+                    if (states.contains(WidgetState.pressed)) {
                       return Colors.white; // White text when pressed
                     } else {
                       return Colors.black; // Black text by default
                     }
                   },
                 ),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(45),
                   ),
                 ),
-                minimumSize: MaterialStateProperty.all<Size>(
-                  Size(120, 48), // Minimum button size
+                minimumSize: WidgetStateProperty.all<Size>(
+                  const Size(120, 48), // Minimum button size
                 ),
               ),
-              child: Text('Sélectionner un fichier'), // Button text
+              child: const Text('Sélectionner un fichier'), // Button text
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: Text(
                 file != null
@@ -688,7 +720,7 @@ class _EnregistrementsState extends State<Enregistrements> {
             ),
           ],
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -723,6 +755,8 @@ class _EnregistrementsState extends State<Enregistrements> {
 }
 
 class Catalogue extends StatefulWidget {
+  const Catalogue({super.key});
+
   @override
   _CatalogueState createState() => _CatalogueState();
 }
@@ -742,22 +776,15 @@ class _CatalogueState extends State<Catalogue> {
   Future<void> _fetchCamions() async {
     try {
       List<dynamic> camions = await ApiRequest.getUserCamions();
-      if (camions != null) {
-        setState(() {
-          _camionsEnAttente = camions
-              .where((camion) => camion['statut'] == 'En attent')
-              .toList();
-          _camionsValides =
-              camions.where((camion) => camion['statut'] == 'Validé').toList();
-          _camionsRejetes =
-              camions.where((camion) => camion['statut'] == 'Rejeté').toList();
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      setState(() {
+        _camionsEnAttente =
+            camions.where((camion) => camion['statut'] == 'En attent').toList();
+        _camionsValides =
+            camions.where((camion) => camion['statut'] == 'Validé').toList();
+        _camionsRejetes =
+            camions.where((camion) => camion['statut'] == 'Rejeté').toList();
+        _isLoading = false;
+      });
     } catch (e) {
       print('Erreur: $e');
       setState(() {
@@ -788,7 +815,7 @@ class _CatalogueState extends State<Catalogue> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 15), // Espace entre chaque camion
+          const SizedBox(height: 15), // Espace entre chaque camion
           ...camions.map((camion) {
             bool isModifiable =
                 camion['statut'] != 'Validé' && camion['statut'] != 'En attent';
@@ -810,10 +837,11 @@ class _CatalogueState extends State<Catalogue> {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   tileColor: Colors.white,
-                  leading: Icon(Icons.directions_car, color: Color(0xFFFCCE00)),
+                  leading: const Icon(Icons.directions_car,
+                      color: Color(0xFFFCCE00)),
                   title: Text(
                     camion['matricule'],
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -824,12 +852,12 @@ class _CatalogueState extends State<Catalogue> {
                     children: [
                       Text(
                         _formatDate(camion['created_at']),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 14,
                         ),
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       Text(
                         camion['statut'],
                         style: TextStyle(
@@ -840,11 +868,12 @@ class _CatalogueState extends State<Catalogue> {
                       ),
                     ],
                   ),
-                  trailing: isModifiable ? Icon(Icons.arrow_forward_ios) : null,
+                  trailing:
+                      isModifiable ? const Icon(Icons.arrow_forward_ios) : null,
                 ),
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -859,7 +888,7 @@ class _CatalogueState extends State<Catalogue> {
   Color _getStatutColor(String statut) {
     switch (statut) {
       case 'En attent':
-        return Color(0xFFFCCE00);
+        return const Color(0xFFFCCE00);
       case 'Validé':
         return Colors.green;
       case 'Rejeté':
@@ -873,7 +902,7 @@ class _CatalogueState extends State<Catalogue> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -882,17 +911,17 @@ class _CatalogueState extends State<Catalogue> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('En attente',
+                      const Text('En attente',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
                       _buildCamionTable(_camionsEnAttente, false),
-                      SizedBox(height: 20),
-                      Text('Validé(s)',
+                      const SizedBox(height: 20),
+                      const Text('Validé(s)',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
                       _buildCamionTable(_camionsValides, false),
-                      SizedBox(height: 20),
-                      Text('Rejeté(s)',
+                      const SizedBox(height: 20),
+                      const Text('Rejeté(s)',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
                       _buildCamionTable(_camionsRejetes, true),
@@ -906,13 +935,15 @@ class _CatalogueState extends State<Catalogue> {
 }
 
 class Tracking extends StatelessWidget {
+  const Tracking({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tracking'),
+        title: const Text('Tracking'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Contenu de Tracking'),
       ),
     );
@@ -1033,6 +1064,8 @@ class _NotificationPageState extends State<NotificationPage> {
 }
  */
 class NotificationPage extends StatefulWidget {
+  const NotificationPage({super.key});
+
   @override
   _NotificationPageState createState() => _NotificationPageState();
 }
@@ -1115,14 +1148,15 @@ class _NotificationPageState extends State<NotificationPage> {
         backgroundColor: Colors.grey[200],
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child:
                   CircularProgressIndicator()) // Afficher l'indicateur de chargement pendant le fetch
           : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 15), // Espace entre chaque notification
+                  const SizedBox(
+                      height: 15), // Espace entre chaque notification
                   ..._notifications.map((notification) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(
@@ -1140,7 +1174,7 @@ class _NotificationPageState extends State<NotificationPage> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           tileColor: Colors.white,
-                          leading: Icon(Icons.notifications,
+                          leading: const Icon(Icons.notifications,
                               color: Color(0xFFFCCE00)),
                           title: Text(
                             notification['message'],
@@ -1155,7 +1189,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           ),
                           subtitle: Text(
                             notification['date'],
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 14,
                               decoration: TextDecoration.none,
@@ -1176,7 +1210,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                     builder: (context, snapshot) {
                                       if (snapshot.connectionState ==
                                           ConnectionState.waiting) {
-                                        return Center(
+                                        return const Center(
                                             child: CircularProgressIndicator());
                                       } else if (snapshot.hasError) {
                                         return Center(
@@ -1184,7 +1218,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                 'Erreur : ${snapshot.error}'));
                                       } else if (!snapshot.hasData ||
                                           snapshot.data == null) {
-                                        return Center(
+                                        return const Center(
                                             child: Text(
                                                 'Aucun détail disponible pour ce fret'));
                                       } else {
@@ -1198,16 +1232,16 @@ class _NotificationPageState extends State<NotificationPage> {
                               );
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Color(0xFFFCCE00)),
-                              shape: MaterialStateProperty.all<
+                              backgroundColor: WidgetStateProperty.all<Color>(
+                                  const Color(0xFFFCCE00)),
+                              shape: WidgetStateProperty.all<
                                   RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(24.0),
                                 ),
                               ),
                             ),
-                            child: Text(
+                            child: const Text(
                               'Détails',
                               style: TextStyle(
                                 color: Colors.black,
@@ -1218,7 +1252,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
                 ],
               ),
             ),

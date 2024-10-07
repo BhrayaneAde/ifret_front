@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ifret/develop/auth_service.dart';
-import 'package:ifret/develop/otp2.dart'; // Importez la page OTP2
+// Importez la page OTP2
 import 'package:ifret/develop/otp_login.dart';
 import 'package:ifret/develop/register.dart';
 
 class Login extends StatefulWidget {
-  Login({Key? key}) : super(key: key);
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -187,10 +187,10 @@ class _LoginState extends State<Login> {
                                   },
                                   style: ButtonStyle(
                                     backgroundColor:
-                                        MaterialStateProperty.all<Color>(
+                                        WidgetStateProperty.all<Color>(
                                       const Color(0xFFFCCE00),
                                     ),
-                                    shape: MaterialStateProperty.all<
+                                    shape: WidgetStateProperty.all<
                                         RoundedRectangleBorder>(
                                       RoundedRectangleBorder(
                                         borderRadius:
@@ -214,7 +214,7 @@ class _LoginState extends State<Login> {
                             ],
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 12,
                         ),
                         Row(
@@ -225,7 +225,7 @@ class _LoginState extends State<Login> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Register(),
+                                    builder: (context) => const Register(),
                                   ),
                                 );
                               },
@@ -250,12 +250,12 @@ class _LoginState extends State<Login> {
           ),
         ),
       ),
-       bottomNavigationBar: Container(
+      bottomNavigationBar: Container(
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width,
         ),
         color: const Color(0xFF222222),
-        padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -263,19 +263,22 @@ class _LoginState extends State<Login> {
               children: [
                 IconButton(
                   onPressed: () {},
-                  icon: FaIcon(FontAwesomeIcons.facebook, color: Colors.white),
+                  icon: const FaIcon(FontAwesomeIcons.facebook,
+                      color: Colors.white),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: FaIcon(FontAwesomeIcons.twitter, color: Colors.white),
+                  icon: const FaIcon(FontAwesomeIcons.twitter,
+                      color: Colors.white),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: FaIcon(FontAwesomeIcons.instagram, color: Colors.white),
+                  icon: const FaIcon(FontAwesomeIcons.instagram,
+                      color: Colors.white),
                 ),
               ],
             ),
-            Expanded(
+            const Expanded(
               child: Text(
                 'Suivez-nous sur les réseaux sociaux',
                 style: TextStyle(
@@ -288,6 +291,6 @@ class _LoginState extends State<Login> {
           ],
         ),
       ),
-  );
+    );
   }
 }

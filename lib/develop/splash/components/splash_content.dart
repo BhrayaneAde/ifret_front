@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class SplashContent extends StatefulWidget {
   const SplashContent({
-    Key? key,
+    super.key,
     this.image,
-  }) : super(key: key);
+  });
   final String? image;
 
   @override

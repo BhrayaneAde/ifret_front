@@ -5,7 +5,7 @@ class SuccessScreen extends StatelessWidget {
   final int montantPaye;
   final String transactionId;
 
-  SuccessScreen({
+  const SuccessScreen({super.key, 
     required this.montantPaye,
     required this.transactionId,
   });

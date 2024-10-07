@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart' as Dio;
 import 'package:dio/dio.dart';
 import 'package:ifret/api/dio.dart';
-import 'package:ifret/composant/Chargeurs/accueilChargeur.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /* 
@@ -364,7 +362,7 @@ class ApiRequest {
             'Erreur lors de la récupération des données : ${response.statusCode}');
         return [];
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       // Gérer les exceptions spécifiques à Dio
       print(
           'Erreur lors de la récupération des voyages (DioError) : ${e.response?.statusCode} - ${e.response?.data}');
@@ -376,8 +374,8 @@ class ApiRequest {
     }
   }
 
-  // Fonction pour récupérer les détails d'un voyage par demandeId
-  static Future<Map<String, dynamic>> fetchVoyageDetails(int demandeId) async {
+  // Fonction pour récupérer les détails d'un voyage par fretId
+  static Future<Map<String, dynamic>> fetchVoyageDetails(int fretId) async {
     try {
       String? authToken = await _getAuthToken();
       if (authToken == null) {
@@ -386,33 +384,35 @@ class ApiRequest {
 
       Options options =
           Options(headers: {'Authorization': 'Bearer $authToken'});
-      Response response =
-          await dio().get('/voyages/$demandeId', options: options);
+      Response response = await dio().get('/frets/$fretId', options: options);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         Map<String, dynamic> voyageDetails =
             Map<String, dynamic>.from(response.data);
 
-        if (voyageDetails.containsKey('demande_details')) {
+        // Vérification des détails du fret
+        if (voyageDetails.containsKey('fret_details')) {
+          // Assigner tous les champs du fret, y compris l'image
           voyageDetails['fret_details'] = {
-            'type_vehicule': voyageDetails['demande_details']
-                    ['type_vehicule'] ??
+            'type_vehicule': voyageDetails['fret_details']['type_vehicule'] ??
                 'Non spécifié',
-            'date_depart': voyageDetails['demande_details']['date_depart'] ??
-                'Non spécifié',
-            'date_arrive': voyageDetails['demande_details']['date_arrive'] ??
-                'Non spécifié',
+            'date_depart':
+                voyageDetails['fret_details']['date_depart'] ?? 'Non spécifié',
+            'date_arrive':
+                voyageDetails['fret_details']['date_arrive'] ?? 'Non spécifié',
             'montant':
-                voyageDetails['demande_details']['montant'] ?? 'Non spécifié',
-            'lieu_depart': voyageDetails['demande_details']['lieu_depart'] ??
-                'Non spécifié',
-            'lieu_arrive': voyageDetails['demande_details']['lieu_arrive'] ??
-                'Non spécifié',
-            'description_fret': voyageDetails['demande_details']
-                    ['description_fret'] ??
+                voyageDetails['fret_details']['montant'] ?? 'Non spécifié',
+            'lieu_depart':
+                voyageDetails['fret_details']['lieu_depart'] ?? 'Non spécifié',
+            'lieu_arrive':
+                voyageDetails['fret_details']['lieu_arrive'] ?? 'Non spécifié',
+            'description': voyageDetails['fret_details']['description'] ??
                 'Aucune description disponible',
+            'image_url': voyageDetails['fret_details']
+                ['image_url'], // Ajouter l'image ici
           };
         } else {
+          // Si 'fret_details' n'existe pas, assigner des valeurs par défaut
           voyageDetails['fret_details'] = {
             'type_vehicule': 'Non spécifié',
             'date_depart': 'Non spécifié',
@@ -420,7 +420,8 @@ class ApiRequest {
             'montant': 'Non spécifié',
             'lieu_depart': 'Non spécifié',
             'lieu_arrive': 'Non spécifié',
-            'description_fret': 'Aucune description disponible',
+            'description': 'Aucune description disponible',
+            'image_url': null, // Image non disponible
           };
         }
 
@@ -431,7 +432,69 @@ class ApiRequest {
         throw Exception(
             'Error fetching voyage details: ${response.statusCode}');
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
+      print(
+          'Erreur lors de la récupération des détails du voyage (DioException) : ${e.response?.statusCode} - ${e.response?.data}');
+      throw Exception(
+          'Erreur lors de la récupération des détails du voyage : ${e.response?.statusCode} - ${e.response?.data}');
+    } catch (e) {
+      print('Erreur lors de la récupération des détails du voyage : $e');
+      throw Exception(
+          'Erreur lors de la récupération des détails du voyage : $e');
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchFretVoyageDetails(int fretId) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response = await dio().get('/voyages/$fretId', options: options);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Map<String, dynamic> voyageDetails =
+            Map<String, dynamic>.from(response.data);
+
+        if (voyageDetails.containsKey('fret_details')) {
+          voyageDetails['fret_details'] = {
+            'type_vehicule': voyageDetails['type_vehicule'] ?? 'Non spécifié',
+            'date_depart':
+                voyageDetails['fret_details']['date_depart'] ?? 'Non spécifié',
+            'date_arrive':
+                voyageDetails['fret_details']['date_arrive'] ?? 'Non spécifié',
+            'montant':
+                voyageDetails['fret_details']['montant'] ?? 'Non spécifié',
+            'lieu_depart':
+                voyageDetails['fret_details']['lieu_depart'] ?? 'Non spécifié',
+            'lieu_arrive':
+                voyageDetails['fret_details']['lieu_arrive'] ?? 'Non spécifié',
+            'description': voyageDetails['fret_details']['description'] ??
+                'Aucune description disponible',
+          };
+        } else {
+          voyageDetails['fret_details'] = {
+            'type_vehicule': 'Non spécifié',
+            'date_depart': 'Non spécifié',
+            'date_arrive': 'Non spécifié',
+            'montant': 'Non spécifié',
+            'lieu_depart': 'Non spécifié',
+            'lieu_arrive': 'Non spécifié',
+            'description': 'Aucune description disponible',
+          };
+        }
+
+        return voyageDetails;
+      } else if (response.statusCode == 404) {
+        throw Exception('Voyage not found');
+      } else {
+        throw Exception(
+            'Error fetching voyage details: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
       // Gérer les exceptions spécifiques à Dio
       print(
           'Erreur lors de la récupération des détails du voyage (DioException) : ${e.response?.statusCode} - ${e.response?.data}');
@@ -478,6 +541,187 @@ class ApiRequest {
       throw Exception('Error fetching fret details: $e');
     }
   } */
+
+  static Future<Response> createFret(Map<String, dynamic> fretData) async {
+    String? authToken = await _getAuthToken();
+    if (authToken == null) {
+      throw Exception('No auth token available');
+    }
+
+    Options options = Options(
+      headers: {
+        'Authorization': 'Bearer $authToken',
+        'Content-Type':
+            'multipart/form-data', // Assurez-vous que l'en-tête est configuré pour multipart
+      },
+    );
+
+    try {
+      // Si l'image est incluse, on utilise FormData pour l'envoi
+      FormData formData = FormData.fromMap(fretData);
+
+      Response response =
+          await dio().post('/initfrets', data: formData, options: options);
+
+      if (response.statusCode == 201) {
+        print('Fret créé avec succès');
+      }
+
+      return response;
+    } catch (e) {
+      print('Erreur lors de la création du fret: $e');
+      throw Exception('Erreur lors de la création du fret: $e');
+    }
+  }
+
+  static Future<void> updateFretStatus(
+      int fretId, String kkiapayTransactionId) async {
+    try {
+      // Fonction pour obtenir le token d'authentification
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      print('Auth Token: $authToken');
+      print('Fret ID: $fretId');
+      print('Kkiapay Transaction ID: $kkiapayTransactionId');
+
+      // Préparer les headers avec l'authentification
+      Options options = Options(
+        headers: {'Authorization': 'Bearer $authToken'},
+      );
+
+      // Corps de la requête pour mettre à jour le fret
+      Map<String, dynamic> data = {
+        'kkiapay_transaction_id': kkiapayTransactionId,
+        'statut_paiement': 'Payé',
+      };
+
+      // Faire la requête PUT pour mettre à jour le fret
+      Response response = await dio().post(
+        '/frets/$fretId/update-status',
+        options: options,
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        print('Statut de paiement et montant mis à jour avec succès !');
+      } else {
+        print('Erreur lors de la mise à jour : ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erreur lors de la mise à jour : $e');
+      throw Exception('Erreur lors de la mise à jour du statut : $e');
+    }
+  }
+
+  static Future<void> updateFeedbackAndStatut(
+      int fretId, String feedback) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+
+      // Envoie la requête POST pour mettre à jour le feedback
+      Response response = await dio().post(
+        '/frets/$fretId/update-feedback-statut',
+        options: options,
+        data: {
+          'feedback': feedback, // Le feedback est envoyé en tant que chaîne
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Erreur lors de la mise à jour du feedback et du statut.');
+      }
+    } catch (e) {
+      print('Error updating feedback and status: $e');
+      throw Exception('Error updating feedback and status: $e');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>?>
+      fetchSoumissionsForConnectedUser() async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options = Options(
+        headers: {'Authorization': 'Bearer $authToken'},
+        // Accepter les codes d'état inférieurs à 500, donc 404 ne lèvera pas une exception
+        validateStatus: (status) {
+          return status != null && status < 500;
+        },
+      );
+
+      Response response = await dio().get('/soumissions', options: options);
+
+      if (response.statusCode == 200) {
+        // Convertir les données reçues en une liste de maps
+        List<dynamic> data = response.data;
+        List<Map<String, dynamic>> soumissions = data.map((item) {
+          return item as Map<String, dynamic>;
+        }).toList();
+        return soumissions;
+      } else if (response.statusCode == 404) {
+        // Si le code de statut est 404, on renvoie null et on affiche un message
+        print('No soumissions found (404)');
+        return null;
+      } else {
+        // Gérer d'autres erreurs possibles
+        print('Error soumissions: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching soumissions: $e');
+      throw Exception('Error fetching soumissions: $e');
+    }
+  }
+
+  static Future<void> updateFretTransactionId(
+      int fretId, String kkiapayTransactionId) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      print('Auth Token: $authToken');
+      print('Fret ID: $fretId');
+      print('Kkiapay Transaction ID: $kkiapayTransactionId');
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+
+      // Conversion de fretId en String pour l'URL
+      Response response = await dio().post(
+        '/update-fret-transaction-id/${fretId.toString()}', // Convertir fretId en String ici
+        options: options,
+        data: {
+          'kkiapay_transaction_id': kkiapayTransactionId,
+        },
+      );
+
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Data: ${response.data}');
+
+      if (response.statusCode != 200) {
+        throw Exception(
+            'Erreur lors de la mise à jour du kkiapay_transaction_id.');
+      }
+    } catch (e) {
+      print('Error updating kkiapay transaction ID: $e');
+      throw Exception('Error updating kkiapay transaction ID: $e');
+    }
+  }
 
   static Future<Map<String, dynamic>?> updateUserProfileWithImage({
     required Map<String, dynamic> userData,
@@ -683,6 +927,61 @@ class ApiRequest {
     }
   }
 
+  static Future<List<Map<String, dynamic>>> checkTransporteursValides(
+      int fretId) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      final response = await dio().get(
+        '/frets/$fretId/check-transporteurs',
+        options: Options(headers: {'Authorization': 'Bearer $authToken'}),
+      );
+
+      if (response.statusCode == 200) {
+        return List<Map<String, dynamic>>.from(response.data);
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception(
+            'Error checking transporteurs validity: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error checking transporteurs validity: $e');
+    }
+  }
+
+  static Future<void> updateMontantFret(
+      int fretId, int montantAvecInteret) async {
+    try {
+      // Récupération du jeton d'authentification
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      final response = await dio().post(
+        '/updatemontantfret', // Assurez-vous de remplacer cette URL par la vôtre
+        data: {
+          'fret_id': fretId, // Inclure le fret_id dans les données envoyées
+          'montant': montantAvecInteret
+              .toString(), // Convertir montant en chaîne pour correspondre à l'attente de Laravel
+        },
+        options: Options(
+          headers: {'Authorization': 'Bearer $authToken'},
+        ),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Error updating montant: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error updating montant: $e');
+    }
+  }
+
   static Future<Map<String, dynamic>> fetchFretDetails(int id) async {
     try {
       String? authToken = await _getAuthToken();
@@ -873,26 +1172,21 @@ class ApiRequest {
     required File carteGrise,
     required File visiteTechnique,
     required File assurance,
+    required String typeVehicule, // Nouveau paramètre
   }) async {
     try {
-      // Vérifie si l'utilisateur est connecté (par exemple, si un jeton d'authentification est disponible)
       String? authToken = await _getAuthToken();
-      print(authToken);
 
       if (authToken == null) {
-        // Affiche un message d'erreur ou redirige l'utilisateur vers l'écran de connexion
         print('L\'utilisateur n\'est pas connecté');
-        return null; // Ajout d'un retour null en cas d'utilisateur non connecté
-      } else {
-        print("l\'utilisateur est connecté");
+        return null;
       }
-      // Define request options with the authentication token
+
       Dio.Options options = Dio.Options(
         contentType: Dio.Headers.jsonContentType,
         headers: {
-          "accept": "application/json", // Correction de l'en-tête accept
-          'content-type':
-              'multipart/form-data', // Correction de l'en-tête content-type
+          "accept": "application/json",
+          'content-type': 'multipart/form-data',
           'Authorization': 'Bearer $authToken',
         },
         validateStatus: (status) => status! < 500,
@@ -909,34 +1203,29 @@ class ApiRequest {
 
       FormData formData = FormData();
 
-      formData.fields.add(MapEntry('matricule', matricule));
+      formData.files.addAll([
+        MapEntry(
+            'photo_camion', await MultipartFile.fromFile(photoCamion.path)),
+        MapEntry('carte_grise', await MultipartFile.fromFile(carteGrise.path)),
+        MapEntry('visite_technique',
+            await MultipartFile.fromFile(visiteTechnique.path)),
+        MapEntry('assurance', await MultipartFile.fromFile(assurance.path)),
+      ]);
 
-      // Add image files directly using MapEntry objects
-      formData.files.add(MapEntry(
-          'photo_camion', await MultipartFile.fromFile(photoCamion.path)));
-      formData.files.add(MapEntry(
-          'carte_grise', await MultipartFile.fromFile(carteGrise.path)));
-      formData.files.add(MapEntry('visite_technique',
-          await MultipartFile.fromFile(visiteTechnique.path)));
-      formData.files.add(
-          MapEntry('assurance', await MultipartFile.fromFile(assurance.path)));
+      formData.fields
+        ..add(MapEntry('type_vehicule', typeVehicule))
+        ..add(MapEntry('matricule', matricule));
 
-      print('Sending request to register truck...');
       Dio.Response response = await dio()
           .post('/enregistrementCamion', data: formData, options: options);
 
-      print('Response status code: ${response.statusCode}');
-
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        print('Truck registration successful');
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return response.data;
       } else {
-        throw Exception(
-            "Échec de l'enregistrement du camion: ${response.statusCode}");
+        throw Exception("Erreur lors de l'enregistrement du camion.");
       }
-    } catch (e) {
-      print('Error during truck registration: $e');
-      throw Exception("Erreur lors de l'enregistrement du camion: $e");
+    } on DioException catch (e) {
+      throw Exception("Erreur de réseau: ${e.response?.statusCode}");
     }
   }
 
@@ -1006,7 +1295,75 @@ class ApiRequest {
     } catch (e) {
       // If an error occurs, print the error and throw an exception
       print('Erreur API: $e');
-      throw e;
+      rethrow;
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>?> getSoumissionsForFret(
+      String fretId) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response =
+          await dio().get('/frets/$fretId/soumissions', options: options);
+
+      if (response.statusCode == 200) {
+        // Convertir les données reçues en une liste de maps
+        List<dynamic> data = response.data;
+        List<Map<String, dynamic>> soumissions = data.map((item) {
+          return {
+            'description': item['description'] ?? 'N/A',
+            'montant_propose': item['montant_propose'] ?? 'N/A',
+            'nom_transporteur': item['nom_transporteur'] ?? 'N/A',
+            'prenom_transporteur': item['prenom_transporteur'] ?? 'N/A',
+          };
+        }).toList();
+        return soumissions;
+      } else {
+        print('Error fetching soumissions: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching soumissions: $e');
+      throw Exception('Error fetching soumissions: $e');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>?> fetchSoumissions(
+      String fretId) async {
+    try {
+      String? authToken = await _getAuthToken();
+      if (authToken == null) {
+        throw Exception('No auth token available');
+      }
+
+      Options options =
+          Options(headers: {'Authorization': 'Bearer $authToken'});
+      Response response =
+          await dio().get('/frets/$fretId/soumissions', options: options);
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        List<Map<String, dynamic>> soumissions = data.map((item) {
+          return {
+            'nom_transporteur': item['nom_transporteur'] ?? 'N/A',
+            'prenom_transporteur': item['prenom_transporteur'] ?? 'N/A',
+            'montant_propose': item['montant_propose']?.toString() ?? 'N/A',
+          };
+        }).toList();
+        return soumissions;
+      } else {
+        print('Error fetching soumissions: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching soumissions: $e');
+      return null;
     }
   }
 
@@ -1027,14 +1384,29 @@ class ApiRequest {
       Response response =
           await dio().get('/camions/$matricule', options: options);
 
-      if (response.statusCode == 201) {
-        return response.data['data'];
+      // Log du code de statut HTTP
+      print('Status Code: ${response.statusCode}');
+
+      // Log de la réponse brute
+      print('Response Data: ${response.data}');
+
+      if (response.statusCode == 200) {
+        // Log si les détails sont sous 'data' ou non
+        if (response.data.containsKey('data')) {
+          print('Camion Details (from data): ${response.data['data']}');
+          return response.data['data'];
+        } else {
+          print('Camion Details (direct): ${response.data}');
+          return response.data; // Si 'data' n'est pas un wrapper
+        }
       } else {
-        throw Exception('Erreur lors de la récupération des détails du camion');
+        throw Exception(
+            'Erreur lors de la récupération des détails du camion, code: ${response.statusCode}');
       }
     } catch (e) {
+      // Log de l'erreur
       print('Erreur API: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -1065,7 +1437,7 @@ class ApiRequest {
       }
     } catch (e) {
       print('Erreur API: $e');
-      throw e;
+      rethrow;
     }
   }
 }

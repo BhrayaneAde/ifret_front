@@ -3,7 +3,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Chauffeurs/trafficChauffeur.dart';
 
-import 'package:ifret/composant/Transporteurs/trafficTransporteur.dart';
 import 'package:ifret/composant/service/clientele.dart';
 import 'dart:io';
 
@@ -11,13 +10,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilChauffeur extends StatefulWidget {
+  const ProfilChauffeur({super.key});
+
   @override
   _ProfilChauffeurState createState() => _ProfilChauffeurState();
 }
 
 class _ProfilChauffeurState extends State<ProfilChauffeur> {
-  TextEditingController _firstNameController = TextEditingController();
-  TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
 
   String _dateOfBirth = '';
   String _residence = '';
@@ -25,7 +26,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
   File? _image;
   String authToken = ''; // Variable pour stocker le token d'authentification
 
-  bool _isEditing = false;
+  final bool _isEditing = false;
 
   @override
   void initState() {
@@ -175,9 +176,9 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
       appBar: AppBar(
         title: Row(
           children: [
-            Spacer(), // Pousser le widget RichText vers la droite
+            const Spacer(), // Pousser le widget RichText vers la droite
             RichText(
-              text: TextSpan(
+              text: const TextSpan(
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -192,7 +193,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
           ],
         ),
         backgroundColor:
-            Color(0xFFFCCE00), // Définir la couleur de fond en noir
+            const Color(0xFFFCCE00), // Définir la couleur de fond en noir
       ),
       body: Stack(
         children: [
@@ -222,7 +223,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                                   : Image.asset('assets/images/profil.jpg')
                                       .image,
                               child: _image == null
-                                  ? SizedBox() // Si aucune image n'est sélectionnée, ne pas afficher de texte
+                                  ? const SizedBox() // Si aucune image n'est sélectionnée, ne pas afficher de texte
                                   : null,
                             ),
                             Positioned(
@@ -268,7 +269,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                                     Shadow(
                                       color: Colors.grey.withOpacity(0.5),
                                       blurRadius: 2,
-                                      offset: Offset(1, 1),
+                                      offset: const Offset(1, 1),
                                     ),
                                   ],
                                 ),
@@ -284,7 +285,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                                     Shadow(
                                       color: Colors.grey.withOpacity(0.5),
                                       blurRadius: 2,
-                                      offset: Offset(1, 1),
+                                      offset: const Offset(1, 1),
                                     ),
                                   ],
                                 ),
@@ -297,10 +298,10 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                   ),
                 ),
               ),
-              SizedBox(height: 25),
+              const SizedBox(height: 25),
               // Deuxième ligne
               Padding(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 10), // Padding horizontal de 10
                 child: Card(
                   shape: RoundedRectangleBorder(
@@ -313,8 +314,9 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                       borderRadius:
                           BorderRadius.circular(10.0), // Forme du ListTile
                     ),
-                    tileColor: Color(0xfffcce00), // Couleur de fond du ListTile
-                    title: Row(
+                    tileColor:
+                        const Color(0xfffcce00), // Couleur de fond du ListTile
+                    title: const Row(
                       children: [
                         Icon(
                           Icons.edit,
@@ -335,14 +337,14 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                     ),
 
                     trailing: IconButton(
-                      icon: Icon(Icons.arrow_forward),
+                      icon: const Icon(Icons.arrow_forward),
                       onPressed: _editProfile,
                       color: Colors.black,
                       splashRadius: 20,
                       padding: EdgeInsets
                           .zero, // Supprimer le rembourrage autour de l'icône
                       constraints:
-                          BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
+                          const BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
                       alignment:
                           Alignment.center, // Alignement de l'icône au centre
                       visualDensity: VisualDensity
@@ -353,7 +355,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
               ),
 
               Padding(
-                padding: EdgeInsets.all(10), // Padding horizontal de 10
+                padding: const EdgeInsets.all(10), // Padding horizontal de 10
                 child: Card(
                   shape: RoundedRectangleBorder(
                     borderRadius:
@@ -365,7 +367,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TrafficChauffeur(),
+                          builder: (context) => const TrafficChauffeur(),
                         ),
                       );
                     },
@@ -373,8 +375,9 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                       borderRadius:
                           BorderRadius.circular(10.0), // Forme du ListTile
                     ),
-                    tileColor: Color(0xfffcce00), // Couleur de fond du ListTile
-                    title: Row(
+                    tileColor:
+                        const Color(0xfffcce00), // Couleur de fond du ListTile
+                    title: const Row(
                       children: [
                         Icon(
                           Icons.list,
@@ -395,13 +398,13 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                     ),
 
                     trailing: IconButton(
-                      icon: Icon(Icons.arrow_forward),
+                      icon: const Icon(Icons.arrow_forward),
                       onPressed: () {
                         // Action pour le bouton ">"
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TrafficChauffeur(),
+                            builder: (context) => const TrafficChauffeur(),
                           ),
                         );
                       },
@@ -410,7 +413,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                       padding: EdgeInsets
                           .zero, // Supprimer le rembourrage autour de l'icône
                       constraints:
-                          BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
+                          const BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
                       alignment:
                           Alignment.center, // Alignement de l'icône au centre
                       visualDensity: VisualDensity
@@ -419,9 +422,9 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                   ),
                 ),
               ),
-              SizedBox(height: 5), // Espacement entre les boutons
+              const SizedBox(height: 5), // Espacement entre les boutons
               Padding(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 10), // Padding horizontal de 10
                 child: Card(
                   shape: RoundedRectangleBorder(
@@ -434,7 +437,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Clientele(),
+                          builder: (context) => const Clientele(),
                         ),
                       );
                     },
@@ -442,8 +445,9 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                       borderRadius:
                           BorderRadius.circular(10.0), // Forme du ListTile
                     ),
-                    tileColor: Color(0xfffcce00), // Couleur de fond du ListTile
-                    title: Row(
+                    tileColor:
+                        const Color(0xfffcce00), // Couleur de fond du ListTile
+                    title: const Row(
                       children: [
                         Icon(
                           Icons.support_agent_rounded,
@@ -464,13 +468,13 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                     ),
 
                     trailing: IconButton(
-                      icon: Icon(Icons.arrow_forward),
+                      icon: const Icon(Icons.arrow_forward),
                       onPressed: () {
                         // Action pour le bouton ">"
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Clientele(),
+                            builder: (context) => const Clientele(),
                           ),
                         );
                       },
@@ -479,7 +483,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                       padding: EdgeInsets
                           .zero, // Supprimer le rembourrage autour de l'icône
                       constraints:
-                          BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
+                          const BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
                       alignment:
                           Alignment.center, // Alignement de l'icône au centre
                       visualDensity: VisualDensity
@@ -507,7 +511,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                             onPressed: () {
                               // Action pour la politique de confidentialité
                             },
-                            child: Text(
+                            child: const Text(
                               'Politique de confidentialité',
                               style: TextStyle(
                                 color: Color(0xfffcce00),
@@ -517,7 +521,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                           ),
                         ],
                       ),
-                      Text(
+                      const Text(
                         '|',
                         style: TextStyle(
                           color: Colors.black,
@@ -531,7 +535,7 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                             onPressed: () {
                               // Action pour les conditions générales d'utilisation
                             },
-                            child: Text(
+                            child: const Text(
                               'Conditions générales',
                               style: TextStyle(
                                 color: Color(0xfffcce00),
@@ -544,9 +548,9 @@ class _ProfilChauffeurState extends State<ProfilChauffeur> {
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                     height: 10), // Espacement par rapport au bas de l'écran
-                Text(
+                const Text(
                   'Version 1.0', // Texte de la version de l'application
                   style: TextStyle(
                     color: Colors.grey, // Couleur du texte
@@ -590,7 +594,8 @@ class ModifierProfil extends StatelessWidget {
   static const String KEY_ACCOUNT = 'type_compte';
   static const String KEY_RESIDENCE = 'ville';
 
-  ModifierProfil({
+  const ModifierProfil({
+    super.key,
     required this.firstName,
     required this.lastName,
     required this.dateOfBirth,
@@ -601,26 +606,26 @@ class ModifierProfil extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _newFirstNameController =
+    TextEditingController newFirstNameController =
         TextEditingController(text: firstName);
-    TextEditingController _newLastNameController =
+    TextEditingController newLastNameController =
         TextEditingController(text: lastName);
 
-    TextEditingController _newDateOfBirthController =
+    TextEditingController newDateOfBirthController =
         TextEditingController(text: dateOfBirth);
 
-    TextEditingController _newResidenceController =
+    TextEditingController newResidenceController =
         TextEditingController(text: residence);
-    TextEditingController _newAccountTypeController =
+    TextEditingController newAccountTypeController =
         TextEditingController(text: accountType);
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Spacer(), // Pousser le widget RichText vers la droite
+            const Spacer(), // Pousser le widget RichText vers la droite
             RichText(
-              text: TextSpan(
+              text: const TextSpan(
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -636,76 +641,76 @@ class ModifierProfil extends StatelessWidget {
           ],
         ),
         backgroundColor:
-            Color(0xFFFCCE00), // Définir la couleur de fond en noir
+            const Color(0xFFFCCE00), // Définir la couleur de fond en noir
         leading: IconButton(
-          icon: Icon(Icons
+          icon: const Icon(Icons
               .arrow_back), // Supposant que vous voulez un bouton de retour
           color: Colors.black, // Définir la couleur du bouton en blanc
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.only(top: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildEditableInfoItem(
               'Prénom:',
-              _newFirstNameController,
+              newFirstNameController,
               Icons.person,
               () => _showEditDialog(
-                  context, 'Prénom', _newFirstNameController, KEY_FIRST_NAME),
+                  context, 'Prénom', newFirstNameController, KEY_FIRST_NAME),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildEditableInfoItem(
               'Nom:',
-              _newLastNameController,
+              newLastNameController,
               Icons.person,
               () => _showEditDialog(
-                  context, 'Nom', _newLastNameController, KEY_LAST_NAME),
+                  context, 'Nom', newLastNameController, KEY_LAST_NAME),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildEditableInfoItem(
               'Date de naissance:',
-              _newDateOfBirthController,
+              newDateOfBirthController,
               Icons.calendar_today,
               () => _showEditDialog(context, 'Date de naissance',
-                  _newDateOfBirthController, KEY_DATE_OF_BIRTH),
+                  newDateOfBirthController, KEY_DATE_OF_BIRTH),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildEditableInfoItem(
               'Lieu de résidence:',
-              _newResidenceController,
+              newResidenceController,
               Icons.location_city,
               () => _showEditDialog(context, 'Lieu de résidence',
-                  _newResidenceController, KEY_RESIDENCE),
+                  newResidenceController, KEY_RESIDENCE),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildInfoContainer(
               'Compte:', // Label du champ
-              _newAccountTypeController.text, // Contrôleur du champ
+              newAccountTypeController.text, // Contrôleur du champ
               Icons.account_circle, // Icône associée
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
             Align(
               alignment: Alignment.center,
               child: ElevatedButton(
                 onPressed: () {
                   onUpdate(
-                    firstName: _newFirstNameController.text,
-                    lastName: _newLastNameController.text,
-                    dateOfBirth: _newDateOfBirthController.text,
-                    residence: _newResidenceController.text,
-                    accountType: _newAccountTypeController.text,
+                    firstName: newFirstNameController.text,
+                    lastName: newLastNameController.text,
+                    dateOfBirth: newDateOfBirthController.text,
+                    residence: newResidenceController.text,
+                    accountType: newAccountTypeController.text,
                   );
 
                   // Appeler la fonction pour mettre à jour le profil sur le backend
                   _updateUserProfile(
-                    firstName: _newFirstNameController.text,
-                    lastName: _newLastNameController.text,
-                    dateOfBirth: _newDateOfBirthController.text,
-                    residence: _newResidenceController.text,
-                    accountType: _newAccountTypeController.text,
+                    firstName: newFirstNameController.text,
+                    lastName: newLastNameController.text,
+                    dateOfBirth: newDateOfBirthController.text,
+                    residence: newResidenceController.text,
+                    accountType: newAccountTypeController.text,
                   );
 
                   _showToast(); // Afficher le toast après la mise à jour
@@ -714,8 +719,8 @@ class ModifierProfil extends StatelessWidget {
                 },
                 style: ButtonStyle(
                   backgroundColor:
-                      MaterialStateProperty.all<Color>(const Color(0xFFFCCE00)),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      WidgetStateProperty.all<Color>(const Color(0xFFFCCE00)),
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -744,7 +749,6 @@ class ModifierProfil extends StatelessWidget {
   Future<void> _updateUserProfile({
     String? firstName,
     String? lastName,
-    String? phoneNumber,
     String? dateOfBirth,
     String? residence,
     String? accountType,
@@ -804,19 +808,19 @@ class ModifierProfil extends StatelessWidget {
               size: 20,
               color: Colors.black, // Couleur de l'icône
             ),
-            SizedBox(width: 10), // Espacement entre l'icône et le texte
+            const SizedBox(width: 10), // Espacement entre l'icône et le texte
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black, // Couleur du texte
               ),
             ),
-            SizedBox(width: 10), // Espacement avant le champ de texte
+            const SizedBox(width: 10), // Espacement avant le champ de texte
             Expanded(
               child: TextFormField(
                 controller: controller,
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black),
@@ -826,7 +830,7 @@ class ModifierProfil extends StatelessWidget {
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.edit),
+          icon: const Icon(Icons.edit),
           onPressed: onPressed,
           color: Colors.black, // Couleur de l'icône de modification
         ),
@@ -840,7 +844,7 @@ class ModifierProfil extends StatelessWidget {
     IconData iconData,
   ) {
     return Padding(
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
           vertical: 5.0, horizontal: 5), // Ajout du padding horizontal
       child: Card(
         shape: RoundedRectangleBorder(
@@ -858,20 +862,20 @@ class ModifierProfil extends StatelessWidget {
                 size: 20,
                 color: Colors.black, // Couleur de l'icône
               ),
-              SizedBox(width: 10), // Espacement entre l'icône et le texte
+              const SizedBox(width: 10), // Espacement entre l'icône et le texte
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
 
                   color: Colors.black, // Couleur du texte
                 ),
               ),
-              SizedBox(width: 10), // Espacement avant la valeur
+              const SizedBox(width: 10), // Espacement avant la valeur
               Expanded(
                 child: Text(
                   value,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 18,
                       color: Colors.black,
                       fontWeight: FontWeight.bold),
@@ -888,7 +892,7 @@ class ModifierProfil extends StatelessWidget {
     BuildContext context,
     String fieldName,
     TextEditingController controller,
-    String key_first_name,
+    String keyFirstName,
   ) async {
     String newValue = controller.text;
     await showDialog(
@@ -901,21 +905,21 @@ class ModifierProfil extends StatelessWidget {
               newValue = value;
             },
             controller: controller,
-            decoration: InputDecoration(hintText: 'Nouvelle valeur'),
+            decoration: const InputDecoration(hintText: 'Nouvelle valeur'),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Annuler'),
+              child: const Text('Annuler'),
             ),
             TextButton(
               onPressed: () {
                 controller.text = newValue;
                 Navigator.pop(context);
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -925,7 +929,7 @@ class ModifierProfil extends StatelessWidget {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: ProfilChauffeur(),
   ));
 }

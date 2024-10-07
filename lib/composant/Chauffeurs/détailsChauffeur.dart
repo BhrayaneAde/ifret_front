@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ifret/api/api_request.dart';
 
 class DetailChauffeur extends StatefulWidget {
-  final int voyageId; // L'ID du voyage
+  final int fretId; // L'ID du voyage
   final int chauffeurId;
 
-  DetailChauffeur(
-      {required this.chauffeurId,
-      required this.voyageId}); // Assurez-vous de l'ajouter au constructeur
+  const DetailChauffeur(
+      {super.key,
+      required this.chauffeurId,
+      required this.fretId}); // Assurez-vous de l'ajouter au constructeur
 
   @override
   _DetailChauffeurState createState() => _DetailChauffeurState();
@@ -28,7 +29,7 @@ class _DetailChauffeurState extends State<DetailChauffeur> {
     try {
       // Appel de l'API pour récupérer les détails du voyage
       Map<String, dynamic> details =
-          await ApiRequest.fetchVoyageDetails(widget.voyageId);
+          await ApiRequest.fetchVoyageDetails(widget.fretId);
       setState(() {
         _voyageDetails = details;
         _isLoading = false;
@@ -45,21 +46,21 @@ class _DetailChauffeurState extends State<DetailChauffeur> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Détails Chauffeur',
           style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Color(0xFFFCCE00),
+        backgroundColor: const Color(0xFFFCCE00),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.black,
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : _hasError
-              ? Center(
+              ? const Center(
                   child: Text('Erreur lors de la récupération des données'))
               : SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -68,7 +69,7 @@ class _DetailChauffeurState extends State<DetailChauffeur> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                             'Nom:', _voyageDetails['chauffeur_nom'] ?? 'N/A'),
                         _buildDetailsCard('Prénom(s):',
@@ -95,7 +96,7 @@ class _DetailChauffeurState extends State<DetailChauffeur> {
         tileColor: Colors.white,
         title: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -104,13 +105,13 @@ class _DetailChauffeurState extends State<DetailChauffeur> {
         ),
         subtitle: Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 16,
             decoration: TextDecoration.none,
           ),
         ),
-        leading: Icon(
+        leading: const Icon(
           Icons.info,
           color: Color(0xfffcce00),
         ),

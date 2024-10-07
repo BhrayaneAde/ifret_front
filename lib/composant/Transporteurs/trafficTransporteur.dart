@@ -4,6 +4,8 @@ import 'package:ifret/composant/Transporteurs/d%C3%A9tailsTransporteur.dart';
 import 'package:intl/intl.dart';
 
 class TrafficTransporteur extends StatefulWidget {
+  const TrafficTransporteur({super.key});
+
   @override
   _TrafficTransporteurState createState() => _TrafficTransporteurState();
 }
@@ -42,11 +44,11 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Erreur'),
-          content: Text('Erreur lors du chargement des voyages.'),
+          title: const Text('Erreur'),
+          content: const Text('Erreur lors du chargement des voyages.'),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -65,16 +67,16 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
 
   // Fonction pour gérer le tap sur un voyage
   Future<void> handleVoyageTap(Map<String, dynamic> voyageDetails) async {
-    if (voyageDetails.containsKey('demande_id')) {
-      int demandeId = voyageDetails['demande_id'];
-      print('Demande ID: $demandeId');
+    if (voyageDetails.containsKey('fret_id')) {
+      int fretId = voyageDetails['fret_id'];
+      print('Fret ID: $fretId');
 
       try {
         await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => DetailTransporteur(
-              demandeId: demandeId,
+              fretId: fretId,
             ),
           ),
         );
@@ -84,12 +86,12 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Erreur'),
-            content: Text(
-                'Détails du voyage non disponibles pour cet ID de demande.'),
+            title: const Text('Erreur'),
+            content: const Text(
+                'Détails du voyage non disponibles pour cet ID de fret.'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -102,11 +104,11 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Erreur'),
-          content: Text('ID de la demande manquant.'),
+          title: const Text('Erreur'),
+          content: const Text('ID de la fret manquant.'),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -121,21 +123,21 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Historique Parcours',
           style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Color(0xFFFCCE00),
+        backgroundColor: const Color(0xFFFCCE00),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : voyages.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text('Aucun voyage disponible'),
                 )
               : ListView.builder(
@@ -144,8 +146,9 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
                     final voyage = voyages[index];
 
                     // Vérifier si voyage est null ou vide
-                    if (voyage == null || voyage.isEmpty) {
-                      return SizedBox.shrink(); // Retourner un widget vide
+                    if (voyage.isEmpty) {
+                      return const SizedBox
+                          .shrink(); // Retourner un widget vide
                     }
 
                     return Padding(
@@ -163,7 +166,7 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
                           tileColor: Colors.white,
                           title: Text(
                             formatDateTime(voyage['date_creation']),
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.black,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -174,13 +177,13 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
                             children: [
                               Text(
                                 voyage['vehicule_matricule'] ?? 'N/A',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 16,
                                   decoration: TextDecoration.none,
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                   width:
                                       10), // Add some space between the texts
                               Text(
@@ -194,26 +197,25 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
                               ),
                             ],
                           ),
-                          leading: Icon(
+                          leading: const Icon(
                             Icons.directions_car,
                             color: Color(0xFFFCCE00),
                           ),
-                          trailing: Container(
+                          trailing: SizedBox(
                             width: 100,
                             child: ElevatedButton(
                               onPressed: () => handleVoyageTap(voyage),
                               style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Color(0xFFFCCE00)),
-                                shape: MaterialStateProperty.all<
+                                backgroundColor: WidgetStateProperty.all<Color>(
+                                    const Color(0xFFFCCE00)),
+                                shape: WidgetStateProperty.all<
                                     RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(24.0),
                                   ),
                                 ),
                               ),
-                              child: Text(
+                              child: const Text(
                                 'Détails',
                                 style: TextStyle(
                                   color: Colors.black,
@@ -235,7 +237,7 @@ class _TrafficTransporteurState extends State<TrafficTransporteur> {
   Color _getStatutColor(String? statut) {
     switch (statut) {
       case 'En attente':
-        return Color(0xFFFCCE00);
+        return const Color(0xFFFCCE00);
       case 'Retenue':
         return Colors.green;
       case 'Rejetée':

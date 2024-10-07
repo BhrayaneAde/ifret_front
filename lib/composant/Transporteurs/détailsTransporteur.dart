@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:ifret/api/api_request.dart';
 
 class DetailTransporteur extends StatefulWidget {
-  final int demandeId;
+  final int fretId;
 
-  DetailTransporteur({required this.demandeId});
+  const DetailTransporteur({super.key, required this.fretId});
 
   @override
   _DetailTransporteurState createState() => _DetailTransporteurState();
 }
 
 class _DetailTransporteurState extends State<DetailTransporteur> {
-  late Map<String, dynamic> _voyageDetails = {}; // Initialize with empty map
+  late Map<String, dynamic> fretDetails = {}; // Initialize with empty map
   bool _isLoading = true;
   bool _hasError = false;
   String _errorMessage = '';
@@ -25,19 +25,19 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
   Future<void> _fetchVoyageDetails() async {
     try {
       // Récupérer les détails du voyage
-      Map<String, dynamic> details =
-          await ApiRequest.fetchVoyageDetails(widget.demandeId);
+      Map<String, dynamic> fretdetails =
+          await ApiRequest.fetchFretVoyageDetails(widget.fretId);
 
       // Extraire les détails du fret si disponibles
-      if (details.containsKey('fret_details')) {
-        // Assurer que la clé 'description_fret' est correctement extraite
-        details['fret_details']['description'] = details['fret_details']
-                ['description_fret'] ??
+      if (fretdetails.containsKey('fret_details')) {
+        // Assurer que la clé 'description' est correctement extraite
+        fretdetails['fret_details']['description'] = fretdetails['fret_details']
+                ['description'] ??
             'Aucune description disponible';
       }
 
       setState(() {
-        _voyageDetails = details;
+        fretDetails = fretdetails;
         _isLoading = false;
       });
     } catch (error) {
@@ -58,7 +58,7 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             RichText(
-              text: TextSpan(
+              text: const TextSpan(
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -74,22 +74,23 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
             ),
           ],
         ),
-        backgroundColor: Color(0xFFFCCE00),
+        backgroundColor: const Color(0xFFFCCE00),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.black,
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : _hasError
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Erreur lors du chargement des détails du voyage'),
-                      SizedBox(height: 10),
+                      const Text(
+                          'Erreur lors du chargement des détails du voyage'),
+                      const SizedBox(height: 10),
                       Text('Détails de l\'erreur: $_errorMessage'),
                     ],
                   ),
@@ -101,98 +102,77 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildSectionTitle('Statut'),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Statut:',
-                          _voyageDetails['statut_demande'] ?? 'Non spécifié',
+                          fretDetails['statut'] ?? 'Non spécifié',
                         ),
                         _buildSectionTitle('Fret'),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Description :',
-                          _voyageDetails['fret_details']?['description'] ??
+                          fretDetails['fret_details']?['description'] ??
                               'Aucune description disponible',
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Montant:',
-                          _voyageDetails['fret_details']?['montant']
-                                  ?.toString() ??
+                          fretDetails['fret_details']?['montant']?.toString() ??
                               'Non spécifié',
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Lieu de Départ:',
-                          _voyageDetails['fret_details']?['lieu_depart'] ??
+                          fretDetails['fret_details']?['lieu_depart'] ??
                               'Non spécifié',
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Lieu d\'Arrivée:',
-                          _voyageDetails['fret_details']?['lieu_arrive'] ??
+                          fretDetails['fret_details']?['lieu_arrive'] ??
                               'Non spécifié',
                         ),
                         _buildSectionTitle('Véhicule'),
                         _buildDetailsCard(
                           'Type :',
-                          _voyageDetails['fret_details']?['type_vehicule'] ??
-                              'Non spécifié',
+                          fretDetails['type_vehicule'] ?? 'Non spécifié',
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Matricule :',
-                          _voyageDetails['vehicule_matricule'] ??
-                              'Non spécifié',
+                          fretDetails['vehicule_matricule'] ?? 'Non spécifié',
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Date de Départ:',
-                          _voyageDetails['fret_details']?['date_depart'] ??
+                          fretDetails['fret_details']?['date_depart'] ??
                               'Non spécifié',
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Date d\'Arrivée:',
-                          _voyageDetails['fret_details']?['date_arrive'] ??
+                          fretDetails['fret_details']?['date_arrive'] ??
                               'Non spécifié',
                         ),
                         /*  SizedBox(height: 5),
                         _buildDetailsCard(
                           'Statut de la Soumission:',
-                          _voyageDetails['statut_soumission'] ?? 'Non spécifié',
+                          fretDetails['statut_soumission'] ?? 'Non spécifié',
                         ), */
 
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                         _buildSectionTitle('Chauffeur'),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Nom et Prénom :',
-                          '${_voyageDetails['chauffeur_nom'] ?? 'Non spécifié'} ${_voyageDetails['chauffeur_prenom'] ?? 'Non spécifié'}',
+                          '${fretDetails['chauffeur_nom'] ?? 'Non spécifié'} ${fretDetails['chauffeur_prenom'] ?? 'Non spécifié'}',
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         _buildDetailsCard(
                           'Téléphone :',
-                          _voyageDetails['numero_tel_chauffeur'] ??
-                              'Non spécifié',
+                          fretDetails['numero_tel_chauffeur'] ?? 'Non spécifié',
                         ),
-
-                        /*  SizedBox(height: 5),
-                        _buildDetailsCard(
-                          'ID de la Demande:',
-                          _voyageDetails['demande_id'].toString(),
-                        ), */
-
-                        SizedBox(height: 5),
-                        /*  _buildSectionTitle('Transporteur'),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        _buildDetailsCard(
-                          'Numéro de Téléphone:',
-                          _voyageDetails['numero_tel_transport'] ??
-                              'Non spécifié',
-                        ), */
-                        SizedBox(height: 15),
+                        const SizedBox(height: 15),
                       ],
                     ),
                   ),
@@ -206,7 +186,7 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
       padding: const EdgeInsets.all(8.0),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
@@ -226,7 +206,7 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
         tileColor: Colors.white,
         title: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -235,13 +215,13 @@ class _DetailTransporteurState extends State<DetailTransporteur> {
         ),
         subtitle: Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 16,
             decoration: TextDecoration.none,
           ),
         ),
-        leading: Icon(
+        leading: const Icon(
           Icons.info,
           color: Color(0xfffcce00),
         ),

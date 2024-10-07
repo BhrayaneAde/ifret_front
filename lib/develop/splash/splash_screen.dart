@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Widget _buildHeaderRow() {
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height * 0.2,
       child: Stack(
         children: [
@@ -82,7 +82,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   Text(
                     'Bienvenue sur I-FRET',
                     style: TextStyle(
-                      color: const Color(0xFFFCCE00),
+                      color: Color(0xFFFCCE00),
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -137,10 +137,10 @@ class _SplashScreenState extends State<SplashScreen> {
           );
         },
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(
+          backgroundColor: WidgetStateProperty.all<Color>(
             const Color(0xFFFCCE00),
           ),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24.0),
             ),

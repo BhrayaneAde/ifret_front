@@ -9,7 +9,8 @@ class EnregistrerCamionModifPage extends StatefulWidget {
   final String? matricule;
   final Map<String, dynamic> details;
 
-  EnregistrerCamionModifPage({required this.matricule, required this.details});
+  const EnregistrerCamionModifPage(
+      {super.key, required this.matricule, required this.details});
 
   @override
   _EnregistrerCamionModifPageState createState() =>
@@ -18,7 +19,7 @@ class EnregistrerCamionModifPage extends StatefulWidget {
 
 class _EnregistrerCamionModifPageState
     extends State<EnregistrerCamionModifPage> {
-  TextEditingController _matriculeController = TextEditingController();
+  final TextEditingController _matriculeController = TextEditingController();
   File? _photoCamion;
   File? _carteGrise;
   File? _visiteTechnique;
@@ -138,7 +139,7 @@ class _EnregistrerCamionModifPageState
 
       if (data.keys.length <= 1) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Aucune modification détectée')),
+          const SnackBar(content: Text('Aucune modification détectée')),
         );
         return;
       }
@@ -152,7 +153,7 @@ class _EnregistrerCamionModifPageState
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Camion mis à jour avec succès!')),
+        const SnackBar(content: Text('Camion mis à jour avec succès!')),
       );
     } catch (e) {
       print('Erreur lors de la mise à jour du camion: $e');
@@ -166,12 +167,12 @@ class _EnregistrerCamionModifPageState
   Widget build(BuildContext context) {
     return Scaffold(
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(context),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Expanded(
                   child: ListView(
                     padding: const EdgeInsets.all(20.0),
@@ -181,52 +182,52 @@ class _EnregistrerCamionModifPageState
                         controller: _matriculeController,
                         hintText: 'Ex: 22442890',
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       buildImageField(
                         label: "Photo du Camion",
                         file: _photoCamion,
                         onPressed: () => _pickFile(0),
                         commentaire: _photoCamionCommentaire,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       buildImageField(
                         label: "Carte Grise",
                         file: _carteGrise,
                         onPressed: () => _pickFile(1),
                         commentaire: _carteGriseCommentaire,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       buildImageField(
                         label: "Visite Technique",
                         file: _visiteTechnique,
                         onPressed: () => _pickFile(2),
                         commentaire: _visiteTechniqueCommentaire,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       buildImageField(
                         label: "Assurance",
                         file: _assurance,
                         onPressed: () => _pickFile(3),
                         commentaire: _assuranceCommentaire,
                       ),
-                      SizedBox(height: 50),
+                      const SizedBox(height: 50),
                       ElevatedButton(
                         onPressed: _submitForm,
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                            Color(0xFFFCCE00),
+                          backgroundColor: WidgetStateProperty.all<Color>(
+                            const Color(0xFFFCCE00),
                           ),
                           shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                              WidgetStateProperty.all<RoundedRectangleBorder>(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24.0),
                             ),
                           ),
-                          minimumSize: MaterialStateProperty.all<Size>(
-                            Size(double.infinity, 50),
+                          minimumSize: WidgetStateProperty.all<Size>(
+                            const Size(double.infinity, 50),
                           ),
                         ),
-                        child: Text(
+                        child: const Text(
                           'Mettre à jour',
                           style: TextStyle(
                             fontSize: 20,
@@ -255,7 +256,7 @@ class _EnregistrerCamionModifPageState
           padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
             label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
         Container(
@@ -268,7 +269,7 @@ class _EnregistrerCamionModifPageState
             decoration: InputDecoration(
               hintText: hintText,
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(horizontal: 10),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
             ),
           ),
         ),
@@ -289,7 +290,7 @@ class _EnregistrerCamionModifPageState
           padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
             label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
         Container(
@@ -304,7 +305,7 @@ class _EnregistrerCamionModifPageState
                     ? ListTile(
                         title: Text(file.path.split('/').last),
                         trailing: IconButton(
-                          icon: Icon(Icons.clear),
+                          icon: const Icon(Icons.clear),
                           onPressed: () {
                             setState(() {
                               switch (label) {
@@ -325,8 +326,8 @@ class _EnregistrerCamionModifPageState
                           },
                         ),
                       )
-                    : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    : const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text('Aucun fichier sélectionné'),
                       ),
               ),
@@ -336,14 +337,14 @@ class _EnregistrerCamionModifPageState
                   onPressed: onPressed,
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Color(0xFFFCCE00)),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        WidgetStateProperty.all<Color>(const Color(0xFFFCCE00)),
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24.0),
                       ),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Importer',
                     style: TextStyle(
                       color: Colors.black,
@@ -359,8 +360,9 @@ class _EnregistrerCamionModifPageState
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Text(
-              '$commentaire',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              commentaire,
+              style: const TextStyle(
+                  color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),
       ],
@@ -373,13 +375,13 @@ class _EnregistrerCamionModifPageState
       child: Row(
         children: [
           IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          SizedBox(width: 16.0),
-          Text(
+          const SizedBox(width: 16.0),
+          const Text(
             "Enregistrer un Camion",
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),

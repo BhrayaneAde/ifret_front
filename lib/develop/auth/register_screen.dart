@@ -16,7 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
 class RegisterScreen extends StatefulWidget {
-  RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
@@ -28,11 +28,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late PageController _pageController;
 
   final TextEditingController _codeController = TextEditingController();
-  TextEditingController _nomController = TextEditingController();
-  TextEditingController _prenomController = TextEditingController();
-  TextEditingController _dateNaissanceController = TextEditingController();
-  TextEditingController _villeController = TextEditingController();
-  TextEditingController _telephoneController = TextEditingController();
+  final TextEditingController _nomController = TextEditingController();
+  final TextEditingController _prenomController = TextEditingController();
+  final TextEditingController _dateNaissanceController =
+      TextEditingController();
+  final TextEditingController _villeController = TextEditingController();
+  final TextEditingController _telephoneController = TextEditingController();
 
   String selectedCountry = '+229';
   bool isKeyboardVisible = false;
@@ -87,7 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         centerTitle: true,
       ),
       body: PageView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         controller: _pageController, // Ajout du contrôleur de page
         children: [
           buildFirstPage(),
@@ -99,8 +100,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             maxWidth: MediaQuery.of(context)
                 .size
                 .width), // Limite la largeur maximale du conteneur
-        color: Color(0xFF222222), // Couleur du fond du pied de page
-        padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+        color: const Color(0xFF222222), // Couleur du fond du pied de page
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -108,19 +109,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 IconButton(
                   onPressed: () {},
-                  icon: FaIcon(FontAwesomeIcons.facebook, color: Colors.white),
+                  icon: const FaIcon(FontAwesomeIcons.facebook,
+                      color: Colors.white),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: FaIcon(FontAwesomeIcons.twitter, color: Colors.white),
+                  icon: const FaIcon(FontAwesomeIcons.twitter,
+                      color: Colors.white),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: FaIcon(FontAwesomeIcons.instagram, color: Colors.white),
+                  icon: const FaIcon(FontAwesomeIcons.instagram,
+                      color: Colors.white),
                 ),
               ],
             ),
-            Expanded(
+            const Expanded(
               child: Text(
                 'Suivez-nous sur les réseaux sociaux',
                 style: TextStyle(
@@ -161,21 +165,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     }
                     return null;
                   }),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   buildDivider(),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   buildTextField(_prenomController, 'Prénom', (value) {
                     if (value == null || value.isEmpty) {
                       return 'Le prénom est obligatoire';
                     }
                     return null;
                   }),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   buildDivider(),
                   buildDateField(),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   buildDivider(),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   buildTextField(_villeController, 'Ville de résidence',
                       (value) {
                     if (value == null || value.isEmpty) {
@@ -183,11 +187,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     }
                     return null;
                   }),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   buildDivider(),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   buildDropdownField(),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   buildDivider(),
                   Row(
                     children: [
@@ -227,7 +231,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       )
                     ],
                   ),
-                  SizedBox(height: 10.0),
+                  const SizedBox(height: 10.0),
                   ElevatedButton(
                     onPressed: () async {
                       if (formKey.currentState?.validate() ?? false) {
@@ -253,10 +257,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                     style: ButtonStyle(
                       foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.white),
-                      backgroundColor:
-                          MaterialStateProperty.all<Color>(Color(0xFFFCCE00)),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          WidgetStateProperty.all<Color>(Colors.white),
+                      backgroundColor: WidgetStateProperty.all<Color>(
+                          const Color(0xFFFCCE00)),
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(24.0),
                         ),
@@ -395,10 +399,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         _signInWithPhoneCredential(_verificationId);
                       },
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
+                        backgroundColor: WidgetStateProperty.all<Color>(
                             const Color(0xFFFCCE00)),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24.0),
                           ),
@@ -541,13 +544,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _selectedDate != null
                 ? Text(
                     DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                    style: TextStyle(fontSize: 12, color: Colors.white),
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
                   )
-                : Text(
+                : const Text(
                     'Sélectionner une date',
                     style: TextStyle(color: Colors.white),
                   ),
-            Icon(
+            const Icon(
               Icons.calendar_today,
               color: Colors.white,
             ),
@@ -575,7 +578,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget buildDivider() {
-    return Divider(
+    return const Divider(
       color: Colors.white,
       height: 1.0,
     );
@@ -669,7 +672,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Transporteurs(
+                  builder: (context) => const Transporteurs(
                     name: '',
                     profileUrl: '',
                     username: '',
@@ -681,7 +684,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Chargeur(
+                  builder: (context) => const Chargeur(
                     name: '',
                     profileUrl: '',
                     username: '',
@@ -693,7 +696,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Chauffeur(
+                  builder: (context) => const Chauffeur(
                     name: '',
                     ParametreeUrl: '',
                     username: '',
@@ -725,7 +728,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         // Une erreur s'est produite pendant l'authentification
         ShowToastDialog.showToast("Une erreur s'est produite lors de l'Auth");
-        print("${e.code}");
+        print(e.code);
         print(verificationId);
         return;
       }
@@ -748,7 +751,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: RegisterScreen(),
   ));
 }

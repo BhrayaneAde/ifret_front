@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart' as Dio;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -16,10 +15,10 @@ class Otp_login extends StatefulWidget {
 
   Map? data;
   Otp_login({
-    Key? key,
+    super.key,
     required this.phoneNumber,
     this.data,
-  }) : super(key: key);
+  });
 
   @override
   _Otp_loginState createState() => _Otp_loginState();
@@ -29,7 +28,7 @@ class _Otp_loginState extends State<Otp_login> {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   TextEditingController countryController = TextEditingController();
-  TextEditingController _codeController = TextEditingController();
+  final TextEditingController _codeController = TextEditingController();
 
   var phone = "";
 
@@ -124,7 +123,7 @@ class _Otp_loginState extends State<Otp_login> {
                     textAlign: TextAlign.center,
                   ),
                   Container(
-                    padding: EdgeInsets.all(28),
+                    padding: const EdgeInsets.all(28),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -171,9 +170,9 @@ class _Otp_loginState extends State<Otp_login> {
                               }
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
+                              backgroundColor: WidgetStateProperty.all<Color>(
                                   const Color(0xFFFCCE00)),
-                              shape: MaterialStateProperty.all<
+                              shape: WidgetStateProperty.all<
                                   RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(24.0),
@@ -200,11 +199,11 @@ class _Otp_loginState extends State<Otp_login> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Login(),
+                                    builder: (context) => const Login(),
                                   ),
                                 );
                               },
-                              child: Text(
+                              child: const Text(
                                 "Modifier le Numéro",
                                 style: TextStyle(
                                     color: Colors.red,
@@ -216,7 +215,7 @@ class _Otp_loginState extends State<Otp_login> {
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 18,
                   ),
                 ],
@@ -256,7 +255,7 @@ class _Otp_loginState extends State<Otp_login> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Transporteurs(
+                      builder: (context) => const Transporteurs(
                         name: '',
                         profileUrl: '',
                         username: '',
@@ -270,7 +269,7 @@ class _Otp_loginState extends State<Otp_login> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Chargeur(
+                      builder: (context) => const Chargeur(
                         name: '',
                         profileUrl: '',
                         username: '',
@@ -284,7 +283,7 @@ class _Otp_loginState extends State<Otp_login> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Chauffeur(
+                      builder: (context) => const Chauffeur(
                         name: '',
                         ParametreeUrl: '',
                         username: '',
@@ -292,6 +291,7 @@ class _Otp_loginState extends State<Otp_login> {
                     ),
                   )
                 };
+            break;
           default:
         }
       } else {

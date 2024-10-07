@@ -25,7 +25,7 @@ Future<void> main() async {
   // Configuration des notifications locales
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
-  final InitializationSettings initializationSettings = InitializationSettings(
+  const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
   );
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
@@ -48,8 +48,7 @@ class MyApp extends StatelessWidget {
   final String initialRoute;
   final String? role;
 
-  const MyApp({required this.initialRoute, required this.role, Key? key})
-      : super(key: key);
+  const MyApp({required this.initialRoute, required this.role, super.key});
 
   // This widget is the root of your application.
   @override
@@ -59,7 +58,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: initialRoute,
       routes: {
-        '/notifications': (context) => NotificationPage(),
+        '/notifications': (context) => const NotificationPage(),
         '/splash': (context) => const SplashScreen(),
         '/phone': (context) => const MyPhone(),
         '/login': (context) => const LoginScreen(),
@@ -67,19 +66,19 @@ class MyApp extends StatelessWidget {
           // Redirigez l'utilisateur vers la page appropriée en fonction de son type
           switch (role) {
             case "Transporteur":
-              return Transporteurs(
+              return const Transporteurs(
                 name: '',
                 profileUrl: '',
                 username: '',
               );
             case "Chauffeur":
-              return Chauffeur(
+              return const Chauffeur(
                 name: '',
                 ParametreeUrl: '',
                 username: '',
               );
             case "Chargeur":
-              return Chargeur(
+              return const Chargeur(
                 name: '',
                 profileUrl: '',
                 username: '',

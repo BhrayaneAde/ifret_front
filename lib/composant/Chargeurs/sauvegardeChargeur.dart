@@ -7,7 +7,8 @@ class Chargeur extends StatefulWidget {
   final String profileUrl;
   final String username;
 
-  Chargeur({
+  const Chargeur({
+    super.key,
     required this.name,
     required this.profileUrl,
     required this.username,
@@ -19,7 +20,7 @@ class Chargeur extends StatefulWidget {
 
 class _ChargeurState extends State<Chargeur> {
   List<Message> _messages = [];
-  TextEditingController _messageController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
   int _currentIndex = 0;
   String? _currentUserNumeroTel;
 
@@ -32,9 +33,7 @@ class _ChargeurState extends State<Chargeur> {
   Future<void> fetchMessages() async {
     try {
       var response = await ApiRequest.fetchMessages();
-      if (response != null &&
-          response is Map<String, dynamic> &&
-          response.containsKey('messages')) {
+      if (response != null && response.containsKey('messages')) {
         List<dynamic> messagesData = response['messages'];
         List<Message> messages = messagesData
             .map((messageData) => Message.fromJson(messageData))
@@ -62,7 +61,7 @@ class _ChargeurState extends State<Chargeur> {
           });
         },
         backgroundColor: Colors.white,
-        selectedItemColor: Color(0xFFFCCE00),
+        selectedItemColor: const Color(0xFFFCCE00),
         unselectedItemColor: Colors.black,
         items: [
           _bottomNavigationBarItem(
@@ -107,11 +106,11 @@ class _ChargeurState extends State<Chargeur> {
       case 0:
         return _getMessages();
       case 1:
-        return Paiement();
+        return const Paiement();
       case 2:
-        return Tracking();
+        return const Tracking();
       case 3:
-        return ProfilChargeur();
+        return const ProfilChargeur();
       default:
         return Container();
     }
@@ -123,24 +122,24 @@ class _ChargeurState extends State<Chargeur> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           print('En attente de la récupération des messages...');
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           print(
               'Erreur lors de la récupération des messages : ${snapshot.error}');
-          return Center(child: Text('Erreur de chargement des messages'));
+          return const Center(child: Text('Erreur de chargement des messages'));
         } else if (snapshot.hasData) {
           print('Messages récupérés avec succès !');
 
           List<Message> messages = [];
-          if (snapshot.data != null && snapshot.data! is Map<String, dynamic>) {
+          if (snapshot.data != null) {
             print('Données des messages : ${snapshot.data!['messages']}');
 
             if (snapshot.data!['messages'] is List) {
-              (snapshot.data!['messages'] as List<dynamic>)
-                  .forEach((messageData) {
+              for (var messageData
+                  in (snapshot.data!['messages'] as List<dynamic>)) {
                 Message message = Message.fromJson(messageData);
                 messages.add(message);
-              });
+              }
             } else {
               print('La clé "messages" ne contient pas une liste.');
             }
@@ -151,14 +150,14 @@ class _ChargeurState extends State<Chargeur> {
           messages.sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
           if (messages.isEmpty) {
-            return Center(child: Text('Aucun message disponible'));
+            return const Center(child: Text('Aucun message disponible'));
           }
 
           return Column(
             children: [
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(30),
@@ -167,7 +166,7 @@ class _ChargeurState extends State<Chargeur> {
                   ),
                   child: ListView.builder(
                     reverse: true,
-                    padding: EdgeInsets.only(bottom: 90.0, top: 130),
+                    padding: const EdgeInsets.only(bottom: 90.0, top: 130),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final reversedIndex = messages.length - 1 - index;
@@ -177,7 +176,7 @@ class _ChargeurState extends State<Chargeur> {
                 ),
               ),
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 color: Colors.white,
                 child: Row(
                   children: [
@@ -187,7 +186,7 @@ class _ChargeurState extends State<Chargeur> {
                         onSubmitted: (messageText) {
                           sendMessage(messageText);
                         },
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: "Message",
                           hintStyle: TextStyle(color: Colors.black45),
@@ -198,7 +197,7 @@ class _ChargeurState extends State<Chargeur> {
                       onTap: () {
                         sendMessage(_messageController.text);
                       },
-                      child: Icon(Icons.send_rounded),
+                      child: const Icon(Icons.send_rounded),
                     ),
                   ],
                 ),
@@ -206,7 +205,7 @@ class _ChargeurState extends State<Chargeur> {
             ],
           );
         } else {
-          return Center(child: Text('Aucun message disponible'));
+          return const Center(child: Text('Aucun message disponible'));
         }
       },
     );
@@ -219,8 +218,8 @@ class _ChargeurState extends State<Chargeur> {
     return Align(
       alignment: isSentByAdmin ? Alignment.centerLeft : Alignment.centerRight,
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         decoration: BoxDecoration(
           color: isSentByAdmin ? Colors.yellow : Colors.blue,
           borderRadius: BorderRadius.circular(20),
@@ -251,7 +250,7 @@ class _ChargeurState extends State<Chargeur> {
       } else {
         print('Échec de l\'envoi du message');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Échec de l\'envoi du message'),
           ),
         );
@@ -259,7 +258,7 @@ class _ChargeurState extends State<Chargeur> {
     }).catchError((error) {
       print('Erreur lors de l\'envoi du message : $error');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Erreur lors de l\'envoi du message'),
         ),
       );
@@ -299,6 +298,8 @@ class MesInformations extends StatelessWidget {
 } */
 
 class Paiement extends StatefulWidget {
+  const Paiement({super.key});
+
   @override
   _PaiementState createState() => _PaiementState();
 }
@@ -316,16 +317,16 @@ class _PaiementState extends State<Paiement> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(context),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Expanded(
             child: _currentTabIndex == 0
-                ? PaiementLocal()
-                : PaiementInternational(),
+                ? const PaiementLocal()
+                : const PaiementInternational(),
           ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color.fromARGB(255, 245, 234, 234),
+        backgroundColor: const Color.fromARGB(255, 245, 234, 234),
         currentIndex: _currentTabIndex,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.black,
@@ -337,12 +338,12 @@ class _PaiementState extends State<Paiement> {
         items: [
           BottomNavigationBarItem(
             icon: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
                 border:
                     Border.all(color: const Color.fromARGB(255, 252, 250, 250)),
-                color: _currentTabIndex == 0 ? Color(0xFFFCCE00) : null,
+                color: _currentTabIndex == 0 ? const Color(0xFFFCCE00) : null,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -350,7 +351,7 @@ class _PaiementState extends State<Paiement> {
                   Icon(Icons.save_sharp,
                       color:
                           _currentTabIndex == 0 ? Colors.white : Colors.black),
-                  SizedBox(width: 8.0),
+                  const SizedBox(width: 8.0),
                   Text(
                     'Paiement Local',
                     style: TextStyle(
@@ -365,11 +366,12 @@ class _PaiementState extends State<Paiement> {
           ),
           BottomNavigationBarItem(
             icon: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10.0),
-                border: Border.all(color: Color.fromARGB(255, 247, 245, 245)),
-                color: _currentTabIndex == 1 ? Color(0xFFFCCE00) : null,
+                border:
+                    Border.all(color: const Color.fromARGB(255, 247, 245, 245)),
+                color: _currentTabIndex == 1 ? const Color(0xFFFCCE00) : null,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -377,7 +379,7 @@ class _PaiementState extends State<Paiement> {
                   Icon(Icons.bookmark_sharp,
                       color:
                           _currentTabIndex == 1 ? Colors.white : Colors.black),
-                  SizedBox(width: 8.0),
+                  const SizedBox(width: 8.0),
                   Expanded(
                     child: Text(
                       'Paiement International',
@@ -398,7 +400,7 @@ class _PaiementState extends State<Paiement> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.2,
       child: Stack(
@@ -409,7 +411,7 @@ class _PaiementState extends State<Paiement> {
             width: double.infinity,
             height: double.infinity,
           ),
-          DecoratedBox(
+          const DecoratedBox(
             decoration: BoxDecoration(
                 /*  gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -445,13 +447,13 @@ class _PaiementState extends State<Paiement> {
                     _currentTabIndex == 0
                         ? 'Paiement Local'
                         : 'Paiement International',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xFFFCCE00),
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  Text(
+                  const Text(
                     'En Ligne',
                     style: TextStyle(
                       color: Colors.white,
@@ -470,15 +472,17 @@ class _PaiementState extends State<Paiement> {
 }
 
 class PaiementLocal extends StatelessWidget {
+  const PaiementLocal({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 16.0),
-          Center(
+          const SizedBox(height: 16.0),
+          const Center(
             child: Text(
               'Choisissez un moyen de paiement local:',
               style: TextStyle(
@@ -490,7 +494,7 @@ class PaiementLocal extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 70.0),
+              const SizedBox(height: 70.0),
               ElevatedButton(
                 onPressed: () {
                   // Gérer le paiement local (Fedapay MTN)
@@ -500,12 +504,12 @@ class PaiementLocal extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset('assets/images/mtn.png', height: 30.0),
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                   ],
                 ),
               ),
               /* SizedBox(height: 16.0), */
-              SizedBox(width: 16.0),
+              const SizedBox(width: 16.0),
               ElevatedButton(
                 onPressed: () {
                   // Gérer le paiement local (Fedapay Moov)
@@ -515,7 +519,7 @@ class PaiementLocal extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset('assets/images/moov.png', height: 30.0),
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                     /* Text('Moov'), */
                   ],
                 ),
@@ -529,15 +533,17 @@ class PaiementLocal extends StatelessWidget {
 }
 
 class PaiementInternational extends StatelessWidget {
+  const PaiementInternational({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 16.0),
-          Center(
+          const SizedBox(height: 16.0),
+          const Center(
             child: Text(
               'Choisissez un moyen de paiement international:',
               style: TextStyle(
@@ -546,7 +552,7 @@ class PaiementInternational extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 16.0),
+          const SizedBox(height: 16.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -559,12 +565,12 @@ class PaiementInternational extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset('assets/images/visa.png', height: 20.0),
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                     /* Text('Visa'), */
                   ],
                 ),
               ),
-              SizedBox(width: 16.0),
+              const SizedBox(width: 16.0),
               ElevatedButton(
                 onPressed: () {
                   // Gérer le paiement international (PayPal)
@@ -574,12 +580,12 @@ class PaiementInternational extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset('assets/images/paypal.png', height: 20.0),
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                     /* Text('PayPal'), */
                   ],
                 ),
               ),
-              SizedBox(width: 16.0),
+              const SizedBox(width: 16.0),
               ElevatedButton(
                 onPressed: () {
                   // Gérer le paiement international (MasterCard)
@@ -589,7 +595,7 @@ class PaiementInternational extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset('assets/images/mastercard-2.png', height: 20.0),
-                    SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                     /*  Text('MasterCard'), */
                   ],
                 ),
@@ -603,13 +609,15 @@ class PaiementInternational extends StatelessWidget {
 }
 
 class Tracking extends StatelessWidget {
+  const Tracking({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tracking'),
+        title: const Text('Tracking'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Contenu de Tracking'),
       ),
     );

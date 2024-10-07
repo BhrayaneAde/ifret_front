@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 class NotificationTransporteur extends StatefulWidget {
+  const NotificationTransporteur({super.key});
+
   @override
-  _NotificationTransporteurState createState() => _NotificationTransporteurState();
+  _NotificationTransporteurState createState() =>
+      _NotificationTransporteurState();
 }
 
 class _NotificationTransporteurState extends State<NotificationTransporteur> {
-  List<Map<String, dynamic>> _notifications = [];
+  final List<Map<String, dynamic>> _notifications = [];
   int _notificationCount = 0; // Ajout du compteur de notifications
 
   @override
@@ -61,7 +64,7 @@ class _NotificationTransporteurState extends State<NotificationTransporteur> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: const Text('Notifications'),
       ),
       body: ListView.builder(
         itemCount: _notifications.length,
@@ -90,24 +93,24 @@ class _NotificationTransporteurState extends State<NotificationTransporteur> {
           BottomNavigationBarItem(
             icon: Stack(
               children: [
-                Icon(Icons.notifications_active),
+                const Icon(Icons.notifications_active),
                 if (_notificationCount !=
                     0) // Afficher l'indice uniquement si le compteur est différent de zéro
                   Positioned(
                     right: 0,
                     child: Container(
-                      padding: EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         color: Colors.red,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      constraints: BoxConstraints(
+                      constraints: const BoxConstraints(
                         minWidth: 16,
                         minHeight: 16,
                       ),
                       child: Text(
                         '$_notificationCount',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
                         ),
@@ -126,7 +129,7 @@ class _NotificationTransporteurState extends State<NotificationTransporteur> {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: NotificationTransporteur(),
   ));
 }

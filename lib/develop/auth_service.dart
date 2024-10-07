@@ -43,7 +43,7 @@ class AuthService {
         },
         codeSent: (verificationId, resendToken) {
           print('Code OTP envoyé avec succès');
-          print('VerificationID ${verificationId}');
+          print('VerificationID $verificationId');
           verifyId = verificationId;
         },
         codeAutoRetrievalTimeout: (codeAutoRetrievalTimeout) {
@@ -81,13 +81,13 @@ class AuthService {
   Future<bool> signWithCode(String code) async {
     print("l'id de vérification : $verifyId");
     bool isConnected = false;
-    FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     final cred =
         PhoneAuthProvider.credential(verificationId: verifyId, smsCode: code);
 
     try {
       UserCredential userCredential =
-          await _firebaseAuth.signInWithCredential(cred);
+          await firebaseAuth.signInWithCredential(cred);
       if (userCredential.user != null) {
         print(
             "User login in ${userCredential.user!.displayName} ${userCredential.user!.phoneNumber}");

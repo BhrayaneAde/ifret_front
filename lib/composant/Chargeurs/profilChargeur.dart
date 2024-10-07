@@ -9,13 +9,15 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilChargeur extends StatefulWidget {
+  const ProfilChargeur({super.key});
+
   @override
   _ProfilChargeurState createState() => _ProfilChargeurState();
 }
 
 class _ProfilChargeurState extends State<ProfilChargeur> {
-  TextEditingController _firstNameController = TextEditingController();
-  TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
 
   String _dateOfBirth = '';
   String _residence = '';
@@ -23,7 +25,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
   File? _image;
   String authToken = ''; // Variable pour stocker le token d'authentification
 
-  bool _isEditing = false;
+  final bool _isEditing = false;
 
   @override
   void initState() {
@@ -173,9 +175,9 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
       appBar: AppBar(
         title: Row(
           children: [
-            Spacer(), // Pousser le widget RichText vers la droite
+            const Spacer(), // Pousser le widget RichText vers la droite
             RichText(
-              text: TextSpan(
+              text: const TextSpan(
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -190,7 +192,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
           ],
         ),
         backgroundColor:
-            Color(0xFFFCCE00), // Définir la couleur de fond en noir
+            const Color(0xFFFCCE00), // Définir la couleur de fond en noir
       ),
       body: Stack(
         children: [
@@ -219,7 +221,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                                   ? FileImage(_image!)
                                   : Image.asset('assets/images/2.png').image,
                               child: _image == null
-                                  ? SizedBox() // Si aucune image n'est sélectionnée, ne pas afficher de texte
+                                  ? const SizedBox() // Si aucune image n'est sélectionnée, ne pas afficher de texte
                                   : null,
                             ),
                             Positioned(
@@ -265,7 +267,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                                     Shadow(
                                       color: Colors.grey.withOpacity(0.5),
                                       blurRadius: 2,
-                                      offset: Offset(1, 1),
+                                      offset: const Offset(1, 1),
                                     ),
                                   ],
                                 ),
@@ -281,7 +283,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                                     Shadow(
                                       color: Colors.grey.withOpacity(0.5),
                                       blurRadius: 2,
-                                      offset: Offset(1, 1),
+                                      offset: const Offset(1, 1),
                                     ),
                                   ],
                                 ),
@@ -294,10 +296,10 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                   ),
                 ),
               ),
-              SizedBox(height: 25),
+              const SizedBox(height: 25),
               // Deuxième ligne
               Padding(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 5), // Padding horizontal de 10
                 child: Card(
                   shape: RoundedRectangleBorder(
@@ -310,8 +312,9 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                       borderRadius:
                           BorderRadius.circular(10.0), // Forme du ListTile
                     ),
-                    tileColor: Color(0xfffcce00), // Couleur de fond du ListTile
-                    title: Row(
+                    tileColor:
+                        const Color(0xfffcce00), // Couleur de fond du ListTile
+                    title: const Row(
                       children: [
                         Icon(
                           Icons.edit,
@@ -332,14 +335,14 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                     ),
 
                     trailing: IconButton(
-                      icon: Icon(Icons.arrow_forward),
+                      icon: const Icon(Icons.arrow_forward),
                       onPressed: _editProfile,
                       color: Colors.black,
                       splashRadius: 20,
                       padding: EdgeInsets
                           .zero, // Supprimer le rembourrage autour de l'icône
                       constraints:
-                          BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
+                          const BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
                       alignment:
                           Alignment.center, // Alignement de l'icône au centre
                       visualDensity: VisualDensity
@@ -348,9 +351,9 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                   ),
                 ),
               ),
-              SizedBox(height: 5), // Espacement entre les boutons
+              const SizedBox(height: 5), // Espacement entre les boutons
               Padding(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 5), // Padding horizontal de 10
                 child: Card(
                   shape: RoundedRectangleBorder(
@@ -363,7 +366,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TrafficChargeur(),
+                          builder: (context) => const TrafficChargeur(),
                         ),
                       );
                     },
@@ -371,8 +374,9 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                       borderRadius:
                           BorderRadius.circular(10.0), // Forme du ListTile
                     ),
-                    tileColor: Color(0xfffcce00), // Couleur de fond du ListTile
-                    title: Row(
+                    tileColor:
+                        const Color(0xfffcce00), // Couleur de fond du ListTile
+                    title: const Row(
                       children: [
                         Icon(
                           Icons.list,
@@ -393,13 +397,13 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                     ),
 
                     trailing: IconButton(
-                      icon: Icon(Icons.arrow_forward),
+                      icon: const Icon(Icons.arrow_forward),
                       onPressed: () {
                         // Action pour le bouton ">"
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TrafficChargeur(),
+                            builder: (context) => const TrafficChargeur(),
                           ),
                         );
                       },
@@ -408,7 +412,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                       padding: EdgeInsets
                           .zero, // Supprimer le rembourrage autour de l'icône
                       constraints:
-                          BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
+                          const BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
                       alignment:
                           Alignment.center, // Alignement de l'icône au centre
                       visualDensity: VisualDensity
@@ -417,9 +421,9 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                   ),
                 ),
               ),
-              SizedBox(height: 5), // Espacement entre les boutons
+              const SizedBox(height: 5), // Espacement entre les boutons
               Padding(
-                padding: EdgeInsets.symmetric(
+                padding: const EdgeInsets.symmetric(
                     horizontal: 5), // Padding horizontal de 10
                 child: Card(
                   shape: RoundedRectangleBorder(
@@ -432,7 +436,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Clientele(),
+                          builder: (context) => const Clientele(),
                         ),
                       );
                     },
@@ -440,8 +444,9 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                       borderRadius:
                           BorderRadius.circular(10.0), // Forme du ListTile
                     ),
-                    tileColor: Color(0xfffcce00), // Couleur de fond du ListTile
-                    title: Row(
+                    tileColor:
+                        const Color(0xfffcce00), // Couleur de fond du ListTile
+                    title: const Row(
                       children: [
                         Icon(
                           Icons.support_agent_rounded,
@@ -462,13 +467,13 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                     ),
 
                     trailing: IconButton(
-                      icon: Icon(Icons.arrow_forward),
+                      icon: const Icon(Icons.arrow_forward),
                       onPressed: () {
                         // Action pour le bouton ">"
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Clientele(),
+                            builder: (context) => const Clientele(),
                           ),
                         );
                       },
@@ -477,7 +482,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                       padding: EdgeInsets
                           .zero, // Supprimer le rembourrage autour de l'icône
                       constraints:
-                          BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
+                          const BoxConstraints(), // Permet à l'IconButton de se redimensionner en fonction de son contenu
                       alignment:
                           Alignment.center, // Alignement de l'icône au centre
                       visualDensity: VisualDensity
@@ -505,7 +510,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                             onPressed: () {
                               // Action pour la politique de confidentialité
                             },
-                            child: Text(
+                            child: const Text(
                               'Politique de confidentialité',
                               style: TextStyle(
                                 color: Colors.black,
@@ -515,7 +520,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                           ),
                         ],
                       ),
-                      Text(
+                      const Text(
                         '|',
                         style: TextStyle(
                           color: Colors.black,
@@ -529,7 +534,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                             onPressed: () {
                               // Action pour les conditions générales d'utilisation
                             },
-                            child: Text(
+                            child: const Text(
                               'Conditions générales',
                               style: TextStyle(
                                 color: Colors.black,
@@ -542,7 +547,7 @@ class _ProfilChargeurState extends State<ProfilChargeur> {
                     ],
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                     height: 10), // Espacement par rapport au bas de l'écran
                 Text(
                   'Version 1.0', // Texte de la version de l'application
@@ -589,7 +594,8 @@ class ModifierProfil extends StatelessWidget {
   static const String KEY_ACCOUNT = 'type_compte';
   static const String KEY_RESIDENCE = 'ville';
 
-  ModifierProfil({
+  const ModifierProfil({
+    super.key,
     required this.firstName,
     required this.lastName,
     required this.dateOfBirth,
@@ -600,26 +606,26 @@ class ModifierProfil extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _newFirstNameController =
+    TextEditingController newFirstNameController =
         TextEditingController(text: firstName);
-    TextEditingController _newLastNameController =
+    TextEditingController newLastNameController =
         TextEditingController(text: lastName);
 
-    TextEditingController _newDateOfBirthController =
+    TextEditingController newDateOfBirthController =
         TextEditingController(text: dateOfBirth);
 
-    TextEditingController _newResidenceController =
+    TextEditingController newResidenceController =
         TextEditingController(text: residence);
-    TextEditingController _newAccountTypeController =
+    TextEditingController newAccountTypeController =
         TextEditingController(text: accountType);
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Spacer(), // Pousser le widget RichText vers la droite
+            const Spacer(), // Pousser le widget RichText vers la droite
             RichText(
-              text: TextSpan(
+              text: const TextSpan(
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -635,76 +641,76 @@ class ModifierProfil extends StatelessWidget {
           ],
         ),
         backgroundColor:
-            Color(0xFFFCCE00), // Définir la couleur de fond en noir
+            const Color(0xFFFCCE00), // Définir la couleur de fond en noir
         leading: IconButton(
-          icon: Icon(Icons
+          icon: const Icon(Icons
               .arrow_back), // Supposant que vous voulez un bouton de retour
           color: Colors.black, // Définir la couleur du bouton en blanc
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.only(top: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildEditableInfoItem(
               'Prénom:',
-              _newFirstNameController,
+              newFirstNameController,
               Icons.person,
               () => _showEditDialog(
-                  context, 'Prénom', _newFirstNameController, KEY_FIRST_NAME),
+                  context, 'Prénom', newFirstNameController, KEY_FIRST_NAME),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildEditableInfoItem(
               'Nom:',
-              _newLastNameController,
+              newLastNameController,
               Icons.person,
               () => _showEditDialog(
-                  context, 'Nom', _newLastNameController, KEY_LAST_NAME),
+                  context, 'Nom', newLastNameController, KEY_LAST_NAME),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildEditableInfoItem(
               'Date de naissance:',
-              _newDateOfBirthController,
+              newDateOfBirthController,
               Icons.calendar_today,
               () => _showEditDialog(context, 'Date de naissance',
-                  _newDateOfBirthController, KEY_DATE_OF_BIRTH),
+                  newDateOfBirthController, KEY_DATE_OF_BIRTH),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildEditableInfoItem(
               'Lieu de résidence:',
-              _newResidenceController,
+              newResidenceController,
               Icons.location_city,
               () => _showEditDialog(context, 'Lieu de résidence',
-                  _newResidenceController, KEY_RESIDENCE),
+                  newResidenceController, KEY_RESIDENCE),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildInfoContainer(
               'Compte:', // Label du champ
-              _newAccountTypeController.text, // Contrôleur du champ
+              newAccountTypeController.text, // Contrôleur du champ
               Icons.account_circle, // Icône associée
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
             Align(
               alignment: Alignment.center,
               child: ElevatedButton(
                 onPressed: () {
                   onUpdate(
-                    firstName: _newFirstNameController.text,
-                    lastName: _newLastNameController.text,
-                    dateOfBirth: _newDateOfBirthController.text,
-                    residence: _newResidenceController.text,
-                    accountType: _newAccountTypeController.text,
+                    firstName: newFirstNameController.text,
+                    lastName: newLastNameController.text,
+                    dateOfBirth: newDateOfBirthController.text,
+                    residence: newResidenceController.text,
+                    accountType: newAccountTypeController.text,
                   );
 
                   // Appeler la fonction pour mettre à jour le profil sur le backend
                   _updateUserProfile(
-                    firstName: _newFirstNameController.text,
-                    lastName: _newLastNameController.text,
-                    dateOfBirth: _newDateOfBirthController.text,
-                    residence: _newResidenceController.text,
-                    accountType: _newAccountTypeController.text,
+                    firstName: newFirstNameController.text,
+                    lastName: newLastNameController.text,
+                    dateOfBirth: newDateOfBirthController.text,
+                    residence: newResidenceController.text,
+                    accountType: newAccountTypeController.text,
                   );
 
                   _showToast(); // Afficher le toast après la mise à jour
@@ -713,8 +719,8 @@ class ModifierProfil extends StatelessWidget {
                 },
                 style: ButtonStyle(
                   backgroundColor:
-                      MaterialStateProperty.all<Color>(const Color(0xFFFCCE00)),
-                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      WidgetStateProperty.all<Color>(const Color(0xFFFCCE00)),
+                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -744,7 +750,6 @@ class ModifierProfil extends StatelessWidget {
   Future<void> _updateUserProfile({
     String? firstName,
     String? lastName,
-    String? phoneNumber,
     String? dateOfBirth,
     String? residence,
     String? accountType,
@@ -802,21 +807,21 @@ class ModifierProfil extends StatelessWidget {
             Icon(
               iconData,
               size: 20,
-              color: Color(0xfffcce00), // Couleur de l'icône
+              color: const Color(0xfffcce00), // Couleur de l'icône
             ),
-            SizedBox(width: 10), // Espacement entre l'icône et le texte
+            const SizedBox(width: 10), // Espacement entre l'icône et le texte
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black, // Couleur du texte
                   fontWeight: FontWeight.bold),
             ),
-            SizedBox(width: 10), // Espacement avant le champ de texte
+            const SizedBox(width: 10), // Espacement avant le champ de texte
             Expanded(
               child: TextFormField(
                 controller: controller,
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black),
@@ -826,9 +831,9 @@ class ModifierProfil extends StatelessWidget {
           ],
         ),
         trailing: IconButton(
-          icon: Icon(Icons.edit),
+          icon: const Icon(Icons.edit),
           onPressed: onPressed,
-          color: Color(0xfffcce00), // Couleur de l'icône de modification
+          color: const Color(0xfffcce00), // Couleur de l'icône de modification
         ),
       ),
     );
@@ -840,7 +845,7 @@ class ModifierProfil extends StatelessWidget {
     IconData iconData,
   ) {
     return Padding(
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
           vertical: 5.0, horizontal: 5), // Ajout du padding horizontal
       child: Card(
         shape: RoundedRectangleBorder(
@@ -856,22 +861,22 @@ class ModifierProfil extends StatelessWidget {
               Icon(
                 iconData,
                 size: 20,
-                color: Color(0xfffcce00), // Couleur de l'icône
+                color: const Color(0xfffcce00), // Couleur de l'icône
               ),
-              SizedBox(width: 10), // Espacement entre l'icône et le texte
+              const SizedBox(width: 10), // Espacement entre l'icône et le texte
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.black, // Couleur du texte
                 ),
               ),
-              SizedBox(width: 10), // Espacement avant la valeur
+              const SizedBox(width: 10), // Espacement avant la valeur
               Expanded(
                 child: Text(
                   value,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontSize: 18,
                       color: Colors.black,
                       fontWeight: FontWeight.bold),
@@ -888,7 +893,7 @@ class ModifierProfil extends StatelessWidget {
     BuildContext context,
     String fieldName,
     TextEditingController controller,
-    String key_first_name,
+    String keyFirstName,
   ) async {
     String newValue = controller.text;
     await showDialog(
@@ -897,7 +902,7 @@ class ModifierProfil extends StatelessWidget {
         return AlertDialog(
           title: Text(
             'Modifier $fieldName',
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.black,
               fontSize: 20,
@@ -910,17 +915,17 @@ class ModifierProfil extends StatelessWidget {
             controller: controller,
             decoration: InputDecoration(
               hintText: 'Nouvelle valeur',
-              hintStyle: TextStyle(
+              hintStyle: const TextStyle(
                 color: Colors.grey,
               ),
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.grey,
                 ),
                 borderRadius: BorderRadius.circular(10.0),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(
+                borderSide: const BorderSide(
                   color: Colors.blue,
                 ),
                 borderRadius: BorderRadius.circular(10.0),
@@ -932,7 +937,7 @@ class ModifierProfil extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text(
+              child: const Text(
                 'Annuler',
                 style: TextStyle(
                   color: Colors.red,
@@ -945,7 +950,7 @@ class ModifierProfil extends StatelessWidget {
                 controller.text = newValue;
                 Navigator.pop(context);
               },
-              child: Text(
+              child: const Text(
                 'OK',
                 style: TextStyle(
                   color: Colors.blue,
@@ -965,7 +970,7 @@ class ModifierProfil extends StatelessWidget {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: ProfilChargeur(),
   ));
 }

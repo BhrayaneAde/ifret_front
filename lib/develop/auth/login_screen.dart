@@ -1,11 +1,7 @@
 import 'dart:async';
 
-import 'package:dio/dio.dart' as dio;
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ifret/api/api_request.dart';
@@ -216,10 +212,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     },
                                     style: ButtonStyle(
                                       backgroundColor:
-                                          MaterialStateProperty.all<Color>(
+                                          WidgetStateProperty.all<Color>(
                                         const Color(0xFFFCCE00),
                                       ),
-                                      shape: MaterialStateProperty.all<
+                                      shape: WidgetStateProperty.all<
                                           RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                           borderRadius:
@@ -254,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  RegisterScreen(),
+                                                  const RegisterScreen(),
                                             ),
                                           );
                                         },
@@ -392,10 +388,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _signInWithPhoneCredential(_verificationId);
                               },
                               style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        const Color(0xFFFCCE00)),
-                                shape: MaterialStateProperty.all<
+                                backgroundColor: WidgetStateProperty.all<Color>(
+                                    const Color(0xFFFCCE00)),
+                                shape: WidgetStateProperty.all<
                                     RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(24.0),
@@ -489,7 +484,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => Transporteurs(
+                builder: (context) => const Transporteurs(
                       name: '',
                       profileUrl: '',
                       username: '',
@@ -500,7 +495,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => Chargeur(
+                builder: (context) => const Chargeur(
                       name: '',
                       profileUrl: '',
                       username: '',
@@ -511,7 +506,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => Chauffeur(
+                builder: (context) => const Chauffeur(
                       name: '',
                       ParametreeUrl: '',
                       username: '',
@@ -524,7 +519,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // à l'utilisateur ou le rediriger vers la page d'inscription.
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => RegisterScreen()),
+            MaterialPageRoute(builder: (context) => const RegisterScreen()),
           );
         } // Passer à la page suivante du contrôleur de page _pageController
         _pageController.nextPage(
@@ -615,7 +610,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => RegisterScreen(),
+            builder: (context) => const RegisterScreen(),
           ),
         );
       }

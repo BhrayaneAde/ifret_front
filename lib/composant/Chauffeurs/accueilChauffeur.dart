@@ -1,9 +1,5 @@
 import 'dart:io';
-import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Chauffeurs/profilChauffeur.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -14,7 +10,8 @@ class Chauffeur extends StatefulWidget {
   final String ParametreeUrl;
   final String username;
 
-  Chauffeur({
+  const Chauffeur({
+    super.key,
     required this.name,
     required this.ParametreeUrl,
     required this.username,
@@ -39,7 +36,7 @@ class _ChauffeurState extends State<Chauffeur> {
         },
         backgroundColor: Colors.white, // Couleur de fond blanc
         selectedItemColor:
-            Color(0xFFFCCE00), // Couleur de l'élément sélectionné
+            const Color(0xFFFCCE00), // Couleur de l'élément sélectionné
         unselectedItemColor:
             Colors.black, // Couleur des éléments non sélectionnés
         items: [
@@ -78,18 +75,20 @@ class _ChauffeurState extends State<Chauffeur> {
   Widget _getBody() {
     switch (_currentIndex) {
       case 0:
-        return ProfilChauffeur();
+        return const ProfilChauffeur();
       case 1:
-        return Notification();
+        return const Notification();
       case 2:
-        return Parametre();
+        return const Parametre();
       default:
-        return Notification();
+        return const Notification();
     }
   }
 }
 
 class Notification extends StatelessWidget {
+  const Notification({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,7 +100,7 @@ class Notification extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(context),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildAnnonces(context),
           ],
         ),
@@ -110,8 +109,8 @@ class Notification extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    var _currentTabIndex;
-    return Container(
+    var currentTabIndex;
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.2,
       child: Stack(
@@ -122,7 +121,7 @@ class Notification extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
           ),
-          DecoratedBox(
+          const DecoratedBox(
             decoration: BoxDecoration(
                 /*  gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -146,10 +145,10 @@ class Notification extends StatelessWidget {
               fit: BoxFit.cover, // Ajustement de l'image
             ),
           ),
-          Align(
+          const Align(
             alignment: Alignment.bottomLeft,
             child: Padding(
-              padding: const EdgeInsets.only(left: 27, bottom: 30),
+              padding: EdgeInsets.only(left: 27, bottom: 30),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -190,14 +189,14 @@ class Notification extends StatelessWidget {
           '10 Nov 2023',
           'assets/images/2.png',
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         _buildSingleAnnonce(
           'Annonce 2',
           'Description brève de l\'annonce 2',
           '17 dec 2023',
           'assets/images/2.png',
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         _buildSingleAnnonce(
           'Annonce 3',
           'Description brève de l\'annonce 3',
@@ -233,25 +232,25 @@ class Notification extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     description,
-                    style: TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16),
                   ),
                   Text(
                     date,
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 10, color: Color.fromARGB(255, 252, 206, 0)),
                   ),
                 ],
@@ -265,6 +264,8 @@ class Notification extends StatelessWidget {
 }
 
 class Parametre extends StatefulWidget {
+  const Parametre({super.key});
+
   @override
   _ParametreState createState() => _ParametreState();
 }
@@ -277,36 +278,34 @@ class _ParametreState extends State<Parametre> {
   List<File> _images = [];
 
   Future<void> _pickImages() async {
-    final List<XFile>? pickedImages = await ImagePicker().pickMultiImage();
-    if (pickedImages != null) {
-      setState(() {
-        _images = pickedImages.map((image) => File(image.path)).toList();
-      });
-    }
+    final List<XFile> pickedImages = await ImagePicker().pickMultiImage();
+    setState(() {
+      _images = pickedImages.map((image) => File(image.path)).toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Renseignez vos Informations'),
+        title: const Text('Renseignez vos Informations'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Formulaire de permis',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: TextFormField(
                     controller: _numeroPermisController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Numéro de permis',
                       focusedBorder: OutlineInputBorder(
                         borderSide:
@@ -318,7 +317,7 @@ class _ParametreState extends State<Parametre> {
                     ),
                   ),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _categorieVehicule,
@@ -334,7 +333,7 @@ class _ParametreState extends State<Parametre> {
                         child: Text(category),
                       );
                     }).toList(),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Catégorie de véhicule',
                       focusedBorder: OutlineInputBorder(
                         borderSide:
@@ -348,10 +347,10 @@ class _ParametreState extends State<Parametre> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
-                Text(
+                const Text(
                   'Date d\'obtention du permis :',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
@@ -369,19 +368,19 @@ class _ParametreState extends State<Parametre> {
                       });
                     }
                   },
-                  icon: Icon(Icons.calendar_today),
+                  icon: const Icon(Icons.calendar_today),
                 ),
               ],
             ),
             if (_dateOptention != null)
               Text(
                 'Date : ${DateFormat('dd/MM/yyyy').format(_dateOptention!)}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               children: [
-                Text(
+                const Text(
                   'Date d\'expiration du permis :',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
@@ -399,36 +398,36 @@ class _ParametreState extends State<Parametre> {
                       });
                     }
                   },
-                  icon: Icon(Icons.calendar_today),
+                  icon: const Icon(Icons.calendar_today),
                 ),
               ],
             ),
             if (_dateExpiration != null)
               Text(
                 'Date : ${DateFormat('dd/MM/yyyy').format(_dateExpiration!)}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _pickImages,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFFCCE00), // background color
+                backgroundColor: const Color(0xFFFCCE00), // background color
               ),
-              child: Text(
+              child: const Text(
                 'Importer des images du permis',
                 style: TextStyle(color: Colors.white), // text color
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             if (_images.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Images sélectionnées :',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
@@ -449,7 +448,7 @@ class _ParametreState extends State<Parametre> {
                   ),
                 ],
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Align(
               alignment: Alignment.center,
               child: ElevatedButton(
@@ -457,9 +456,9 @@ class _ParametreState extends State<Parametre> {
                   // Valider les données
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFCCE00), // background color
+                  backgroundColor: const Color(0xFFFCCE00), // background color
                 ),
-                child: Text(
+                child: const Text(
                   'Valider',
                   style: TextStyle(color: Colors.white), // text color
                 ),

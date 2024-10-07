@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Clientele extends StatelessWidget {
   // Sample customer service number (replace with actual number)
   final String customerServiceNumber = '+1234567890';
+
+  const Clientele({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +13,9 @@ class Clientele extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           children: [
-            Spacer(),
+            const Spacer(),
             RichText(
-              text: TextSpan(
+              text: const TextSpan(
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -30,9 +31,9 @@ class Clientele extends StatelessWidget {
             ),
           ],
         ),
-        backgroundColor: Color(0xFFFCCE00),
+        backgroundColor: const Color(0xFFFCCE00),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.black,
           onPressed: () => Navigator.pop(context),
         ),
@@ -41,10 +42,10 @@ class Clientele extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 15),
-            Center(
+            const SizedBox(height: 15),
+            const Center(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.0),
                 child: Text(
                   'Support',
                   style: TextStyle(
@@ -54,9 +55,9 @@ class Clientele extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
@@ -66,8 +67,8 @@ class Clientele extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  tileColor: Color(0xFFFCCE00),
-                  title: Row(
+                  tileColor: const Color(0xFFFCCE00),
+                  title: const Row(
                     children: [
                       Icon(
                         Icons.support_agent_rounded,
@@ -86,7 +87,7 @@ class Clientele extends StatelessWidget {
                     ],
                   ),
                   trailing: IconButton(
-                    icon: Icon(Icons.phone),
+                    icon: const Icon(Icons.phone),
                     onPressed: () => _makeCall(context, customerServiceNumber),
                     color: Colors.black,
                   ),
@@ -119,7 +120,7 @@ class Clientele extends StatelessWidget {
       // Print the reason if the redirection fails
       print('Échec de la redirection vers le numéro $phoneNumber');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Impossible de lancer l\'application téléphone.'),
         ),
       );

@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class TrafficChargeur extends StatefulWidget {
+  const TrafficChargeur({super.key});
+
   @override
   _TrafficChargeurState createState() => _TrafficChargeurState();
 }
@@ -31,9 +33,9 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
       appBar: AppBar(
         title: Row(
           children: [
-            Spacer(),
+            const Spacer(),
             RichText(
-              text: TextSpan(
+              text: const TextSpan(
                 style: TextStyle(
                   fontSize: 18.0,
                   fontWeight: FontWeight.bold,
@@ -49,9 +51,9 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
             ),
           ],
         ),
-        backgroundColor: Color(0xFFFCCE00),
+        backgroundColor: const Color(0xFFFCCE00),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () => Navigator.pop(context),
         ),
@@ -60,7 +62,7 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
         future: _futureTransactions,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
+            return const Center(
               child: SpinKitFadingCircle(
                 color: Color(0xFFFCCE00),
                 size: 50.0,
@@ -71,7 +73,7 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
               child: Text('Erreur: ${snapshot.error}'),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
+            return const Center(
               child: Text('Aucune transaction trouvée'),
             );
           }
@@ -112,7 +114,7 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
                       tileColor: Colors.white,
                       title: Text(
                         formatDate(transaction['created_at'] ?? ''),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -121,15 +123,15 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
                       ),
                       subtitle: Text(
                         transaction['description'] ?? 'N/A',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 16,
                           decoration: TextDecoration.none,
                         ),
                       ),
-                      leading:
-                          Icon(Icons.directions_car, color: Color(0xfffcce00)),
-                      trailing: Container(
+                      leading: const Icon(Icons.directions_car,
+                          color: Color(0xfffcce00)),
+                      trailing: SizedBox(
                         width: 100,
                         child: ElevatedButton(
                           onPressed: () {
@@ -144,17 +146,17 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
                             );
                           },
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              Color(0xfffcce00),
+                            backgroundColor: WidgetStateProperty.all<Color>(
+                              const Color(0xfffcce00),
                             ),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
+                            shape:
+                                WidgetStateProperty.all<RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24.0),
                               ),
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Détails',
                             style: TextStyle(
                               color: Colors.black,
@@ -177,7 +179,7 @@ class _TrafficChargeurState extends State<TrafficChargeur> {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: TrafficChargeur(),
   ));
 }

@@ -1,9 +1,7 @@
-import 'package:dio/dio.dart' as Dio;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:ifret/api/api_request.dart';
-import 'package:ifret/api/dio.dart';
 import 'package:ifret/composant/Chargeurs/accueilChargeur.dart';
 import 'package:ifret/composant/Chauffeurs/accueilChauffeur.dart';
 import 'package:ifret/composant/Transporteurs/accueilTransporteur.dart';
@@ -18,12 +16,12 @@ class Otp2 extends StatefulWidget {
       verificationCode; // Nouveau paramètre pour le code de vérification
   Map? data;
   Otp2({
-    Key? key,
+    super.key,
     required this.phoneNumber,
     required this.verificationId,
     required this.verificationCode, // Ajout du nouveau paramètre
     this.data,
-  }) : super(key: key);
+  });
 
   @override
   _Otp2State createState() => _Otp2State();
@@ -77,17 +75,17 @@ class _Otp2State extends State<Otp2> {
         alignment: Alignment.center,
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 18,
                   ),
                   Container(
                     width: 200,
                     height: 200,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
@@ -95,7 +93,7 @@ class _Otp2State extends State<Otp2> {
                       'assets/images/2.png',
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 24,
                   ),
                   const Text(
@@ -106,10 +104,10 @@ class _Otp2State extends State<Otp2> {
                       color: Colors.black,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
-                  Text(
+                  const Text(
                     "Veuillez entrer le code envoyé au numéro ** ** ** ** ",
                     style: TextStyle(
                       fontSize: 12,
@@ -119,7 +117,7 @@ class _Otp2State extends State<Otp2> {
                     textAlign: TextAlign.center,
                   ),
                   Container(
-                    padding: EdgeInsets.all(28),
+                    padding: const EdgeInsets.all(28),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -142,7 +140,7 @@ class _Otp2State extends State<Otp2> {
                             });
                           },
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 30,
                         ),
                         SizedBox(
@@ -166,9 +164,9 @@ class _Otp2State extends State<Otp2> {
                               }
                             },
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Color(0xFFFCCE00)),
-                              shape: MaterialStateProperty.all<
+                              backgroundColor: WidgetStateProperty.all<Color>(
+                                  const Color(0xFFFCCE00)),
+                              shape: WidgetStateProperty.all<
                                   RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(24.0),
@@ -192,11 +190,11 @@ class _Otp2State extends State<Otp2> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => Login(),
+                                    builder: (context) => const Login(),
                                   ),
                                 );
                               },
-                              child: Text(
+                              child: const Text(
                                 "Modifier le Numéro",
                                 style: TextStyle(
                                     color: Colors.red,
@@ -208,7 +206,7 @@ class _Otp2State extends State<Otp2> {
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 18,
                   ),
                 ],
@@ -221,13 +219,13 @@ class _Otp2State extends State<Otp2> {
   }
 
   Future<void> submitVerificationCode() async {
-    FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
     final cred = PhoneAuthProvider.credential(
         verificationId: widget.verificationId, smsCode: code);
     try {
       UserCredential userCredential =
-          await _firebaseAuth.signInWithCredential(cred);
+          await firebaseAuth.signInWithCredential(cred);
       if (userCredential.user != null) {
         print(
             "User login in ${userCredential.user!.displayName} ${userCredential.user!.phoneNumber}");
@@ -253,7 +251,7 @@ class _Otp2State extends State<Otp2> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Transporteurs(
+                      builder: (context) => const Transporteurs(
                         name: '',
                         profileUrl: '',
                         username: '',
@@ -267,7 +265,7 @@ class _Otp2State extends State<Otp2> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Chargeur(
+                      builder: (context) => const Chargeur(
                         name: '',
                         profileUrl: '',
                         username: '',
@@ -281,7 +279,7 @@ class _Otp2State extends State<Otp2> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Chauffeur(
+                      builder: (context) => const Chauffeur(
                         name: '',
                         ParametreeUrl: '',
                         username: '',
@@ -289,6 +287,7 @@ class _Otp2State extends State<Otp2> {
                     ),
                   )
                 };
+            break;
           default:
         }
       } else {

@@ -5,7 +5,8 @@ class ValidatedCamionsPage extends StatefulWidget {
   final List<dynamic> validatedCamions;
   final int fretId; // Ajout de l'ID du fret
 
-  ValidatedCamionsPage({required this.validatedCamions, required this.fretId});
+  const ValidatedCamionsPage(
+      {super.key, required this.validatedCamions, required this.fretId});
 
   @override
   _ValidatedCamionsPageState createState() => _ValidatedCamionsPageState();
@@ -18,6 +19,9 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
   List<dynamic>? chauffeurs;
   final TextEditingController _localisationController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _montantProposerController =
+      TextEditingController(); // Ajout du contrôleur pour montantProposer
+
   String? numeroTelTransporteur;
   List<dynamic> _filteredChauffeurs = [];
 
@@ -58,43 +62,51 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
   void dispose() {
     _localisationController.dispose();
     _searchController.dispose(); // Dispose of the search controller
+    _montantProposerController
+        .dispose(); // Dispose of montantProposer controller
     super.dispose();
   }
 
   Future<void> fetchCamionDetails(String matricule) async {
     try {
-      // Appel à votre API pour récupérer les détails du camion par son matricule
       dynamic camionDetails = await ApiRequest.getCamionDetails(matricule);
+
+      // Log des détails du camion récupérés
+      print('Camion Details: $camionDetails');
+
       setState(() {
         _selectedMatricule = camionDetails['matricule'];
         _selectedCamionId = camionDetails['id'].toString();
       });
     } catch (e) {
+      // Log de l'erreur de récupération des détails du camion
       print('Error fetching camion details: $e');
+      // Vous pouvez également afficher un message d'erreur à l'utilisateur ici
     }
   }
 
   void _soumissionner() async {
     try {
-      // Retrieve the transporter's phone number from SharedPreferences
+      // Récupérer le numéro de téléphone du transporteur depuis SharedPreferences
       String? numeroTelTransporteur = await ApiRequest.getUserNumeroTel();
       if (numeroTelTransporteur == null) {
         throw Exception('Numéro de téléphone du transporteur non disponible');
       }
 
-      // Check if all required fields are filled
+      // Vérifiez si tous les champs requis sont remplis
       if (_selectedCamionId == null ||
           _selectedChauffeur == null ||
-          _localisationController.text.isEmpty) {
+          _localisationController.text.isEmpty ||
+          _montantProposerController.text.isEmpty) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Erreur'),
-              content: Text('Veuillez remplir tous les champs.'),
+              title: const Text('Erreur'),
+              content: const Text('Veuillez remplir tous les champs.'),
               actions: <Widget>[
                 TextButton(
-                  child: Text('OK'),
+                  child: const Text('OK'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -103,28 +115,33 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
             );
           },
         );
-        return; // Exit method if required fields are missing
+        return; // Sortir de la méthode si des champs requis sont manquants
       }
 
-      // Ensure we have the selected chauffeur's phone number
+      // Assurez-vous d'avoir le numéro de téléphone du chauffeur sélectionné
       String numeroTelChauffeur =
-          _selectedChauffeur['numero_tel']; // Chauffeur's phone number
-
-      // Other data
+          _selectedChauffeur['numero_tel']; // Numéro de téléphone du chauffeur
+      String montantProposer =
+          _montantProposerController.text; // Récupérer montantProposer
       String localisation = _localisationController.text;
 
-      // Prepare data for submission
+      // Préparer les données pour la soumission
       Map<String, dynamic> data = {
         'localisation': localisation,
         'numero_tel_transport': numeroTelTransporteur,
         'vehicule_id': _selectedCamionId,
         'numero_tel_chauffeur': numeroTelChauffeur,
-        'demande_id': widget.fretId,
-        'statut_soumission': 'En attente',
+        'montant':
+            montantProposer, // Inclure montantProposer dans la soumission
+        'fret_id': widget.fretId, // Assurez-vous que c'est le bon champ
+        'statut': 'En attente',
         'statut_demande': '',
       };
 
-      // Call the APIRequest method for submission
+      print(
+          'Données soumises: $data'); // Log pour vérifier les données soumises
+
+      // Appel de la méthode APIRequest pour la soumission
       ApiRequest.soumissionner(data).then((response) {
         if (response != null && response.statusCode == 201) {
           print('Soumission réussie.');
@@ -132,11 +149,12 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Soumission réussie'),
-                content: Text('Les informations ont été soumises avec succès.'),
+                title: const Text('Soumission réussie'),
+                content: const Text(
+                    'Les informations ont été soumises avec succès.'),
                 actions: <Widget>[
                   TextButton(
-                    child: Text('OK'),
+                    child: const Text('OK'),
                     onPressed: () {
                       Navigator.of(context).pop();
                       Navigator.of(context).pushNamed(
@@ -148,7 +166,7 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
             },
           );
         } else {
-          // Show error message if submission fails
+          // Afficher un message d'erreur si la soumission échoue
           String errorMessage = response != null
               ? 'Erreur lors de la soumission : ${response.statusCode} - ${response.statusMessage}\nDétails: ${response.data}'
               : 'Aucune réponse reçue.';
@@ -158,11 +176,11 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Erreur'),
+                title: const Text('Erreur'),
                 content: Text(errorMessage),
                 actions: <Widget>[
                   TextButton(
-                    child: Text('OK'),
+                    child: const Text('OK'),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -173,18 +191,18 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
           );
         }
       }).catchError((error) {
-        // Handle any API request errors
+        // Gérer les erreurs de requête API
         print('Erreur lors de la soumission : $error');
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Erreur'),
-              content: Text(
+              title: const Text('Erreur'),
+              content: const Text(
                   'Erreur lors de la soumission. Veuillez réessayer plus tard.'),
               actions: <Widget>[
                 TextButton(
-                  child: Text('OK'),
+                  child: const Text('OK'),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -195,18 +213,18 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
         );
       });
     } catch (error) {
-      // Handle any general errors
+      // Gérer les erreurs générales
       print('Erreur lors de la soumission : $error');
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Erreur'),
-            content: Text(
+            title: const Text('Erreur'),
+            content: const Text(
                 'Erreur lors de la récupération des informations de l\'utilisateur. Veuillez réessayer plus tard.'),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -234,7 +252,7 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Soumission du Transporteur'),
+        title: const Text('Soumission du Transporteur'),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -242,7 +260,7 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Liste des Camions Disponibles',
                 style: TextStyle(
                   fontSize: 18,
@@ -250,7 +268,7 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
                   color: Color(0xFFFCCE00),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   DropdownButton<String>(
@@ -267,66 +285,20 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
                         fetchCamionDetails(selectedMatricule);
                       }
                     },
-                    hint: Text('Sélectionner un camion'),
+                    hint: const Text('Sélectionner un camion'),
                   ),
-                  SizedBox(width: 10),
-                  /*  ElevatedButton(
-                    onPressed: () {
-                      if (_selectedMatricule != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CamionDetailsPage(
-                              matricule: _selectedMatricule!,
-                            ),
-                          ),
-                        );
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('                      ...
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Erreur'),
-                              content: Text('Veuillez sélectionner un camion.'),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: Text('OK'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        Color(0xFFFCCE00),
-                      ),
-                    ),
-                    child: Text(
-                      'Voir Plus',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-           */
+                  const SizedBox(width: 10),
                 ],
               ),
               _selectedMatricule != null
                   ? Text(
                       'Camion sélectionné: $_selectedMatricule',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     )
                   : Container(),
-              SizedBox(height: 50),
-              Text(
+              const SizedBox(height: 50),
+              const Text(
                 'Liste des Chauffeurs Disponibles',
                 style: TextStyle(
                   fontSize: 18,
@@ -334,7 +306,7 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
                   color: Color(0xFFFCCE00),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -343,7 +315,7 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
                       onChanged: (value) {
                         _filterChauffeurs();
                       },
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText:
                             'Rechercher par nom, prénom ou numéro de téléphone',
@@ -351,24 +323,24 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () {
                       _filterChauffeurs();
                     },
                     style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        Color(0xFFFCCE00),
+                      backgroundColor: WidgetStateProperty.all<Color>(
+                        const Color(0xFFFCCE00),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Rechercher',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               _filteredChauffeurs.isNotEmpty
                   ? Row(
                       children: [
@@ -387,69 +359,27 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
                               _selectedChauffeur = selectedChauffeur;
                             });
                           },
-                          hint: Text('Sélectionner un chauffeur'),
+                          hint: const Text('Sélectionner un chauffeur'),
                         ),
-                        SizedBox(width: 10),
-                        /*  ElevatedButton(
-                          onPressed: () {
-                            if (_selectedChauffeur != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ChauffeurDetailsPage(
-                                    chauffeur: _selectedChauffeur!,
-                                  ),
-                                ),
-                              );
-                            } else {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Erreur'),
-                                    content: Text(
-                                        'Veuillez sélectionner un chauffeur.'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        child: Text('OK'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            }
-                          },
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                              Color(0xFFFCCE00),
-                            ),
-                          ),
-                          child: Text(
-                            'Détails',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ), */
+                        const SizedBox(width: 10),
                       ],
                     )
-                  : Center(
+                  : const Center(
                       child: Text(
                         'Aucun chauffeur trouvé',
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _selectedChauffeur != null
                   ? Text(
                       'Chauffeur sélectionné: ${_selectedChauffeur['nom']} ${_selectedChauffeur['prenom']} (${_selectedChauffeur['numero_tel']})',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     )
                   : Container(),
-              SizedBox(height: 50),
-              Text(
+              const SizedBox(height: 50),
+              const Text(
                 'Localisation',
                 style: TextStyle(
                   fontSize: 18,
@@ -457,29 +387,49 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
                   color: Color(0xFFFCCE00),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _localisationController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Entrez la localisation',
                   hintText: 'Localisation',
                 ),
               ),
-              SizedBox(height: 70),
+              const SizedBox(height: 20),
+              const Text(
+                'Montant Proposé',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFFCCE00),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller:
+                    _montantProposerController, // Champ pour le montant proposé
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Montant proposé',
+                  hintText: 'Entrez le montant proposé',
+                ),
+              ),
+              const SizedBox(height: 70),
               Center(
                 child: ElevatedButton(
                   onPressed: _soumissionner,
                   style: ButtonStyle(
                     backgroundColor:
-                        MaterialStateProperty.all<Color>(Color(0xFFFCCE00)),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        WidgetStateProperty.all<Color>(const Color(0xFFFCCE00)),
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                       RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24.0),
                       ),
                     ),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Valider',
                       style: TextStyle(
@@ -501,13 +451,13 @@ class _ValidatedCamionsPageState extends State<ValidatedCamionsPage> {
 class CamionDetailsPage extends StatelessWidget {
   final String matricule;
 
-  CamionDetailsPage({required this.matricule});
+  const CamionDetailsPage({super.key, required this.matricule});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Détails du Camion'),
+        title: const Text('Détails du Camion'),
       ),
       body: Center(
         child: Text('Détails pour le camion avec matricule: $matricule'),
@@ -519,13 +469,13 @@ class CamionDetailsPage extends StatelessWidget {
 class ChauffeurDetailsPage extends StatelessWidget {
   final dynamic chauffeur;
 
-  ChauffeurDetailsPage({required this.chauffeur});
+  const ChauffeurDetailsPage({super.key, required this.chauffeur});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Détails du Chauffeur'),
+        title: const Text('Détails du Chauffeur'),
       ),
       body: Center(
         child: Column(
@@ -533,9 +483,9 @@ class ChauffeurDetailsPage extends StatelessWidget {
           children: [
             Text(
               'Chauffeur: ${chauffeur['nom']} ${chauffeur['prenom']}',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text('Numéro de téléphone: ${chauffeur['numero_tel']}'),
           ],
         ),

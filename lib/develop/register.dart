@@ -7,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
 class Register extends StatefulWidget {
-  Register({Key? key}) : super(key: key);
+  const Register({super.key});
   static String verify = "";
   static String? resendToken;
 
@@ -17,11 +17,12 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   // Controllers pour les champs de texte
-  TextEditingController _nomController = TextEditingController();
-  TextEditingController _prenomController = TextEditingController();
-  TextEditingController _dateNaissanceController = TextEditingController();
-  TextEditingController _villeController = TextEditingController();
-  TextEditingController _telephoneController = TextEditingController();
+  final TextEditingController _nomController = TextEditingController();
+  final TextEditingController _prenomController = TextEditingController();
+  final TextEditingController _dateNaissanceController =
+      TextEditingController();
+  final TextEditingController _villeController = TextEditingController();
+  final TextEditingController _telephoneController = TextEditingController();
 
   late AuthService _authService;
 
@@ -50,7 +51,7 @@ class _RegisterState extends State<Register> {
 
   // Valeur et liste pour le champ de sélection
   String _selectedType = '';
-  List<String> _types = ['', 'Transporteur', 'Chauffeur', 'Chargeur'];
+  final List<String> _types = ['', 'Transporteur', 'Chauffeur', 'Chargeur'];
 
   // DateTime pour le champ de date
   DateTime? _selectedDate;
@@ -87,9 +88,9 @@ class _RegisterState extends State<Register> {
                       }
                       return null;
                     }),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     buildDivider(),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     // Champ de texte pour le prénom
                     buildTextField(_prenomController, 'Prénom', (value) {
                       if (value == null || value.isEmpty) {
@@ -97,13 +98,13 @@ class _RegisterState extends State<Register> {
                       }
                       return null;
                     }),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     buildDivider(),
                     // Champ de date
                     buildDateField(),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     buildDivider(),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     // Champ de texte pour la ville
                     buildTextField(_villeController, 'Ville de résidence',
                         (value) {
@@ -112,12 +113,12 @@ class _RegisterState extends State<Register> {
                       }
                       return null;
                     }),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     buildDivider(),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     // Champ de sélection (dropdown)
                     buildDropdownField(),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     buildDivider(),
                     Row(
                       children: [
@@ -157,7 +158,7 @@ class _RegisterState extends State<Register> {
                         )
                       ],
                     ),
-                    SizedBox(height: 10.0),
+                    const SizedBox(height: 10.0),
                     // Bouton pour la soumission du formulaire
                     ElevatedButton(
                       onPressed: () async {
@@ -195,11 +196,10 @@ class _RegisterState extends State<Register> {
                       },
                       style: ButtonStyle(
                         foregroundColor:
-                            MaterialStateProperty.all<Color>(Colors.white),
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Color(0xFFFCCE00)),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                            WidgetStateProperty.all<Color>(Colors.white),
+                        backgroundColor: WidgetStateProperty.all<Color>(
+                            const Color(0xFFFCCE00)),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24.0),
                           ),
@@ -219,8 +219,8 @@ class _RegisterState extends State<Register> {
             maxWidth: MediaQuery.of(context)
                 .size
                 .width), // Limite la largeur maximale du conteneur
-        color: Color(0xFF222222), // Couleur du fond du pied de page
-        padding: EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+        color: const Color(0xFF222222), // Couleur du fond du pied de page
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -228,20 +228,23 @@ class _RegisterState extends State<Register> {
               children: [
                 IconButton(
                   onPressed: () {},
-                  icon: FaIcon(FontAwesomeIcons.facebook, color: Colors.white),
+                  icon: const FaIcon(FontAwesomeIcons.facebook,
+                      color: Colors.white),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: FaIcon(FontAwesomeIcons.twitter, color: Colors.white),
+                  icon: const FaIcon(FontAwesomeIcons.twitter,
+                      color: Colors.white),
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: FaIcon(FontAwesomeIcons.instagram, color: Colors.white),
+                  icon: const FaIcon(FontAwesomeIcons.instagram,
+                      color: Colors.white),
                 ),
               ],
             ),
             // Informations à droite enveloppées dans un Expanded
-            Expanded(
+            const Expanded(
               child: Text(
                 'Suivez-nous sur les réseaux sociaux',
                 style: TextStyle(
@@ -276,16 +279,16 @@ class _RegisterState extends State<Register> {
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.white),
-        labelStyle: TextStyle(
+        hintStyle: const TextStyle(color: Colors.white),
+        labelStyle: const TextStyle(
             fontSize: 12, fontWeight: FontWeight.w300, color: Colors.white),
         border: InputBorder.none,
-        focusedBorder: OutlineInputBorder(
+        focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Color(0xFFFCCE00)),
         ),
-        contentPadding: EdgeInsets.all(10.0),
+        contentPadding: const EdgeInsets.all(10.0),
       ),
-      style: TextStyle(fontSize: 16, color: Colors.white),
+      style: const TextStyle(fontSize: 16, color: Colors.white),
       validator: validator,
     );
   }
@@ -293,7 +296,7 @@ class _RegisterState extends State<Register> {
   Widget buildDropdownField() {
     return DropdownButtonFormField(
       value: _selectedType,
-      style: TextStyle(fontSize: 12),
+      style: const TextStyle(fontSize: 12),
       items: _types.map((type) {
         return DropdownMenuItem(
           value: type,
@@ -341,13 +344,13 @@ class _RegisterState extends State<Register> {
             _selectedDate != null
                 ? Text(
                     DateFormat('dd/MM/yyyy').format(_selectedDate!),
-                    style: TextStyle(fontSize: 12, color: Colors.white),
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
                   )
-                : Text(
+                : const Text(
                     'Sélectionner une date',
                     style: TextStyle(color: Colors.white),
                   ),
-            Icon(
+            const Icon(
               Icons.calendar_today,
               color: Colors.white,
             ),
@@ -375,7 +378,7 @@ class _RegisterState extends State<Register> {
   }
 
   Widget buildDivider() {
-    return Divider(
+    return const Divider(
       color: Colors.white,
       height: 1.0,
     );
@@ -383,7 +386,7 @@ class _RegisterState extends State<Register> {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: Register(),
   ));
 }

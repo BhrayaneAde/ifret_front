@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'détailsChauffeur.dart';
 
 class TrafficChauffeur extends StatefulWidget {
+  const TrafficChauffeur({super.key});
+
   @override
   _TrafficChauffeurState createState() => _TrafficChauffeurState();
 }
@@ -28,11 +30,11 @@ class _TrafficChauffeurState extends State<TrafficChauffeur> {
 
     try {
       // Supposons que vous récupérez l'ID du voyage d'une source dynamique
-      int voyageId =
+      int fretId =
           await _getVoyageId(); // Appel à une fonction pour récupérer l'ID du voyage
 
       Map<String, dynamic> fetchedVoyage =
-          await ApiRequest.fetchVoyageDetails(voyageId);
+          await ApiRequest.fetchVoyageDetails(fretId);
 
       setState(() {
         voyage = fetchedVoyage;
@@ -47,11 +49,12 @@ class _TrafficChauffeurState extends State<TrafficChauffeur> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Erreur'),
-          content: Text('Erreur lors du chargement des détails du voyage.'),
+          title: const Text('Erreur'),
+          content:
+              const Text('Erreur lors du chargement des détails du voyage.'),
           actions: <Widget>[
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -79,21 +82,21 @@ class _TrafficChauffeurState extends State<TrafficChauffeur> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Historique Parcours Chauffeurs',
           style: TextStyle(color: Colors.black),
         ),
-        backgroundColor: Color(0xFFFCCE00),
+        backgroundColor: const Color(0xFFFCCE00),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : voyage.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text('Aucun voyage disponible'),
                 )
               : Padding(
@@ -106,7 +109,7 @@ class _TrafficChauffeurState extends State<TrafficChauffeur> {
                       onTap: () async {
                         int chauffeurId = voyage['chauffeur']
                             ['id']; // Récupérer l'ID du chauffeur
-                        int voyageId = voyage['id']; // Récupérer l'ID du voyage
+                        int fretId = voyage['id']; // Récupérer l'ID du voyage
 
                         // Utiliser Navigator pour aller à DetailChauffeur avec l'ID
                         await Navigator.push(
@@ -114,8 +117,8 @@ class _TrafficChauffeurState extends State<TrafficChauffeur> {
                           MaterialPageRoute(
                             builder: (context) => DetailChauffeur(
                               chauffeurId: chauffeurId,
-                              voyageId:
-                                  voyageId, // Passer voyageId à DetailChauffeur
+                              fretId:
+                                  fretId, // Passer voyageId à DetailChauffeur
                             ),
                           ),
                         );
@@ -128,7 +131,7 @@ class _TrafficChauffeurState extends State<TrafficChauffeur> {
                       tileColor: Colors.white,
                       title: Text(
                         formatDateTime(voyage['date_creation']),
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -137,21 +140,21 @@ class _TrafficChauffeurState extends State<TrafficChauffeur> {
                       ),
                       subtitle: Text(
                         voyage['vehicule_matricule'] ?? 'N/A',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 16,
                           decoration: TextDecoration.none,
                         ),
                       ),
-                      leading:
-                          Icon(Icons.directions_car, color: Color(0xFFFCCE00)),
-                      trailing: Container(
+                      leading: const Icon(Icons.directions_car,
+                          color: Color(0xFFFCCE00)),
+                      trailing: SizedBox(
                         width: 100,
                         child: ElevatedButton(
                           onPressed: () async {
                             int chauffeurId = voyage['chauffeur']
                                 ['id']; // Récupérer l'ID du chauffeur
-                            int voyageId =
+                            int fretId =
                                 voyage['id']; // Récupérer l'ID du voyage
 
                             // Utiliser Navigator pour aller à DetailChauffeur avec l'ID
@@ -160,8 +163,8 @@ class _TrafficChauffeurState extends State<TrafficChauffeur> {
                               MaterialPageRoute(
                                 builder: (context) => DetailChauffeur(
                                   chauffeurId: chauffeurId,
-                                  voyageId:
-                                      voyageId, // Passer voyageId à DetailChauffeur
+                                  fretId:
+                                      fretId, // Passer voyageId à DetailChauffeur
                                 ),
                               ),
                             );
@@ -169,16 +172,16 @@ class _TrafficChauffeurState extends State<TrafficChauffeur> {
                             loadVoyageDetails();
                           },
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                Color(0xFFFCCE00)),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
+                            backgroundColor: WidgetStateProperty.all<Color>(
+                                const Color(0xFFFCCE00)),
+                            shape:
+                                WidgetStateProperty.all<RoundedRectangleBorder>(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24.0),
                               ),
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Détails',
                             style: TextStyle(
                               color: Colors.black,
