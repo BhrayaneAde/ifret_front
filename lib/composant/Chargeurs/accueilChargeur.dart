@@ -1,23 +1,17 @@
-import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-
+import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
+import 'package:google_places_flutter/model/prediction.dart';
+import 'package:ifret/composant/Chargeurs/maps.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:ifret/api/api_request.dart';
-
-import 'dart:convert';
-
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:http/http.dart' as http;
-
 import 'package:ifret/composant/Chargeurs/paiement.dart';
 import 'package:ifret/composant/Chargeurs/profilChargeur.dart';
-
 import 'package:dio/dio.dart' as Dio;
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Chargeur extends StatefulWidget {
   final String name;
@@ -36,10 +30,7 @@ class Chargeur extends StatefulWidget {
 }
 
 class _ChargeurState extends State<Chargeur> {
-  final List<Message> _messages = [];
-  final TextEditingController _messageController = TextEditingController();
   int _currentIndex = 0;
-  String? _currentUserNumeroTel;
 
   @override
   void initState() {
@@ -124,14 +115,6 @@ class Message {
   final DateTime createdAt;
 
   Message({required this.text, required this.createdAt, required this.type});
-
-  factory Message.fromJson(Map<String, dynamic> json) {
-    return Message(
-      text: json['message'],
-      createdAt: DateTime.parse(json['created_at']),
-      type: json['type'],
-    );
-  }
 }
 
 class FretFormScreen extends StatefulWidget {
@@ -150,86 +133,6 @@ class _FretFormScreenState extends State<FretFormScreen> {
   String _infoComplementaires = '';
   String _typeCamion = '';
   String _typeMarchandise = '';
-
-  final List<String> _cities = [
-    'Abomey',
-    'Abomey-Calavi',
-    'Adja-Ouèrè',
-    'Adjarra',
-    'Adjohoun',
-    'Agbangnizoun',
-    'Aguégués',
-    'Allada',
-    'Aplahoué',
-    'Athiémé',
-    'Avrankou',
-    'Banikoara',
-    'Bantè',
-    'Bassila',
-    'Bembèrèkè',
-    'Bohicon',
-    'Bonou',
-    'Bopa',
-    'Boukombé',
-    'Cobly',
-    'Comè',
-    'Copargo',
-    'Cotonou',
-    'Covè',
-    'Dangbo',
-    'Dassa-Zoumè',
-    'Djakotomey',
-    'Djidja',
-    'Djougou',
-    'Dogbo',
-    'Glazoué',
-    'Gogounou',
-    'Grand-Popo',
-    'Houéyogbé',
-    'Ifangni',
-    'Kalalé',
-    'Kandi',
-    'Karimama',
-    'Kérou',
-    'Kétou',
-    'Klouékanmè',
-    'Kouandé',
-    'Kpomassè',
-    'Lalo',
-    'Lokossa',
-    'Malanville',
-    'Matéri',
-    'Missérété',
-    'N’dali',
-    'Natitingou',
-    'Nikki',
-    'Ouaké',
-    'Ouèssè',
-    'Ouidah',
-    'Ouinhi',
-    'Parakou',
-    'Pehunco',
-    'Pèrèrè',
-    'Pobè',
-    'Porto-Novo',
-    'Sakété',
-    'Savalou',
-    'Savè',
-    'Ségbana',
-    'Sèmè-Podji',
-    'Sinendé',
-    'Sô-Ava',
-    'Tanguiéta',
-    'Tchaourou',
-    'Toffo',
-    'Tori-Bossito',
-    'Toucountouna',
-    'Toviklin',
-    'Zagnanado',
-    'Za-Kpota',
-    'Zè',
-    'Zogbodomey',
-  ];
 
   final List<String> _typeCamionOptions = [
     'Ampliroll',
@@ -490,30 +393,72 @@ class _FretFormScreenState extends State<FretFormScreen> {
                       value!.isEmpty ? 'Veuillez entrer une description' : null,
                 ),
                 const SizedBox(height: 20),
-                _buildDropdown(
-                  label: 'Lieu de Départ',
-                  items: _cities,
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() => _lieuDepart = value);
-                    }
+                // Lieu de départ
+                TextFormField(
+                  readOnly: true, // Empêche la saisie manuelle
+                  decoration: InputDecoration(
+                    labelText: 'Lieu de Départ',
+                    suffixIcon: Icon(Icons.location_on),
+                  ),
+                  onTap: () async {
+                    // Redirection vers la page de sélection du lieu
+                    final selectedLocation =
+                        await Navigator.push<MapSelectPosition>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MapSelectPosition(
+                          onLocationSelected:
+                              (String fullLocation, LatLng location) {
+                            // Mettre à jour le lieu de départ avec la chaîne concaténée
+                            setState(() {
+                              _lieuDepart =
+                                  fullLocation; // Utilisez le nom du lieu et les coordonnées
+                            });
+                          },
+                        ),
+                      ),
+                    );
                   },
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Veuillez sélectionner un lieu de départ'
-                      : null,
+                  controller: TextEditingController(
+                      text: _lieuDepart), // Affiche le lieu sélectionné
                 ),
+
                 const SizedBox(height: 20),
-                _buildDropdown(
-                  label: 'Lieu d\'Arrivée',
-                  items: _cities,
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() => _lieuArrive = value);
+                // Lieu de d'arrivé
+                TextFormField(
+                  readOnly: true, // Empêche la saisie manuelle
+                  decoration: InputDecoration(
+                    labelText: 'Lieu d\'Arrivée',
+                    suffixIcon: Icon(Icons.location_on),
+                  ),
+                  onTap: () async {
+                    // Redirection vers la page de sélection du lieu
+                    LatLng? selectedLocation = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MapSelectPosition(
+                          onLocationSelected:
+                              (String fullLocation, LatLng location) {
+                            // Mettre à jour le lieu de départ avec la chaîne concaténée
+                            setState(() {
+                              _lieuArrive =
+                                  fullLocation; // Utilisez le nom du lieu et les coordonnées
+                            });
+                          },
+                        ),
+                      ),
+                    );
+
+                    // Si une location est sélectionnée, mettez à jour le lieu de départ
+                    if (selectedLocation != null) {
+                      setState(() {
+                        _lieuArrive =
+                            'Lieu: ${selectedLocation.latitude}, ${selectedLocation.longitude}';
+                      });
                     }
                   },
-                  validator: (value) => value == null || value.isEmpty
-                      ? 'Veuillez sélectionner un lieu d\'arrivée'
-                      : null,
+                  controller: TextEditingController(
+                      text: _lieuArrive), // Affiche le lieu sélectionné
                 ),
                 const SizedBox(height: 20),
                 _buildTextField(
@@ -981,7 +926,7 @@ class _PaiementState extends State<Paiement> {
 }
 
 const kGoogleApiKey =
-    "AIzaSyB1ytAgVmhTWQUdOI73b2C9N-xTqvUn0lk"; // Remplacez par votre clé API Google
+    "AIzaSyA26h7EKkKUUYcy-PvyFDS_Zc2DJmsWVVw"; // Remplacez par votre clé API Google
 
 void main() {
   runApp(MyApp());
@@ -1007,121 +952,80 @@ class MapsHomePage extends StatefulWidget {
 
 class _MapsHomePageState extends State<MapsHomePage> {
   GoogleMapController? mapController;
-  LatLng? startLocation;
-  LatLng? endLocation;
+  TextEditingController _searchController = TextEditingController();
+  final places = GoogleMapsPlaces(apiKey: kGoogleApiKey); // Google Places API
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sélectionner un lieu de départ et d\'arrivée'),
+        title: const Text('Carte Google Maps'),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          ElevatedButton(
-            onPressed: () async {
-              // Ouvrir un TextField pour que l'utilisateur entre un lieu de départ
-              await _showPlaceSearchDialog(context, "Départ");
+          // Carte Google Maps
+          GoogleMap(
+            onMapCreated: (controller) {
+              mapController = controller;
             },
-            child: const Text("Choisir le lieu de départ"),
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(6.3702928, 2.3912365), // Coordonnées de Cotonou
+              zoom: 12,
+            ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
           ),
-          ElevatedButton(
-            onPressed: () async {
-              // Ouvrir un TextField pour que l'utilisateur entre un lieu d'arrivée
-              await _showPlaceSearchDialog(context, "Arrivée");
-            },
-            child: const Text("Choisir le lieu d'arrivée"),
-          ),
-          Expanded(
-            child: GoogleMap(
-              onMapCreated: (controller) {
-                mapController = controller;
-              },
-              initialCameraPosition: const CameraPosition(
-                target: LatLng(48.8588443,
-                    2.2943506), // Coordonnées de Paris (Tour Eiffel)
-                zoom: 12,
-              ),
-              markers: _createMarkers(),
+
+          // Barre de recherche pour les adresses
+          Positioned(
+            top: 20,
+            left: 10,
+            right: 10,
+            child: Row(
+              children: [
+                Expanded(
+                  child: GooglePlaceAutoCompleteTextField(
+                    textEditingController: _searchController,
+                    googleAPIKey: kGoogleApiKey,
+                    countries: ["bj"], // Limiter la recherche au Bénin
+                    boxDecoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    inputDecoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Rechercher votre adresse",
+                      hintStyle: GoogleFonts.inter(
+                        color: Colors.black54,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 20),
+                    ),
+                    containerHorizontalPadding: 10,
+                    itemClick: (prediction) async {
+                      // Effacer le texte de recherche
+                      _searchController.clear();
+
+                      // Obtenir les détails du lieu sélectionné
+                      PlacesDetailsResponse detail =
+                          await places.getDetailsByPlaceId(prediction.placeId!);
+                      final lat = detail.result.geometry!.location.lat;
+                      final lng = detail.result.geometry!.location.lng;
+
+                      // Rediriger la carte vers le lieu sélectionné
+                      mapController?.animateCamera(
+                        CameraUpdate.newLatLng(
+                          LatLng(lat, lng),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
-  }
-
-  Set<Marker> _createMarkers() {
-    Set<Marker> markers = {};
-    if (startLocation != null) {
-      markers.add(Marker(
-        markerId: const MarkerId("start"),
-        position: startLocation!,
-        infoWindow: const InfoWindow(title: "Lieu de départ"),
-      ));
-    }
-    if (endLocation != null) {
-      markers.add(Marker(
-        markerId: const MarkerId("end"),
-        position: endLocation!,
-        infoWindow: const InfoWindow(title: "Lieu d'arrivée"),
-      ));
-    }
-    return markers;
-  }
-
-  Future<void> _showPlaceSearchDialog(
-      BuildContext context, String locationType) async {
-    TextEditingController searchController = TextEditingController();
-
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Rechercher un lieu ($locationType)"),
-        content: TextField(
-          controller: searchController,
-          decoration: const InputDecoration(hintText: "Entrez un lieu"),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              String query = searchController.text;
-              if (query.isNotEmpty) {
-                await _searchLocation(query, locationType);
-              }
-            },
-            child: const Text("Rechercher"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Rechercher un lieu via une requête HTTP à l'API Google Places
-  Future<void> _searchLocation(String query, String locationType) async {
-    final String url =
-        'https://maps.googleapis.com/maps/api/place/textsearch/json?query=$query&key=$kGoogleApiKey';
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data['results'] != null && data['results'].isNotEmpty) {
-        final lat = data['results'][0]['geometry']['location']['lat'];
-        final lng = data['results'][0]['geometry']['location']['lng'];
-
-        setState(() {
-          if (locationType == "Départ") {
-            startLocation = LatLng(lat, lng);
-          } else {
-            endLocation = LatLng(lat, lng);
-          }
-        });
-
-        // Recentrer la carte sur la nouvelle position
-        mapController?.animateCamera(CameraUpdate.newLatLng(LatLng(lat, lng)));
-      }
-    } else {
-      throw Exception("Impossible de récupérer les détails du lieu.");
-    }
   }
 }

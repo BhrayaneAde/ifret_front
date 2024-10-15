@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:ifret/api/api_request.dart';
 import 'package:ifret/composant/Transporteurs/EnregistrerCamionModif.dart';
 import 'package:ifret/composant/Transporteurs/FretDetailsPage.dart';
@@ -934,17 +938,101 @@ class _CatalogueState extends State<Catalogue> {
   }
 }
 
+const kGoogleApiKey =
+    "AIzaSyA26h7EKkKUUYcy-PvyFDS_Zc2DJmsWVVw"; // Remplacez par votre clé API Google
+
 class Tracking extends StatelessWidget {
   const Tracking({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return const MapsHomePage(); // Remplacer par la carte Google Maps
+  }
+}
+
+class MapsHomePage extends StatefulWidget {
+  const MapsHomePage({super.key});
+
+  @override
+  _MapsHomePageState createState() => _MapsHomePageState();
+}
+
+class _MapsHomePageState extends State<MapsHomePage> {
+  GoogleMapController? mapController;
+  TextEditingController _searchController = TextEditingController();
+  final GoogleMapsPlaces places =
+      GoogleMapsPlaces(apiKey: kGoogleApiKey); // Google Places API
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tracking'),
+        title: const Text('Carte Google Maps'),
       ),
-      body: const Center(
-        child: Text('Contenu de Tracking'),
+      body: Stack(
+        children: [
+          // Carte Google Maps
+          GoogleMap(
+            onMapCreated: (controller) {
+              mapController = controller;
+            },
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(6.3702928, 2.3912365), // Coordonnées de Cotonou
+              zoom: 12,
+            ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+          ),
+
+          // Barre de recherche pour les adresses
+          Positioned(
+            top: 20,
+            left: 10,
+            right: 10,
+            child: Row(
+              children: [
+                Expanded(
+                  child: GooglePlaceAutoCompleteTextField(
+                    textEditingController: _searchController,
+                    googleAPIKey: kGoogleApiKey,
+                    countries: ["bj"], // Limiter la recherche au Bénin
+                    boxDecoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    inputDecoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Rechercher votre adresse à Cotonou",
+                      hintStyle: GoogleFonts.inter(
+                        color: Colors.black54,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 20),
+                    ),
+                    containerHorizontalPadding: 10,
+                    itemClick: (prediction) async {
+                      // Effacer le texte de recherche
+                      _searchController.clear();
+
+                      // Obtenir les détails du lieu sélectionné
+                      PlacesDetailsResponse detail =
+                          await places.getDetailsByPlaceId(prediction.placeId!);
+                      final lat = detail.result.geometry!.location.lat;
+                      final lng = detail.result.geometry!.location.lng;
+
+                      // Rediriger la carte vers le lieu sélectionné
+                      mapController?.animateCamera(
+                        CameraUpdate.newLatLng(
+                          LatLng(lat, lng),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
